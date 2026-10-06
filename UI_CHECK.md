@@ -28,3 +28,5 @@ Current opening uses an actual original 3D background image, not just charcoal f
 ## Animated call preview
 
 In desktop Chrome, refresh the website and scroll down to the call preview. The call window appears, audio bars move, and a floating card shows a prewritten example. Try Pause and Replay. No microphone or Meet audio is captured. Reduced motion shows the final example without automatic motion. Narrow layout is readable without horizontal overflow. This preview does not validate actual listening or AI response speed.
+
+Production verification: npm run deploy published commit 28a62ca. Actual Chrome checks against the live URL passed animation phases, pause/replay, reduced motion, narrow answer-card containment and invitation navigation, plus source import/inspection/deletion and disabled paid-answer controls. No microphone capture, AI requests or page errors.

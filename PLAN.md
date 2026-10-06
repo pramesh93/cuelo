@@ -144,3 +144,5 @@ UI review revision: user rejected the lavender wash, then approved a charcoal op
 ### UI publication — authorised by user
 
 Replaced rejected call illustration with an original staged animated call preview inspired by Cluely; explicit illustrative/prewritten labels, pause/replay and reduced-motion support. Desktop/narrow Chrome passed animation states, navigation, no microphone capture and no page errors; 55 tests pass. User explicitly requested shipping this UI. Publish to existing GitHub/Convex destinations, then verify production. Google sign-in, opening voice, avatar demo and secure live Meet listening remain unfinished; performance work stays parked.
+
+UI publication complete: commit 28a62ca pushed; npm run deploy succeeded. Production Chrome checked the animated preview and existing guest source/answer-mode flow, without paid requests. Remaining v1 integrations stay pending as above.
