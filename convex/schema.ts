@@ -21,6 +21,8 @@ export default defineSchema({
     purpose: v.union(v.literal("opening"), v.literal("practice"), v.literal("live")),
     amountPaise: v.number(),
   }).index("by_key", ["key"]),
+  answerVisits: defineTable({ownerKey:v.string(),successful:v.number(),activeKey:v.union(v.string(),v.null()),activeUntil:v.number(),expiresAt:v.number()}).index("by_owner",["ownerKey"]).index("by_expiry",["expiresAt"]),
+  answerRequests: defineTable({key:v.string(),ownerKey:v.string(),cancelled:v.boolean(),expiresAt:v.number()}).index("by_key",["key"]).index("by_expiry",["expiresAt"]),
   evaluationUsage: defineTable({ scope: v.literal("milestone1"), count: v.number(), reservedUsd: v.number() }).index("by_scope", ["scope"]),
   speechUsage: defineTable({scope: v.literal("mic-evaluation"), count: v.number(), reservedUsd: v.number(), activeLease: v.union(v.string(), v.null()), activeUntil: v.number()}).index("by_scope", ["scope"]),
   preparedSources:defineTable({secret:v.string(),expiresAt:v.number(),source:v.union(sourceValue,v.null())}).index("by_expiry",["expiresAt"]),

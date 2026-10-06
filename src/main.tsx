@@ -4,6 +4,7 @@ import {ConvexHttpClient} from "convex/browser";
 import {ConvexReactClient} from "convex/react";
 import {ConvexAuthProvider} from "@convex-dev/auth/react";
 import {Account} from "./Account";
+import {AnswerCheck} from "./AnswerCheck";
 import {SourcesPage} from "./SourceManager";
 import {api} from "../convex/_generated/api";
 import type {FunctionReturnType} from "convex/server";
@@ -85,6 +86,7 @@ function App() {
 const view = new URLSearchParams(location.search).get("view");
 const accountView = view === "account";
 const sourcesView = view === "sources";
+const answersView = view === "answers";
 const CaptureCheck = import.meta.env.DEV ? React.lazy(() => import("./CaptureCheck")) : null;
 const captureCheckView = import.meta.env.DEV && view === "capture-check";
-createRoot(document.getElementById("root")!).render(url ? <React.StrictMode>{captureCheckView && CaptureCheck ? <Suspense fallback={<main><p role="status">Opening capture check…</p></main>}><CaptureCheck/></Suspense> : sourcesView ? <ConvexAuthProvider client={accountClient!}><SourcesPage/></ConvexAuthProvider> : accountView ? <ConvexAuthProvider client={accountClient!}><Account/></ConvexAuthProvider> : <App/>}</React.StrictMode> : <main><h1>Connect the development backend</h1><p>Set CONVEX_URL in .env.local, then restart the app.</p></main>);
+createRoot(document.getElementById("root")!).render(url ? <React.StrictMode>{captureCheckView && CaptureCheck ? <Suspense fallback={<main><p role="status">Opening capture check…</p></main>}><CaptureCheck/></Suspense> : answersView ? <ConvexAuthProvider client={accountClient!}><AnswerCheck/></ConvexAuthProvider> : sourcesView ? <ConvexAuthProvider client={accountClient!}><SourcesPage/></ConvexAuthProvider> : accountView ? <ConvexAuthProvider client={accountClient!}><Account/></ConvexAuthProvider> : <App/>}</React.StrictMode> : <main><h1>Connect the development backend</h1><p>Set CONVEX_URL in .env.local, then restart the app.</p></main>);

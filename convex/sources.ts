@@ -55,3 +55,10 @@ export const cleanup=internalMutation({args:{},returns:v.null(),handler:async ct
  const expired=await ctx.db.query('sources').withIndex('by_expiry',q=>q.gt('expiresAt',null).lte('expiresAt',Date.now())).take(5);
  for(const row of expired)await erase(ctx,row);return null;
 }});
+
+// Internal answer reads enforce the same ownership/current-source/expiry checks.
+export const answerSource=internalQuery({args:{...sourceScopeArgs,id:v.id('sources')},returns:v.object({meta:sourceMetaValue,passages:v.array(passageValue)}),handler:async(ctx,args)=>{
+ const row=active(await current(ctx,await ownerKey(ctx,args.guestSecret)));if(!row||row._id!==args.id)throw new ConvexError('This source was deleted, replaced or expired. Add or confirm it again.');
+ const rows=await ctx.db.query('sourcePassages').withIndex('by_source',q=>q.eq('sourceId',row._id)).take(501);
+ return {meta:meta(row),passages:rows.map(p=>({ordinal:p.ordinal,reference:p.reference,text:p.text}))};
+}});

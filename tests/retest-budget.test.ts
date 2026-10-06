@@ -32,3 +32,9 @@ test("authorised retest adds exactly four answers without resetting usage or inc
     names.forEach((name,i)=>{if(previous[i]===undefined) delete process.env[name];else process.env[name]=previous[i];});
   }
 });
+
+test('completion check permits exactly one additional answer and preserves the existing count',async()=>{
+ const names=['EVALUATION_ATTEMPT_LIMIT','EVALUATION_TESTING_ENABLED','OPENAI_API_KEY'];const previous=names.map(name=>process.env[name]);const usage={count:10,reservedUsd:1.6};
+ const ctx={db:{query:()=>({withIndex:()=>({take:async()=>[usage]})}),patch:async(_id:unknown,values:Record<string,unknown>)=>Object.assign(usage,values)}} as unknown as Parameters<typeof reserveAnswer._handler>[0];
+ try{process.env.EVALUATION_ATTEMPT_LIMIT='11';process.env.EVALUATION_TESTING_ENABLED='true';process.env.OPENAI_API_KEY='fake-test-key';assert.equal(answerAttemptLimit(),11);assert.equal(await reserveAnswer._handler(ctx,{}),true);assert.equal(usage.count,11);assert.equal(await reserveAnswer._handler(ctx,{}),false);}finally{names.forEach((name,i)=>{if(previous[i]===undefined)delete process.env[name];else process.env[name]=previous[i];});}
+});

@@ -5,13 +5,13 @@ import {api} from '../convex/_generated/api';
 import type {FunctionReturnType} from 'convex/server';
 
 type Meta=NonNullable<FunctionReturnType<typeof api.sources.get>>;
-function guestSecret() {
+export function getSourceVisitSecret() {
  const key='cuelo-temporary-source';let value=sessionStorage.getItem(key);
  if(!value||!/^[a-f0-9]{64}$/.test(value)){value=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');sessionStorage.setItem(key,value);}return value;
 }
-export function SourceManager({savedOnly=false,onConfirmed}:{savedOnly?:boolean;onConfirmed?:(source:Meta)=>void}) {
+export function SourceManager({savedOnly=false,onConfirmed,onSourceChanged}:{savedOnly?:boolean;onConfirmed?:(source:Meta,scope:{guestSecret?:string})=>void;onSourceChanged?:(source:Meta|null,scope:{guestSecret?:string})=>void}) {
  const {isAuthenticated}=useConvexAuth();
- const [secret]=useState(guestSecret);
+ const [secret]=useState(getSourceVisitSecret);
  const [kept,setKept]=useState(false),[preferGuest,setPreferGuest]=useState(false);
  const saved=useQuery(api.sources.get,isAuthenticated?{}:'skip');
  const temporary=useQuery(api.sources.get,{guestSecret:secret});
@@ -28,6 +28,7 @@ export function SourceManager({savedOnly=false,onConfirmed}:{savedOnly?:boolean;
  const passages=useQuery(api.sources.passages,inspect&&source?{...scope,id:source.id}:'skip');
  useEffect(()=>{setInspect(false);},[source?.id]);
  useEffect(()=>{const expiresAt=storedSource?.expiresAt;if(expiresAt!==null&&expiresAt!==undefined){const timer=setTimeout(()=>{setNow(Date.now());setInspect(false);},Math.max(0,expiresAt-Date.now()));return()=>clearTimeout(timer);}},[storedSource?.id,storedSource?.expiresAt]);
+ useEffect(()=>{if(storedSource!==undefined)onSourceChanged?.(source??null,scope);},[source?.id,source?.expiresAt,useGuest,secret,onSourceChanged,storedSource===undefined]);
  function fail(error:unknown){setError(error instanceof ConvexError&&typeof error.data==='string'?error.data:error instanceof Error?error.message:'Your source could not be saved. Check your connection and try again.');}
  async function submit(event:React.FormEvent){event.preventDefault();setBusy(true);setError('');setMessage('');
  try {const args={...scope,expectedId:source?.id??null};
@@ -48,7 +49,7 @@ export function SourceManager({savedOnly=false,onConfirmed}:{savedOnly?:boolean;
  <div className="source-actions"><button type="button" className="text-button" disabled={busy} onClick={()=>setInspect(!inspect)}>{inspect?'Hide readable text':'Inspect readable text'}</button><button type="button" className="text-button" disabled={busy} onClick={()=>{setEditing(true);setError('');}}>Replace source</button><button type="button" className="text-button" disabled={busy} onClick={deleteSource}>Delete source</button></div>
  {inspect&&<div className="source-preview">{passages===undefined?<p role="status">Loading readable text…</p>:passages.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><p>{p.text}</p></div>)}</div>}
  {!source.saved&&(isAuthenticated?<button type="button" className="cancel-button" disabled={busy} onClick={saveSource}>{saved&&saved.id!==source.id?'Keep this source and replace saved source':'Keep this source'}</button>:<p className="supporting"><a href="/?view=account">Sign in with Google</a> to choose whether to keep this source.</p>)}
- {onConfirmed&&<button type="button" className="primary" disabled={busy} onClick={()=>onConfirmed(source)}>Use this source</button>}
+ {onConfirmed&&<button type="button" className="primary" disabled={busy} onClick={()=>onConfirmed(source,scope)}>Use this source</button>}
  </div>}
  {(!source||editing)&&<form onSubmit={submit}>
  <fieldset className="source-methods"><legend>How will you add your source?</legend>{([['text','Paste text'],['file','Upload file'],['webpage','Public webpage']] as const).map(([value,label])=><label key={value}><input type="radio" name="source-method" checked={method===value} disabled={busy} onChange={()=>{setMethod(value);setError('');}}/>{label}</label>)}</fieldset>
@@ -60,4 +61,4 @@ export function SourceManager({savedOnly=false,onConfirmed}:{savedOnly?:boolean;
  {message&&<p role="status">{message}</p>}{error&&<p className="error" role="alert">{error}</p>}
  </section>;
 }
-export function SourcesPage(){return <><header><a className="wordmark brand-link" href="/">Cuelo</a><a href="/">Back to Cuelo</a></header><main className="account-page"><h1>Answers start with your source.</h1><p className="intro">Add a source and check its readable text. This step does not connect a call or generate answers.</p><SourceManager/><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}
+export function SourcesPage(){return <><header><a className="wordmark brand-link" href="/">Cuelo</a><a href="/">Back to Cuelo</a></header><main className="account-page"><h1>Answers start with your source.</h1><p className="intro">Add a source and check its readable text. This step does not connect a call or generate answers.</p><SourceManager/><p><a href="/?view=answers">Try answers with your selected source</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}

@@ -90,3 +90,12 @@ nav {display:flex;align-items:center;gap:28px}
 .source-preview p { white-space: pre-wrap; overflow-wrap: anywhere; }
 .source-manager input[type=file] { max-width: 100%; }
 .source-manager .primary { justify-self: start; }
+
+.selected-question { display: grid; gap: 12px; margin: 32px 0 16px; max-width: 64ch; }
+.selected-question .primary { justify-self: start; }
+.selected-answer-card { margin-top: 32px; min-height: 0; max-width: 64ch; }
+.selected-answer-card summary { cursor: pointer; min-height: 44px; display: flex; align-items: center; color: #5C429F; text-decoration: underline; text-underline-offset: 4px; }
+.selected-answer-card summary:focus-visible { outline: 3px solid #7357C8; outline-offset: 4px; }
+.selected-answer-card .provenance { font-size: 14px; font-weight: 700; color: #25232B; margin: 12px 0; }
+.selected-answer-card li + li { margin-top: 8px; }
+.selected-answer-card blockquote { overflow-wrap: anywhere; }
