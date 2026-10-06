@@ -21,6 +21,18 @@ button {font:inherit;cursor:pointer;min-height:44px}
 .primary {border:0;background:var(--accent);color:white;border-radius:12px;padding:12px 24px;font-weight:600;margin-top:20px;width:100%}
 .primary:hover {background:#6045B1}
 .primary:disabled {background:#E4DFEA;color:#64606C;cursor:default}
+.speech-input {margin-bottom:28px}
+.speech-controls {display:flex;gap:12px}
+.speech-button {flex:1;background:var(--accent);color:#fff;border:0;border-radius:12px;padding:12px 20px;font-weight:600}
+.speech-button:hover {background:#6045B1}
+.speech-button:disabled {background:#E4DFEA;color:#64606C;cursor:default}
+.cancel-button {border:1px solid var(--border);border-radius:12px;background:#fff;color:#25232B;padding:10px 16px}
+.cancel-button:hover {background:#E9E1F8}
+.speech-status,.speech-error,.speech-privacy {font-size:14px;margin:12px 0 0}
+.speech-status,.speech-privacy {color:var(--muted)}
+.speech-error {color:#B42338}
+textarea:disabled {background:#FAF8F5;color:var(--muted)}
+.examples button:disabled {color:var(--muted);cursor:default}
 .examples {margin-top:30px;font-size:14px}
 .examples p {color:var(--muted);margin-bottom:8px}
 .examples button {display:block;text-align:left;width:100%;border:0;border-bottom:1px solid var(--border);padding:12px 0;background:transparent;color:#25232B;font-size:14px}

@@ -12,6 +12,9 @@ import type * as evaluation from "../evaluation.js";
 import type * as evaluationBudget from "../evaluationBudget.js";
 import type * as evidence from "../evidence.js";
 import type * as providerError from "../providerError.js";
+import type * as speech from "../speech.js";
+import type * as speechAudio from "../speechAudio.js";
+import type * as speechBudget from "../speechBudget.js";
 
 import type {
   ApiFromModules,
@@ -24,6 +27,9 @@ declare const fullApi: ApiFromModules<{
   evaluationBudget: typeof evaluationBudget;
   evidence: typeof evidence;
   providerError: typeof providerError;
+  speech: typeof speech;
+  speechAudio: typeof speechAudio;
+  speechBudget: typeof speechBudget;
 }>;
 
 /**
