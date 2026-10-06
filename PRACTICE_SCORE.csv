@@ -1,0 +1,5 @@
+round,question_id,completed_yes_no,recognition_correct_yes_no,answer_correct_yes_no,evidence_correct_yes_no,within_40_words_yes_no,question_end_to_answer_seconds,question_end_to_stop_seconds,displayed_stop_to_answer_seconds,used_answer_yes_no,extra_detail_recalled_yes_no,repetition_needed_yes_no,issue_category
+1,B,yes,,yes,yes,,8,,,,yes,,reported_total_time_method_unconfirmed
+2,E,yes,,yes,yes,,7,,,,yes,,reported_total_time_method_unconfirmed
+3,A,yes,,,yes,,6,,,,yes,,reported_excerpt_correctness_not_explicitly_confirmed
+4,F,yes,,,yes,,4,,,,yes,,reported_excerpt_salesforce_condition_not_explicitly_confirmed

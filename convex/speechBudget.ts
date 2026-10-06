@@ -1,5 +1,6 @@
 import {internalMutation, query} from "./_generated/server";
 import {v} from "convex/values";
+import {answerAttemptLimit} from "./testingLimits";
 
 // One small evaluation pool per deployment. Failures count; no automatic retry.
 const MAX_ATTEMPTS = 10;
@@ -17,7 +18,7 @@ export const status = query({
     }
     const row = (await ctx.db.query("speechUsage").withIndex("by_scope",q=>q.eq("scope","mic-evaluation")).take(1))[0];
     const answers = (await ctx.db.query("evaluationUsage").withIndex("by_scope",q=>q.eq("scope","milestone1")).take(1))[0];
-    if ((answers?.count ?? 0) >= 10) return {enabled:false,message:"The answer testing allowance is used up. Paid requests have stopped."};
+    if ((answers?.count ?? 0) >= answerAttemptLimit()) return {enabled:false,message:"The answer testing allowance is used up. Paid requests have stopped."};
     if ((row?.count ?? 0) >= MAX_ATTEMPTS) return {enabled:false,message:"The speech testing allowance is used up. Paid requests have stopped."};
     if (row && row.activeUntil > Date.now()) return {enabled:false,message:"Another question is being transcribed. Try again shortly."};
     return {enabled:true,message:""};
@@ -29,7 +30,7 @@ export const reserve = internalMutation({
   handler: async (ctx,args) => {
     if (!process.env.DEEPGRAM_API_KEY || process.env.SPEECH_TESTING_ENABLED !== "true" || !process.env.OPENAI_API_KEY || process.env.EVALUATION_TESTING_ENABLED !== "true") return "disabled" as const;
     const answers = (await ctx.db.query("evaluationUsage").withIndex("by_scope",q=>q.eq("scope","milestone1")).take(1))[0];
-    if ((answers?.count ?? 0) >= 10) return "answers_exhausted" as const;
+    if ((answers?.count ?? 0) >= answerAttemptLimit()) return "answers_exhausted" as const;
     const row = (await ctx.db.query("speechUsage").withIndex("by_scope",q=>q.eq("scope","mic-evaluation")).take(1))[0];
     if ((row?.count ?? 0) >= MAX_ATTEMPTS) return "exhausted" as const;
     if (row && row.activeUntil > Date.now()) return "busy" as const;

@@ -6,15 +6,16 @@ import { Agent } from "@convex-dev/agent";
 import { openai } from "@ai-sdk/openai";
 import { fetchSource, checkResult } from "./evidence";
 import { safeProviderError } from "./providerError";
+import {sourceTicketValue} from "./preparedSourceValues";
 
 export const ask = action({
-  args: {question: v.string()},
+  args: {question: v.string(),sourceTicket:v.optional(sourceTicketValue)},
   returns: v.object({
     status: v.union(v.literal("verified"), v.literal("unverified"), v.literal("error")),
     answer: v.string(), excerpt: v.union(v.string(), v.null()), section: v.union(v.string(), v.null()),
     sourceTitle: v.string(), sourceUrl: v.string(), elapsedMs: v.number(),
   }),
-  handler: async (ctx, args) => {
+  handler: async (ctx, args):Promise<{status:"verified"|"unverified"|"error";answer:string;excerpt:string|null;section:string|null;sourceTitle:string;sourceUrl:string;elapsedMs:number}> => {
     const started = Date.now();
     const error = (answer: string) => ({status: "error" as const, answer, excerpt: null, section: null, sourceTitle: "", sourceUrl: "", elapsedMs: Date.now() - started});
     const logFailure = (step: string, cause: unknown) => {
@@ -33,7 +34,10 @@ export const ask = action({
       return error("Real answers are not enabled yet. Set the provider key and enable evaluation testing in Convex.");
     }
     let source;
-    try { source = await fetchSource(); } catch (cause) {
+    try {
+      source=args.sourceTicket ? await ctx.runMutation(internal.preparedSources.consume,{ticket:args.sourceTicket}) : await fetchSource();
+      if(!source) return error("The prepared source is unavailable or expired. Speak your question again.");
+    } catch (cause) {
       logFailure("fetch_slack_article", cause);
       return error("The Slack article could not be read within the source limits. Try again or check the original article.");
     }

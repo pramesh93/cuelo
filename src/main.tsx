@@ -1,6 +1,10 @@
-import React, {useRef, useState} from "react";
+import React, {Suspense, useRef, useState} from "react";
 import {createRoot} from "react-dom/client";
 import {ConvexHttpClient} from "convex/browser";
+import {ConvexReactClient} from "convex/react";
+import {ConvexAuthProvider} from "@convex-dev/auth/react";
+import {Account} from "./Account";
+import {SourcesPage} from "./SourceManager";
 import {api} from "../convex/_generated/api";
 import type {FunctionReturnType} from "convex/server";
 import "@fontsource/nunito-sans/400.css";
@@ -12,6 +16,7 @@ import {SpeechInput} from "./SpeechInput";
 const sourceUrl = "https://slack.com/help/articles/203772216-SAML-single-sign-on";
 const url = import.meta.env.VITE_CONVEX_URL;
 const client = url ? new ConvexHttpClient(url) : null;
+const accountClient = url ? new ConvexReactClient(url) : null;
 function App() {
   const [question, setQuestion] = useState("");
   const [result, setResult] = useState<FunctionReturnType<typeof api.evaluation.ask> | null>(null);
@@ -29,18 +34,18 @@ function App() {
     e.preventDefault();
     await answerQuestion(question.trim());
   }
-  async function answerQuestion(text:string,stoppedAt?:number) {
+  async function answerQuestion(text:string,stoppedAt?:number,sourceTicket?:NonNullable<FunctionReturnType<typeof api.sourcePreparation.prepare>["ticket"]>) {
     const id = ++requestId.current;
     setBusy(true); setResult(null); setSubmittedQuestion(text);setVoiceElapsed(null);
     try {
-      const answer = await client!.action(api.evaluation.ask, {question:text});
+      const answer = await client!.action(api.evaluation.ask, {question:text,...(sourceTicket ? {sourceTicket} : {})});
       if (id === requestId.current) {setResult(answer);if(stoppedAt!==undefined && answer.status!=="error") setVoiceElapsed(performance.now()-stoppedAt);}
     } catch {
       if (id === requestId.current) setResult({status: "error", answer: "Could not reach Cuelo. Check your connection and try again.", excerpt: null, section: null, sourceTitle: "", sourceUrl: "", elapsedMs: 0});
     } finally { if (id === requestId.current) setBusy(false); }
   }
   return <>
-    <header><span className="wordmark">Cuelo</span><span>Source evaluation</span></header>
+    <header><span className="wordmark">Cuelo</span><nav aria-label="Main"><span>Source evaluation</span><a href="/?view=account">Log in</a></nav></header>
     <main>
       <h1>An answer you can check.</h1>
       <p className="intro">Speak or type one question about Slack’s SAML single sign-on. Cuelo uses only this article and shows the evidence beside its answer.</p>
@@ -50,7 +55,7 @@ function App() {
           <h2 id="question-heading">Your question</h2>
           <SpeechInput client={client!} disabled={busy}
             onBegin={()=>{requestId.current++;setResult(null);setBusy(false);setVoiceElapsed(null);}}
-            onQuestion={async(text,stoppedAt)=>{setQuestion(text);await answerQuestion(text,stoppedAt);}}
+            onQuestion={async(text,stoppedAt,ticket)=>{setQuestion(text);await answerQuestion(text,stoppedAt,ticket);}}
             onCancel={()=>{requestId.current++;setBusy(false);setResult(null);setVoiceElapsed(null);}}
             onActive={setVoiceActive}/>
           <form onSubmit={submit}>
@@ -77,4 +82,9 @@ function App() {
     </main>
   </>;
 }
-createRoot(document.getElementById("root")!).render(url ? <React.StrictMode><App/></React.StrictMode> : <main><h1>Connect the development backend</h1><p>Set CONVEX_URL in .env.local, then restart the app.</p></main>);
+const view = new URLSearchParams(location.search).get("view");
+const accountView = view === "account";
+const sourcesView = view === "sources";
+const CaptureCheck = import.meta.env.DEV ? React.lazy(() => import("./CaptureCheck")) : null;
+const captureCheckView = import.meta.env.DEV && view === "capture-check";
+createRoot(document.getElementById("root")!).render(url ? <React.StrictMode>{captureCheckView && CaptureCheck ? <Suspense fallback={<main><p role="status">Opening capture check…</p></main>}><CaptureCheck/></Suspense> : sourcesView ? <ConvexAuthProvider client={accountClient!}><SourcesPage/></ConvexAuthProvider> : accountView ? <ConvexAuthProvider client={accountClient!}><Account/></ConvexAuthProvider> : <App/>}</React.StrictMode> : <main><h1>Connect the development backend</h1><p>Set CONVEX_URL in .env.local, then restart the app.</p></main>);
