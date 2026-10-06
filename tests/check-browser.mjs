@@ -21,7 +21,7 @@ try {
       sourceUrl:"https://slack.com/help/articles/203772216-SAML-single-sign-on",elapsedMs:1234,
     }}});
   });
-  await page.goto("http://127.0.0.1:5173/");
+  await page.goto(process.env.CUELO_TEST_URL ?? "http://127.0.0.1:5173/");
   await page.getByRole("heading",{name:"An answer you can check."}).waitFor();
   assert.equal(await page.getByRole("button",{name:"Check the source",exact:true}).isDisabled(),true);
   await page.getByRole("button",{name:"Do you support SSO on the Pro plan?",exact:true}).click();

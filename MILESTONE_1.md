@@ -2,7 +2,7 @@
 
 ## Current state
 
-Typed evaluation screen and Convex answer action are implemented. Paid testing is off. No real model answer has been verified yet. Only the named Slack SAML article is accepted; this is not the voice onboarding, an upload flow or a live call.
+Typed evaluation screen and Convex answer action are deployed. The user authorised shipping on 6 October 2026; real production checks are recorded in PROGRESS.md. Only the named Slack SAML article is accepted; this is not the voice onboarding, an upload flow or a live call.
 
 ## Start locally
 
@@ -32,6 +32,12 @@ Run `npm test` for evidence checks and `npm run build` for frontend compilation.
 
 ## Assumptions and remaining gate
 
-The user's latest Slack SAML article and two questions replace the earlier notifications article as this milestone's acceptance set. The refusal text is the user's exact wording. No login is needed for this local evaluation. Development setup is authorised; production shipping remains gated on user confirmation and an established GitHub repository/destination. No Git repository exists in this folder yet.
+The user's latest Slack SAML article and two questions replace the earlier notifications article as this milestone's acceptance set. The refusal text is the user's exact wording. No login is needed for this local evaluation. Development setup is authorised; production shipping was authorised by the user. Repository: https://github.com/pramesh93/cuelo (public). Website: https://deafening-frog-846.convex.site.
 
-PLAN.md and PROGRESS.md were missing and were reconstructed from agreed decisions. The existing Idea_Scope.md was read under its actual filename. Provider quality, answer latency and the two real generated answers remain unverified until the provider setup is completed.
+PLAN.md and PROGRESS.md were missing and were reconstructed from agreed decisions. The existing Idea_Scope.md was read under its actual filename. The two acceptance questions were checked live; this does not validate voice or live calls.
+
+## Production shipping
+
+Run `npm run deploy` to build against the production backend, deploy backend functions and upload website assets with @convex-dev/static-hosting. Production provider settings are in Convex, separate from development; local secret files are ignored by Git. The small 10-attempt evaluation cap applies separately to each deployment and is not a public-launch spending system.
+
+Run `CUELO_TEST_URL=https://deafening-frog-846.convex.site node tests/check-browser.mjs --live` for two paid production checks; omit `--live` for simulated display checks.

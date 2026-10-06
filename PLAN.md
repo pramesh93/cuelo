@@ -14,7 +14,7 @@ Source: https://slack.com/help/articles/203772216-SAML-single-sign-on
 - Check excerpts against the fetched article. Refuse unsupported questions; preserve conditions.
 - Check “Do you support SSO on the Pro plan?” preserves the Salesforce condition.
 - Check “Can you guarantee a custom integration by Friday?” returns “Not verified in this source”.
-- Verify in desktop Chrome and check narrow layout. User confirmation remains required before shipping.
+- Verify in desktop Chrome and check narrow layout. The user authorised shipping on 6 October 2026.
 
 ## Later milestones (not authorised for this build)
 
@@ -26,4 +26,4 @@ Everything outside milestone 1, including voice, uploads, login and live calls.
 
 ## Shipping gate
 
-No commit, push or production deployment before user confirmation and established repository/destination. No Git repository currently exists in this folder. Paid testing requires explicit activation and a provider key entered directly into Convex.
+Shipping authorised on 6 October 2026. Public repository: https://github.com/pramesh93/cuelo. Production: https://deafening-frog-846.convex.site. Deploy with npm run deploy; git push does not deploy. Paid testing requires explicit activation and a provider key entered directly into Convex.

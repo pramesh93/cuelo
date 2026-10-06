@@ -98,9 +98,9 @@ When I report a bug, I will name the part. Look there first, and tell me if the 
 
 ## 3. Shipping
 
-Live website link: the sprint’s .convex.site link; actual deployment URL still needed. Serve the built website and its assets through the fixed Convex stack. This is the product website and the submission link. Do not introduce a separate frontend host.
+Live website link: https://deafening-frog-846.convex.site. Serve the built website and its assets through the fixed Convex stack. This is the product website and the submission link. Do not introduce a separate frontend host.
 
-Repo: existing GitHub repository; URL still needed. Do not assume its visibility or change it.
+Repo: https://github.com/pramesh93/cuelo (public, explicitly requested by the user). Do not assume its visibility or change it.
 
 Deploy: npm run deploy. Implement this as the explicit deployment command for the website assets and Convex backend. A push never deploys by itself. After I confirm a milestone works: commit, push, update PROGRESS.md, then deploy.
 
@@ -145,8 +145,8 @@ The AI must never invent product capabilities, pricing, discounts, policies or c
 
 ## 5. Setup still needed
 
-- GitHub repository URL and confirmation that this is the repository to use.
-- Convex project, sprint deployment setup and the live .convex.site URL.
+- GitHub repository established: https://github.com/pramesh93/cuelo (public).
+- Convex project: prmsh-biz/build-sprint-app; production: https://deafening-frog-846.convex.site.
 - Provider accounts and secrets entered directly in service settings.
 - Google OAuth configuration for the sprint’s .convex.site website.
 - Tested input limits, transient-data expiry, streaming architecture and initial tester capacity. These are implementation details to resolve before live testing, not evidence that the product already works.
