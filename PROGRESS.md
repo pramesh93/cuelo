@@ -8,3 +8,5 @@ The user authorised shipping milestone 1 on 6 October 2026. PLAN.md and this fil
 6 Oct: Implemented spoken source evaluation with Deepgram Nova-3 through Convex, bounded audio and spending checks, and the existing answer action unchanged. Real microphone verification and user confirmation are pending; production still serves the previous typed milestone. Setup and Chrome steps are in MICROPHONE_CHECK.md.
 
 6 Oct: All 15 automated tests, frontend build, backend types and development push passed. Chrome simulations passed supported/refusal answers, Stop/Cancel cleanup, empty transcript, stale results, device loss, permission refusal, hidden tab, late permission, 20-second cutoff and narrow layout. The real development backend also showed the missing-key message before capture. Deepgram key and live speech verification remain pending; no speech provider requests were made.
+
+6 Oct: User confirmed the microphone flow works in Chrome, authorising release. Saved and pushed the microphone milestone; all 15 automated tests and frontend/backend compilation passed again. Production speech settings were configured securely in Convex; user-measured latency was not reported.
