@@ -1,3 +1,4 @@
+import {Topbar} from "./Topbar";
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useAction,useMutation,useQuery} from 'convex/react';
 import type {FunctionReturnType} from 'convex/server';
@@ -41,7 +42,7 @@ export function AnswerCheck(){
   }catch{if(id===generation.current)setNotice('Your answer could not be loaded. Check your connection and try again.');}
   finally{if(id===generation.current){setBusy(false);pending.current=null;}}
  }
- return <><header><a className="wordmark brand-link" href="/">Cuelo</a><a href="/?view=sources">Manage source</a></header>
+ return <><Topbar/>
  <main className="account-page answer-check-page"><h1>Ask a question. Check the evidence.</h1><p className="intro">Answer check only. Meeting audio and microphone are not connected.</p>
  <h2>How should Cuelo answer?</h2>
  <fieldset className="mode-options"><legend className="sr-only">Answer mode</legend>

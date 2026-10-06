@@ -181,3 +181,23 @@ After three questions: **Ready for your next call? Sign up and add Cuelo to a ca
 - Do not add database connectors, desktop downloads, browser extensions, pricing, fabricated testimonials or extra screens without asking.
 - v1 live calls target desktop Chrome; smaller screens need a usable reading layout, but mobile live-call support is not implied.
 - If a design or product choice is not covered here, ask before building it. Unresolved choices include the exact avatar illustration and additional navigation destinations. Authentication, upload limits and retention are specified above.
+
+## Approved background refinement — 7 October 2026
+
+User requested more colour because the opening background felt dull. Use a soft lavender canvas on the opening page, with a deeper pale-violet area around the blob fading to warm off-white lower down. Keep answer cards white and text charcoal; retain quiet neutral reading surfaces for source/account tasks. No stock photos or external image assets are needed for this refinement.
+
+## Approved replacement direction — 7 October 2026
+
+User rejected the lavender background and approved a Fluence-inspired replacement: charcoal (#25232B) opening frame with light text, warm off-white (#FAF8F5) sections below, clean white answer cards and restrained violet actions. This supersedes the lavender-canvas refinement and permits a dark opening while source/account reading screens remain light. Do not copy Fluence artwork, text, pricing, testimonials or brand assets.
+
+Use original matte 3D sales-call imagery above the invitation. The generated decorative salesperson illustration is not the speaking customer avatar, an actual Meet screenshot or evidence of a connected session. `design/style-anchor.md` records the image direction; `public/images/cuelo-call.jpg` is the original asset, compressed to about 220 KB.
+
+Give the interactive code-based blob two charcoal eyes with small highlights. Idle blinking and a curious hover/drag expression provide personality. Reduced-motion preferences remove automatic blinking. Listening and processing expressions must wait for actual voice/backend state wiring; never simulate active capture or AI work. Preserve the opening copy, explicit unavailable controls, evidence labels and existing source/answer behaviour.
+
+## Opening background image — 7 October 2026
+
+User clarified that the actual opening background should be an image, inspired by Fluence/CRED, rather than a plain colour or an illustration below. Use the original generated matte 3D acoustic room at `public/images/cuelo-background.jpg`: curved charcoal/lavender architecture frames a dark open centre. Keep it behind the opening content with a darker lower overlay for control-label contrast. No video, copied reference artwork or extra motion. On narrow screens adapt the architectural background framing so the sides remain visible. White answer cards and expressive eyes stay readable. The separate call illustration remains below the opening.
+
+## On-call animation — 7 October 2026
+
+User requested replacing the below-fold salesperson illustration with a Cluely-inspired animated call preview and explicitly authorised shipping. Remove cuelo-call.jpg. Use original Cuelo components: staged call-window reveal, animated audio bars, processing dots and a floating text card; pause/replay and reduced-motion support. Clearly label the entire preview as illustrative, the answer as prewritten and generic, and state no call/audio is connected. This supersedes earlier decorative call-image decisions. Preserve the architectural opening background and all existing answer/source paths.

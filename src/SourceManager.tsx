@@ -1,3 +1,4 @@
+import {Topbar} from "./Topbar";
 import {useEffect,useState} from 'react';
 import {useAction,useMutation,useQuery,useConvexAuth} from 'convex/react';
 import {ConvexError} from 'convex/values';
@@ -61,4 +62,4 @@ export function SourceManager({savedOnly=false,onConfirmed,onSourceChanged}:{sav
  {message&&<p role="status">{message}</p>}{error&&<p className="error" role="alert">{error}</p>}
  </section>;
 }
-export function SourcesPage(){return <><header><a className="wordmark brand-link" href="/">Cuelo</a><a href="/">Back to Cuelo</a></header><main className="account-page"><h1>Answers start with your source.</h1><p className="intro">Add a source and check its readable text. This step does not connect a call or generate answers.</p><SourceManager/><p><a href="/?view=answers">Try answers with your selected source</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}
+export function SourcesPage(){return <><Topbar/><main className="account-page"><h1>Answers start with your source.</h1><p className="intro">Add a source and check its readable text. This step does not connect a call or generate answers.</p><SourceManager/><p><a href="/?view=answers">Try answers with your selected source</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}

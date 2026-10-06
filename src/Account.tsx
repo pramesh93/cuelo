@@ -1,3 +1,4 @@
+import {Topbar} from "./Topbar";
 import {useEffect, useState} from "react";
 import {useAuthActions} from "@convex-dev/auth/react";
 import {useConvexAuth, useMutation, useQuery} from "convex/react";
@@ -49,7 +50,7 @@ export function Account() {
   }
   const loading = isLoading || access === undefined;
   return <>
-    <header><a className="wordmark brand-link" href="/">Cuelo</a><a href="/">Back to Cuelo</a></header>
+    <Topbar/>
     <main className="account-page">
       <h1>Add Cuelo to your next call.</h1>
       <p className="intro">Short answers in text, while you stay in the conversation.</p>
