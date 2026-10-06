@@ -15,7 +15,10 @@ export function textSource(title:string,text:string):SourceContent {
  return validateContent({title:title.trim(),kind:'text',url:null,pageCount:null,passages});
 }
 export function htmlSource(html:string,url:string):SourceContent {
- const $=load(html);$('script,style,noscript,nav,footer,header,form,iframe').remove();
+ const $=load(html);
+ // Page tools are not evidence. Preserve article headers, including their real heading.
+ $('script,style,noscript,nav,footer,form,iframe,button,[role="button"],[role="navigation"],.breadcrumbs-row,.theme-doc-toc-mobile,.theme-doc-toc-desktop,.hash-link').remove();
+ $('header').each((_,node)=>{if(!$(node).closest('article,main').length)$(node).remove();});
  const root=$('article').first().length?$('article').first():$('main').first().length?$('main').first():$('body');
  const title=($('h1').first().text()||$('title').first().text()||new URL(url).hostname).trim().slice(0,160);
  const passages:SourcePassage[]=[];let reference:string|undefined;
