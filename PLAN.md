@@ -122,3 +122,7 @@ User approved preparing an audio-only relay proposal. AUDIO_RELAY_PROPOSAL.md re
 - Account source saving requires Google sign-in and explicit Keep; selecting a source before signup does not save it automatically. Sources/search entries replaced or deleted together; failed/stale imports preserve the existing source.
 - Development-only source admission enabled. Operational development guard: 60 import attempts per hour globally, shared across guests/accounts; this does not change AI allowances or reliably identify anonymous people. Production admission remains disabled.
 - Chrome instructions: SOURCE_CHECK.md. Real account saving awaits missing Google configuration. Newly managed sources are not yet connected to answer generation or the avatar/live flows. No production deploy or provider calls.
+
+### Source release — confirmed and published
+
+User confirmed source management works. Commit 6d46c35 pushed to the public Cuelo repository; npm run deploy published backend and website to https://deafening-frog-846.convex.site. Guest source setup enabled in production, retaining the global 60-import/hour operational guard. Production Chrome guest flow passed paste/inspect/Word/replacement/private-link rejection/deletion/narrow layout. Google configuration absent and live admission disabled; development capture diagnostic excluded. Provider usage counts unchanged: 13 answers, 10 speech attempts. Account saving, new-source answers and full v1 remain unfinished.
