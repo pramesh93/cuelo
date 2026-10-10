@@ -17,6 +17,8 @@ Cuelo has a website and an approved native Chrome extension sidebar for English 
 
 The current live-call path is sidebar-only: join Meet before or after opening Cuelo, sign in with Google if needed, explicitly choose generic/document mode, select or import one source in document mode, then click Start. No persistent Cuelo website tab, floating window, tab-sharing picker or target-tab toolbar permission is required. The hidden extension document owns the session; tested Meet-page audio supplies separate customer and salesperson inputs. Existing Meet microphone permission is required; handle missing audio, denied/revoked permission and closed tabs honestly. A Meet link alone never grants audio access.
 
+Approved 10 October: with the matching Cuelo extension installed in the same Chrome profile, website and sidebar must share the same Convex Auth login in both directions. Signing out clears both; changing account or signing out stops any active Cuelo call first. Test and production remain separate. Website account/source management remains available; website call setup and old live links show sidebar instructions instead of starting the retired capture flow. Shared login requires real Google/installed-extension verification before it is declared working.
+
 Earlier website floating-card and tabCapture designs are superseded for this extension path. Do not promise screen-share invisibility: the user observed Cuelo visible when sharing its window and absent when sharing a different window; whole-screen sharing may expose it.
 
 ### First experience

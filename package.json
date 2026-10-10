@@ -10,7 +10,7 @@
     "dev:backend": "convex dev",
     "check:backend": "convex dev --once",
     "deploy": "npx @convex-dev/static-hosting deploy",
-    "build:extension": "tsc --noEmit && vite build --config vite.extension.config.ts && CUELO_EXTENSION_ENTRY=call vite build --config vite.extension.config.ts"
+    "build:extension": "tsc --noEmit && vite build --config vite.extension.config.ts && CUELO_EXTENSION_ENTRY=call vite build --config vite.extension.config.ts && CUELO_EXTENSION_ENTRY=worker vite build --config vite.extension.config.ts && CUELO_EXTENSION_ENTRY=bridge vite build --config vite.extension.config.ts"
   },
   "keywords": [],
   "author": "",

@@ -88,6 +88,8 @@ Below the opening voice section, use a calm invitation surface labelled “Exper
 
 The live-call product uses the approved Chrome extension's native sidebar; the website remains the landing, account and practice surface. The earlier website-controlled floating-card route is superseded for current live calls.
 
+Approved shared sign-in revision, 10 October: with the matching extension installed in the same Chrome profile, signing in from either the website or sidebar signs the user into both as the same account; sign-out clears both. An active call stops before sign-out/account changes. Without the extension the website still supports Google account/source management; installing/reloading requires refreshing existing Cuelo pages. Test/production never share sessions. Existing different accounts must be resolved explicitly, not silently switched. The website's former call-connection controls and direct live URL now lead to sidebar guidance; no website audio or paid session starts from that guidance. Real Google checks are pending.
+
 1. Open Cuelo before or after joining Meet in the same Chrome window. Sign in with Google from the sidebar if needed. The accepted temporary Google sign-in window presentation is parked for improvement; no persistent Cuelo website tab is required.
 2. Explicitly choose generic answers or answers from one document. Generic needs no source. Document mode selects the saved source or imports a new one in the sidebar. Full source inspection/replacement/deletion remains available on the website.
 3. Click Start once. Meet-page customer audio and separate salesperson microphone input are checked before paid admission. No tab-sharing picker, floating window or target-tab toolbar capture grant.

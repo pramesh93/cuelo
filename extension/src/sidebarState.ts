@@ -1,9 +1,9 @@
 // Meeting presence, remembered sign-in and permission to capture are separate checks.
 export function sidebarScreen(input:{checking:boolean;meeting:boolean;authLoading:boolean;authenticated:boolean;accessLoading:boolean}){
- if(input.checking)return 'checking-meeting';
- if(!input.meeting)return 'no-meeting';
  if(input.authLoading)return 'checking-account';
  if(!input.authenticated)return 'sign-in';
+ if(input.checking)return 'checking-meeting';
+ if(!input.meeting)return 'no-meeting';
  if(input.accessLoading)return 'checking-access';
  return 'setup';
 }

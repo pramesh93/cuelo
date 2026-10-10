@@ -17,7 +17,7 @@
     "https://meet.google.com/*"
   ],
   "background": {
-    "service_worker": "auth-worker.js",
+    "service_worker": "shared-auth-worker.js",
     "type": "module"
   },
   "action": {
@@ -38,6 +38,17 @@
         "meet-audio.js"
       ],
       "run_at": "document_idle"
+    },
+    {
+      "matches": [
+        "https://deafening-frog-846.convex.site/*",
+        "https://calculating-gecko-263.convex.site/*",
+        "http://127.0.0.1:5173/*"
+      ],
+      "js": [
+        "website-auth-bridge.js"
+      ],
+      "run_at": "document_start"
     }
   ],
   "web_accessible_resources": [

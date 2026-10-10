@@ -31,20 +31,20 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 	};
 	function b() {}
 	b.prototype = y.prototype;
-	function x(e, t, n) {
+	function ee(e, t, n) {
 		this.props = e, this.context = t, this.refs = v, this.updater = n || g;
 	}
-	var ee = x.prototype = new b();
-	ee.constructor = x, _(ee, y.prototype), ee.isPureReactComponent = !0;
-	var te = Array.isArray;
-	function ne() {}
-	var S = {
+	var te = ee.prototype = new b();
+	te.constructor = ee, _(te, y.prototype), te.isPureReactComponent = !0;
+	var ne = Array.isArray;
+	function re() {}
+	var x = {
 		H: null,
 		A: null,
 		T: null,
 		S: null
-	}, re = Object.prototype.hasOwnProperty;
-	function C(e, n, r) {
+	}, ie = Object.prototype.hasOwnProperty;
+	function S(e, n, r) {
 		var i = r.ref;
 		return {
 			$$typeof: t,
@@ -54,13 +54,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			props: r
 		};
 	}
-	function ie(e, t) {
-		return C(e.type, t, e.props);
+	function ae(e, t) {
+		return S(e.type, t, e.props);
 	}
-	function w(e) {
+	function C(e) {
 		return typeof e == "object" && !!e && e.$$typeof === t;
 	}
-	function ae(e) {
+	function oe(e) {
 		var t = {
 			"=": "=0",
 			":": "=2"
@@ -69,15 +69,15 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			return t[e];
 		});
 	}
-	var oe = /\/+/g;
-	function se(e, t) {
-		return typeof e == "object" && e && e.key != null ? ae("" + e.key) : t.toString(36);
+	var se = /\/+/g;
+	function ce(e, t) {
+		return typeof e == "object" && e && e.key != null ? oe("" + e.key) : t.toString(36);
 	}
-	function ce(e) {
+	function le(e) {
 		switch (e.status) {
 			case "fulfilled": return e.value;
 			case "rejected": throw e.reason;
-			default: switch (typeof e.status == "string" ? e.then(ne, ne) : (e.status = "pending", e.then(function(t) {
+			default: switch (typeof e.status == "string" ? e.then(re, re) : (e.status = "pending", e.then(function(t) {
 				e.status === "pending" && (e.status = "fulfilled", e.value = t);
 			}, function(t) {
 				e.status === "pending" && (e.status = "rejected", e.reason = t);
@@ -88,7 +88,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		}
 		throw e;
 	}
-	function le(e, r, i, a, o) {
+	function ue(e, r, i, a, o) {
 		var s = typeof e;
 		(s === "undefined" || s === "boolean") && (e = null);
 		var c = !1;
@@ -104,30 +104,30 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 				case n:
 					c = !0;
 					break;
-				case d: return c = e._init, le(c(e._payload), r, i, a, o);
+				case d: return c = e._init, ue(c(e._payload), r, i, a, o);
 			}
 		}
-		if (c) return o = o(e), c = a === "" ? "." + se(e, 0) : a, te(o) ? (i = "", c != null && (i = c.replace(oe, "$&/") + "/"), le(o, r, i, "", function(e) {
+		if (c) return o = o(e), c = a === "" ? "." + ce(e, 0) : a, ne(o) ? (i = "", c != null && (i = c.replace(se, "$&/") + "/"), ue(o, r, i, "", function(e) {
 			return e;
-		})) : o != null && (w(o) && (o = ie(o, i + (o.key == null || e && e.key === o.key ? "" : ("" + o.key).replace(oe, "$&/") + "/") + c)), r.push(o)), 1;
+		})) : o != null && (C(o) && (o = ae(o, i + (o.key == null || e && e.key === o.key ? "" : ("" + o.key).replace(se, "$&/") + "/") + c)), r.push(o)), 1;
 		c = 0;
 		var l = a === "" ? "." : a + ":";
-		if (te(e)) for (var u = 0; u < e.length; u++) a = e[u], s = l + se(a, u), c += le(a, r, i, s, o);
-		else if (u = h(e), typeof u == "function") for (e = u.call(e), u = 0; !(a = e.next()).done;) a = a.value, s = l + se(a, u++), c += le(a, r, i, s, o);
+		if (ne(e)) for (var u = 0; u < e.length; u++) a = e[u], s = l + ce(a, u), c += ue(a, r, i, s, o);
+		else if (u = h(e), typeof u == "function") for (e = u.call(e), u = 0; !(a = e.next()).done;) a = a.value, s = l + ce(a, u++), c += ue(a, r, i, s, o);
 		else if (s === "object") {
-			if (typeof e.then == "function") return le(ce(e), r, i, a, o);
+			if (typeof e.then == "function") return ue(le(e), r, i, a, o);
 			throw r = String(e), Error("Objects are not valid as a React child (found: " + (r === "[object Object]" ? "object with keys {" + Object.keys(e).join(", ") + "}" : r) + "). If you meant to render a collection of children, use an array instead.");
 		}
 		return c;
 	}
-	function T(e, t, n) {
+	function w(e, t, n) {
 		if (e == null) return e;
 		var r = [], i = 0;
-		return le(e, r, "", "", function(e) {
+		return ue(e, r, "", "", function(e) {
 			return t.call(n, e, i++);
 		}), r;
 	}
-	function ue(e) {
+	function T(e) {
 		if (e._status === -1) {
 			var t = e._result, n = t();
 			n.then(function(t) {
@@ -155,51 +155,51 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		console.error(e);
 	};
 	function fe(e) {
-		var t = S.T, n = {};
-		n.types = t === null ? null : t.types, S.T = n;
+		var t = x.T, n = {};
+		n.types = t === null ? null : t.types, x.T = n;
 		try {
-			var r = e(), i = S.S;
-			i !== null && i(n, r), typeof r == "object" && r && typeof r.then == "function" && r.then(ne, de);
+			var r = e(), i = x.S;
+			i !== null && i(n, r), typeof r == "object" && r && typeof r.then == "function" && r.then(re, de);
 		} catch (e) {
 			de(e);
 		} finally {
-			t !== null && n.types !== null && (t.types = n.types), S.T = t;
+			t !== null && n.types !== null && (t.types = n.types), x.T = t;
 		}
 	}
 	function pe(e) {
-		var t = S.T;
+		var t = x.T;
 		if (t !== null) {
 			var n = t.types;
 			n === null ? t.types = [e] : n.indexOf(e) === -1 && n.push(e);
 		} else fe(pe.bind(null, e));
 	}
 	var me = {
-		map: T,
+		map: w,
 		forEach: function(e, t, n) {
-			T(e, function() {
+			w(e, function() {
 				t.apply(this, arguments);
 			}, n);
 		},
 		count: function(e) {
 			var t = 0;
-			return T(e, function() {
+			return w(e, function() {
 				t++;
 			}), t;
 		},
 		toArray: function(e) {
-			return T(e, function(e) {
+			return w(e, function(e) {
 				return e;
 			}) || [];
 		},
 		only: function(e) {
-			if (!w(e)) throw Error("React.Children.only expected to receive a single React element child.");
+			if (!C(e)) throw Error("React.Children.only expected to receive a single React element child.");
 			return e;
 		}
 	};
-	e.Activity = f, e.Children = me, e.Component = y, e.Fragment = r, e.Profiler = a, e.PureComponent = x, e.StrictMode = i, e.Suspense = l, e.ViewTransition = p, e.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = S, e.__COMPILER_RUNTIME = {
+	e.Activity = f, e.Children = me, e.Component = y, e.Fragment = r, e.Profiler = a, e.PureComponent = ee, e.StrictMode = i, e.Suspense = l, e.ViewTransition = p, e.__CLIENT_INTERNALS_DO_NOT_USE_OR_WARN_USERS_THEY_CANNOT_UPGRADE = x, e.__COMPILER_RUNTIME = {
 		__proto__: null,
 		c: function(e) {
-			return S.H.useMemoCache(e);
+			return x.H.useMemoCache(e);
 		}
 	}, e.addTransitionType = pe, e.cache = function(e) {
 		return function() {
@@ -210,14 +210,14 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 	}, e.cloneElement = function(e, t, n) {
 		if (e == null) throw Error("The argument must be a React element, but you passed " + e + ".");
 		var r = _({}, e.props), i = e.key;
-		if (t != null) for (a in t.key !== void 0 && (i = "" + t.key), t) !re.call(t, a) || a === "key" || a === "__self" || a === "__source" || a === "ref" && t.ref === void 0 || (r[a] = t[a]);
+		if (t != null) for (a in t.key !== void 0 && (i = "" + t.key), t) !ie.call(t, a) || a === "key" || a === "__self" || a === "__source" || a === "ref" && t.ref === void 0 || (r[a] = t[a]);
 		var a = arguments.length - 2;
 		if (a === 1) r.children = n;
 		else if (1 < a) {
 			for (var o = Array(a), s = 0; s < a; s++) o[s] = arguments[s + 2];
 			r.children = o;
 		}
-		return C(e.type, i, r);
+		return S(e.type, i, r);
 	}, e.createContext = function(e) {
 		return e = {
 			$$typeof: s,
@@ -232,7 +232,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		}, e;
 	}, e.createElement = function(e, t, n) {
 		var r, i = {}, a = null;
-		if (t != null) for (r in t.key !== void 0 && (a = "" + t.key), t) re.call(t, r) && r !== "key" && r !== "__self" && r !== "__source" && (i[r] = t[r]);
+		if (t != null) for (r in t.key !== void 0 && (a = "" + t.key), t) ie.call(t, r) && r !== "key" && r !== "__self" && r !== "__source" && (i[r] = t[r]);
 		var o = arguments.length - 2;
 		if (o === 1) i.children = n;
 		else if (1 < o) {
@@ -240,7 +240,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			i.children = s;
 		}
 		if (e && e.defaultProps) for (r in o = e.defaultProps, o) i[r] === void 0 && (i[r] = o[r]);
-		return C(e, a, i);
+		return S(e, a, i);
 	}, e.createRef = function() {
 		return { current: null };
 	}, e.forwardRef = function(e) {
@@ -248,14 +248,14 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			$$typeof: c,
 			render: e
 		};
-	}, e.isValidElement = w, e.lazy = function(e) {
+	}, e.isValidElement = C, e.lazy = function(e) {
 		return {
 			$$typeof: d,
 			_payload: {
 				_status: -1,
 				_result: e
 			},
-			_init: ue
+			_init: T
 		};
 	}, e.memo = function(e, t) {
 		return {
@@ -264,43 +264,43 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			compare: t === void 0 ? null : t
 		};
 	}, e.startTransition = fe, e.unstable_useCacheRefresh = function() {
-		return S.H.useCacheRefresh();
+		return x.H.useCacheRefresh();
 	}, e.use = function(e) {
-		return S.H.use(e);
+		return x.H.use(e);
 	}, e.useActionState = function(e, t, n) {
-		return S.H.useActionState(e, t, n);
+		return x.H.useActionState(e, t, n);
 	}, e.useCallback = function(e, t) {
-		return S.H.useCallback(e, t);
+		return x.H.useCallback(e, t);
 	}, e.useContext = function(e) {
-		return S.H.useContext(e);
+		return x.H.useContext(e);
 	}, e.useDebugValue = function() {}, e.useDeferredValue = function(e, t) {
-		return S.H.useDeferredValue(e, t);
+		return x.H.useDeferredValue(e, t);
 	}, e.useEffect = function(e, t) {
-		return S.H.useEffect(e, t);
+		return x.H.useEffect(e, t);
 	}, e.useEffectEvent = function(e) {
-		return S.H.useEffectEvent(e);
+		return x.H.useEffectEvent(e);
 	}, e.useId = function() {
-		return S.H.useId();
+		return x.H.useId();
 	}, e.useImperativeHandle = function(e, t, n) {
-		return S.H.useImperativeHandle(e, t, n);
+		return x.H.useImperativeHandle(e, t, n);
 	}, e.useInsertionEffect = function(e, t) {
-		return S.H.useInsertionEffect(e, t);
+		return x.H.useInsertionEffect(e, t);
 	}, e.useLayoutEffect = function(e, t) {
-		return S.H.useLayoutEffect(e, t);
+		return x.H.useLayoutEffect(e, t);
 	}, e.useMemo = function(e, t) {
-		return S.H.useMemo(e, t);
+		return x.H.useMemo(e, t);
 	}, e.useOptimistic = function(e, t) {
-		return S.H.useOptimistic(e, t);
+		return x.H.useOptimistic(e, t);
 	}, e.useReducer = function(e, t, n) {
-		return S.H.useReducer(e, t, n);
+		return x.H.useReducer(e, t, n);
 	}, e.useRef = function(e) {
-		return S.H.useRef(e);
+		return x.H.useRef(e);
 	}, e.useState = function(e) {
-		return S.H.useState(e);
+		return x.H.useState(e);
 	}, e.useSyncExternalStore = function(e, t, n) {
-		return S.H.useSyncExternalStore(e, t, n);
+		return x.H.useSyncExternalStore(e, t, n);
 	}, e.useTransition = function() {
-		return S.H.useTransition();
+		return x.H.useTransition();
 	}, e.version = "19.3.0";
 })), u = /* @__PURE__ */ o(((e, t) => {
 	t.exports = l();
@@ -355,31 +355,31 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			i = n(l);
 		}
 	}
-	function x(e) {
+	function ee(e) {
 		if (h = !1, b(e), !m) {
-			if (n(c) !== null) m = !0, ee || (ee = !0, ie());
+			if (n(c) !== null) m = !0, te || (te = !0, ae());
 			else {
 				var t = n(l);
-				t !== null && oe(x, t.startTime - e);
+				t !== null && se(ee, t.startTime - e);
 			}
 		}
 	}
-	var ee = !1, te = -1, ne = 5, S = -1;
-	function re() {
-		return g ? !0 : !(e.unstable_now() - S < ne);
+	var te = !1, ne = -1, re = 5, x = -1;
+	function ie() {
+		return g ? !0 : !(e.unstable_now() - x < re);
 	}
-	function C() {
-		if (g = !1, ee) {
+	function S() {
+		if (g = !1, te) {
 			var t = e.unstable_now();
-			S = t;
+			x = t;
 			var i = !0;
 			try {
 				a: {
-					m = !1, h && (h = !1, v(te), te = -1), p = !0;
+					m = !1, h && (h = !1, v(ne), ne = -1), p = !0;
 					var a = f;
 					try {
 						b: {
-							for (b(t), d = n(c); d !== null && !(d.expirationTime > t && re());) {
+							for (b(t), d = n(c); d !== null && !(d.expirationTime > t && ie());) {
 								var o = d.callback;
 								if (typeof o == "function") {
 									d.callback = null, f = d.priorityLevel;
@@ -395,7 +395,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 							if (d !== null) i = !0;
 							else {
 								var u = n(l);
-								u !== null && oe(x, u.startTime - t), i = !1;
+								u !== null && se(ee, u.startTime - t), i = !1;
 							}
 						}
 						break a;
@@ -405,31 +405,31 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 					i = void 0;
 				}
 			} finally {
-				i ? ie() : ee = !1;
+				i ? ae() : te = !1;
 			}
 		}
 	}
-	var ie;
-	if (typeof y == "function") ie = function() {
-		y(C);
+	var ae;
+	if (typeof y == "function") ae = function() {
+		y(S);
 	};
 	else if (typeof MessageChannel < "u") {
-		var w = new MessageChannel(), ae = w.port2;
-		w.port1.onmessage = C, ie = function() {
-			ae.postMessage(null);
+		var C = new MessageChannel(), oe = C.port2;
+		C.port1.onmessage = S, ae = function() {
+			oe.postMessage(null);
 		};
-	} else ie = function() {
-		_(C, 0);
+	} else ae = function() {
+		_(S, 0);
 	};
-	function oe(t, n) {
-		te = _(function() {
+	function se(t, n) {
+		ne = _(function() {
 			t(e.unstable_now());
 		}, n);
 	}
 	e.unstable_IdlePriority = 5, e.unstable_ImmediatePriority = 1, e.unstable_LowPriority = 4, e.unstable_NormalPriority = 3, e.unstable_Profiling = null, e.unstable_UserBlockingPriority = 2, e.unstable_cancelCallback = function(e) {
 		e.callback = null;
 	}, e.unstable_forceFrameRate = function(e) {
-		0 > e || 125 < e ? console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported") : ne = 0 < e ? Math.floor(1e3 / e) : 5;
+		0 > e || 125 < e ? console.error("forceFrameRate takes a positive int between 0 and 125, forcing frame rates higher than 125 fps is not supported") : re = 0 < e ? Math.floor(1e3 / e) : 5;
 	}, e.unstable_getCurrentPriorityLevel = function() {
 		return f;
 	}, e.unstable_next = function(e) {
@@ -490,8 +490,8 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			startTime: a,
 			expirationTime: s,
 			sortIndex: -1
-		}, a > o ? (r.sortIndex = a, t(l, r), n(c) === null && r === n(l) && (h ? (v(te), te = -1) : h = !0, oe(x, a - o))) : (r.sortIndex = s, t(c, r), m || p || (m = !0, ee || (ee = !0, ie()))), r;
-	}, e.unstable_shouldYield = re, e.unstable_wrapCallback = function(e) {
+		}, a > o ? (r.sortIndex = a, t(l, r), n(c) === null && r === n(l) && (h ? (v(ne), ne = -1) : h = !0, se(ee, a - o))) : (r.sortIndex = s, t(c, r), m || p || (m = !0, te || (te = !0, ae()))), r;
+	}, e.unstable_shouldYield = ie, e.unstable_wrapCallback = function(e) {
 		var t = f;
 		return function() {
 			var n = f;
@@ -787,21 +787,21 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			default: throw Error(i(559));
 		}
 	}
-	var x = null, ee = null;
-	function te(e, t, n) {
-		return e === n || e === t && (x = e, !0);
-	}
+	var ee = null, te = null;
 	function ne(e, t, n) {
-		return e === n ? (ee = e, !1) : e === t && (ee !== null && (x = e), !0);
+		return e === n || e === t && (ee = e, !0);
 	}
-	function S(e) {
+	function re(e, t, n) {
+		return e === n ? (te = e, !1) : e === t && (te !== null && (ee = e), !0);
+	}
+	function x(e) {
 		if (e === null) return null;
 		do
 			e = e === null ? null : e.return;
 		while (e && e.tag !== 5 && e.tag !== 27 && e.tag !== 3);
 		return e || null;
 	}
-	function re(e, t, n) {
+	function ie(e, t, n) {
 		for (var r = 0, i = e; i; i = n(i)) r++;
 		i = 0;
 		for (var a = t; a; a = n(a)) i++;
@@ -813,7 +813,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		}
 		return null;
 	}
-	var C = Object.assign, ie = Symbol.for("react.element"), w = Symbol.for("react.transitional.element"), ae = Symbol.for("react.portal"), oe = Symbol.for("react.fragment"), se = Symbol.for("react.strict_mode"), ce = Symbol.for("react.profiler"), le = Symbol.for("react.consumer"), T = Symbol.for("react.context"), ue = Symbol.for("react.forward_ref"), de = Symbol.for("react.suspense"), fe = Symbol.for("react.suspense_list"), pe = Symbol.for("react.memo"), me = Symbol.for("react.lazy"), he = Symbol.for("react.activity"), ge = Symbol.for("react.legacy_hidden"), _e = Symbol.for("react.memo_cache_sentinel"), ve = Symbol.for("react.view_transition"), ye = Symbol.for("react.recoverable"), be = Symbol.iterator;
+	var S = Object.assign, ae = Symbol.for("react.element"), C = Symbol.for("react.transitional.element"), oe = Symbol.for("react.portal"), se = Symbol.for("react.fragment"), ce = Symbol.for("react.strict_mode"), le = Symbol.for("react.profiler"), ue = Symbol.for("react.consumer"), w = Symbol.for("react.context"), T = Symbol.for("react.forward_ref"), de = Symbol.for("react.suspense"), fe = Symbol.for("react.suspense_list"), pe = Symbol.for("react.memo"), me = Symbol.for("react.lazy"), he = Symbol.for("react.activity"), ge = Symbol.for("react.legacy_hidden"), _e = Symbol.for("react.memo_cache_sentinel"), ve = Symbol.for("react.view_transition"), ye = Symbol.for("react.recoverable"), be = Symbol.iterator;
 	function xe(e) {
 		return typeof e != "object" || !e ? null : (e = be && e[be] || e["@@iterator"], typeof e == "function" ? e : null);
 	}
@@ -823,19 +823,19 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		if (typeof e == "function") return e.$$typeof === Se ? null : e.displayName || e.name || null;
 		if (typeof e == "string") return e;
 		switch (e) {
-			case oe: return "Fragment";
-			case ce: return "Profiler";
-			case se: return "StrictMode";
+			case se: return "Fragment";
+			case le: return "Profiler";
+			case ce: return "StrictMode";
 			case de: return "Suspense";
 			case fe: return "SuspenseList";
 			case he: return "Activity";
 			case ve: return "ViewTransition";
 		}
 		if (typeof e == "object") switch (e.$$typeof) {
-			case ae: return "Portal";
-			case T: return e.displayName || "Context";
-			case le: return (e._context.displayName || "Context") + ".Consumer";
-			case ue:
+			case oe: return "Portal";
+			case w: return e.displayName || "Context";
+			case ue: return (e._context.displayName || "Context") + ".Consumer";
+			case T:
 				var t = e.render;
 				return e = e.displayName, e ||= (e = t.displayName || t.name || "", e === "" ? "ForwardRef" : "ForwardRef(" + e + ")"), e;
 			case pe: return t = e.displayName || null, t === null ? Ce(e.type) || "Memo" : t;
@@ -1653,7 +1653,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			for (var o in this._reactName = t, this._targetInst = r, this.type = n, this.nativeEvent = i, this.target = a, this.currentTarget = null, e) e.hasOwnProperty(o) && (t = e[o], this[o] = t ? t(i) : i[o]);
 			return this.isDefaultPrevented = (i.defaultPrevented == null ? !1 === i.returnValue : i.defaultPrevented) ? Vn : Hn, this.isPropagationStopped = Hn, this;
 		}
-		return C(t.prototype, {
+		return S(t.prototype, {
 			preventDefault: function() {
 				this.defaultPrevented = !0;
 				var e = this.nativeEvent;
@@ -1676,10 +1676,10 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		},
 		defaultPrevented: 0,
 		isTrusted: 0
-	}, Gn = Un(Wn), Kn = C({}, Wn, {
+	}, Gn = Un(Wn), Kn = S({}, Wn, {
 		view: 0,
 		detail: 0
-	}), qn = Un(Kn), Jn, Yn, Xn, Zn = C({}, Kn, {
+	}), qn = Un(Kn), Jn, Yn, Xn, Zn = S({}, Kn, {
 		screenX: 0,
 		screenY: 0,
 		clientX: 0,
@@ -1702,13 +1702,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		movementY: function(e) {
 			return "movementY" in e ? e.movementY : Yn;
 		}
-	}), P = Un(Zn), Qn = Un(C({}, Zn, { dataTransfer: 0 })), $n = Un(C({}, Kn, { relatedTarget: 0 })), er = Un(C({}, Wn, {
+	}), P = Un(Zn), Qn = Un(S({}, Zn, { dataTransfer: 0 })), $n = Un(S({}, Kn, { relatedTarget: 0 })), er = Un(S({}, Wn, {
 		animationName: 0,
 		elapsedTime: 0,
 		pseudoElement: 0
-	})), tr = Un(C({}, Wn, { clipboardData: function(e) {
+	})), tr = Un(S({}, Wn, { clipboardData: function(e) {
 		return "clipboardData" in e ? e.clipboardData : window.clipboardData;
-	} })), nr = Un(C({}, Wn, { data: 0 })), rr = {
+	} })), nr = Un(S({}, Wn, { data: 0 })), rr = {
 		Esc: "Escape",
 		Spacebar: " ",
 		Left: "ArrowLeft",
@@ -1771,7 +1771,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 	function sr() {
 		return or;
 	}
-	var cr = Un(C({}, Kn, {
+	var cr = Un(S({}, Kn, {
 		key: function(e) {
 			if (e.key) {
 				var t = rr[e.key] || e.key;
@@ -1797,7 +1797,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		which: function(e) {
 			return e.type === "keypress" ? Bn(e) : e.type === "keydown" || e.type === "keyup" ? e.keyCode : 0;
 		}
-	})), lr = Un(C({}, Zn, {
+	})), lr = Un(S({}, Zn, {
 		pointerId: 0,
 		width: 0,
 		height: 0,
@@ -1808,7 +1808,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		twist: 0,
 		pointerType: 0,
 		isPrimary: 0
-	})), ur = Un(C({}, Wn, { submitter: 0 })), dr = Un(C({}, Kn, {
+	})), ur = Un(S({}, Wn, { submitter: 0 })), dr = Un(S({}, Kn, {
 		touches: 0,
 		targetTouches: 0,
 		changedTouches: 0,
@@ -1817,11 +1817,11 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		ctrlKey: 0,
 		shiftKey: 0,
 		getModifierState: sr
-	})), fr = Un(C({}, Wn, {
+	})), fr = Un(S({}, Wn, {
 		propertyName: 0,
 		elapsedTime: 0,
 		pseudoElement: 0
-	})), pr = Un(C({}, Zn, {
+	})), pr = Un(S({}, Zn, {
 		deltaX: function(e) {
 			return "deltaX" in e ? e.deltaX : "wheelDeltaX" in e ? -e.wheelDeltaX : 0;
 		},
@@ -1830,7 +1830,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		},
 		deltaZ: 0,
 		deltaMode: 0
-	})), mr = Un(C({}, Wn, {
+	})), mr = Un(S({}, Wn, {
 		newState: 0,
 		oldState: 0,
 		source: 0
@@ -2169,11 +2169,11 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		else if (typeof r == "string") s = qm(e, n, ke.current) ? 26 : e === "html" || e === "head" || e === "body" ? 27 : 5;
 		else a: switch (r) {
 			case he: return e = Li(31, n, t, a), e.elementType = he, e.lanes = o, e;
-			case oe: return Hi(n.children, a, o, t);
-			case se:
+			case se: return Hi(n.children, a, o, t);
+			case ce:
 				s = 8, a |= 24;
 				break;
-			case ce: return e = Li(12, n, t, a | 2), e.elementType = ce, e.lanes = o, e;
+			case le: return e = Li(12, n, t, a | 2), e.elementType = le, e.lanes = o, e;
 			case de: return e = Li(13, n, t, a), e.elementType = de, e.lanes = o, e;
 			case fe: return e = Li(19, n, t, a), e.elementType = fe, e.lanes = o, e;
 			case ge:
@@ -2185,13 +2185,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			}, e;
 			default:
 				if (typeof r == "object" && r) switch (r.$$typeof) {
-					case T:
+					case w:
 						s = 10;
 						break a;
-					case le:
+					case ue:
 						s = 9;
 						break a;
-					case ue:
+					case T:
 						s = 11;
 						break a;
 					case pe:
@@ -2456,7 +2456,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			});
 		};
 	}, Na = t.unstable_scheduleCallback, Pa = t.unstable_NormalPriority, Fa = {
-		$$typeof: T,
+		$$typeof: w,
 		Consumer: null,
 		Provider: null,
 		_currentValue: null,
@@ -2614,7 +2614,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		t = t.props.ref, e.ref = t === void 0 ? null : t;
 	}
 	function mo(e, t) {
-		throw t.$$typeof === ie ? Error(i(525)) : (e = Object.prototype.toString.call(t), Error(i(31, e === "[object Object]" ? "object with keys {" + Object.keys(t).join(", ") + "}" : e)));
+		throw t.$$typeof === ae ? Error(i(525)) : (e = Object.prototype.toString.call(t), Error(i(31, e === "[object Object]" ? "object with keys {" + Object.keys(t).join(", ") + "}" : e)));
 	}
 	function ho(e) {
 		function t(t, n) {
@@ -2646,7 +2646,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		}
 		function l(e, t, n, r) {
 			var i = n.type;
-			return i === oe ? (e = d(e, t, n.props.children, r, n.key), po(e, n), e) : t !== null && (t.elementType === i || typeof i == "object" && i && i.$$typeof === me && ao(i) === t.type) ? (t = a(t, n.props), po(t, n), t.return = e, t) : (t = Vi(n.type, n.key, n.props, null, e.mode, r), po(t, n), t.return = e, t);
+			return i === se ? (e = d(e, t, n.props.children, r, n.key), po(e, n), e) : t !== null && (t.elementType === i || typeof i == "object" && i && i.$$typeof === me && ao(i) === t.type) ? (t = a(t, n.props), po(t, n), t.return = e, t) : (t = Vi(n.type, n.key, n.props, null, e.mode, r), po(t, n), t.return = e, t);
 		}
 		function u(e, t, n, r) {
 			return t === null || t.tag !== 4 || t.stateNode.containerInfo !== n.containerInfo || t.stateNode.implementation !== n.implementation ? (t = Gi(n, e.mode, r), t.return = e, t) : (t = a(t, n.children || []), t.return = e, t);
@@ -2658,13 +2658,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			if (typeof t == "string" && t !== "" || typeof t == "number" || typeof t == "bigint") return t = Ui("" + t, e.mode, n), t.return = e, t;
 			if (typeof t == "object" && t) {
 				switch (t.$$typeof) {
-					case w: return n = Vi(t.type, t.key, t.props, null, e.mode, n), po(n, t), n.return = e, n;
-					case ae: return t = Gi(t, e.mode, n), t.return = e, t;
+					case C: return n = Vi(t.type, t.key, t.props, null, e.mode, n), po(n, t), n.return = e, n;
+					case oe: return t = Gi(t, e.mode, n), t.return = e, t;
 					case me: return t = ao(t), f(e, t, n);
 				}
 				if (we(t) || xe(t)) return t = Hi(t, e.mode, n, null), t.return = e, t;
 				if (typeof t.then == "function") return f(e, fo(t), n);
-				if (t.$$typeof === T) return f(e, Aa(e, t), n);
+				if (t.$$typeof === w) return f(e, Aa(e, t), n);
 				mo(e, t);
 			}
 			return null;
@@ -2674,13 +2674,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			if (typeof n == "string" && n !== "" || typeof n == "number" || typeof n == "bigint") return i === null ? c(e, t, "" + n, r) : null;
 			if (typeof n == "object" && n) {
 				switch (n.$$typeof) {
-					case w: return n.key === i ? l(e, t, n, r) : null;
-					case ae: return n.key === i ? u(e, t, n, r) : null;
+					case C: return n.key === i ? l(e, t, n, r) : null;
+					case oe: return n.key === i ? u(e, t, n, r) : null;
 					case me: return n = ao(n), p(e, t, n, r);
 				}
 				if (we(n) || xe(n)) return i === null ? d(e, t, n, r, null) : null;
 				if (typeof n.then == "function") return p(e, t, fo(n), r);
-				if (n.$$typeof === T) return p(e, t, Aa(e, n), r);
+				if (n.$$typeof === w) return p(e, t, Aa(e, n), r);
 				mo(e, n);
 			}
 			return null;
@@ -2689,13 +2689,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			if (typeof r == "string" && r !== "" || typeof r == "number" || typeof r == "bigint") return e = e.get(n) || null, c(t, e, "" + r, i);
 			if (typeof r == "object" && r) {
 				switch (r.$$typeof) {
-					case w: return e = e.get(r.key === null ? n : r.key) || null, l(t, e, r, i);
-					case ae: return e = e.get(r.key === null ? n : r.key) || null, u(t, e, r, i);
+					case C: return e = e.get(r.key === null ? n : r.key) || null, l(t, e, r, i);
+					case oe: return e = e.get(r.key === null ? n : r.key) || null, u(t, e, r, i);
 					case me: return r = ao(r), m(e, t, n, r, i);
 				}
 				if (we(r) || xe(r)) return e = e.get(n) || null, d(t, e, r, i, null);
 				if (typeof r.then == "function") return m(e, t, n, fo(r), i);
-				if (r.$$typeof === T) return m(e, t, n, Aa(t, r), i);
+				if (r.$$typeof === w) return m(e, t, n, Aa(t, r), i);
 				mo(t, r);
 			}
 			return null;
@@ -2742,13 +2742,13 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			}), I && ra(a, g), u;
 		}
 		function _(e, r, o, c) {
-			if (typeof o == "object" && o && o.type === oe && o.key === null && o.props.ref === void 0 && (o = o.props.children), typeof o == "object" && o) {
+			if (typeof o == "object" && o && o.type === se && o.key === null && o.props.ref === void 0 && (o = o.props.children), typeof o == "object" && o) {
 				switch (o.$$typeof) {
-					case w:
+					case C:
 						a: {
 							for (var l = o.key; r !== null;) {
 								if (r.key === l) {
-									if (l = o.type, l === oe) {
+									if (l = o.type, l === se) {
 										if (r.tag === 7) {
 											n(e, r.sibling), c = a(r, o.props.children), po(c, o), c.return = e, e = c;
 											break a;
@@ -2762,10 +2762,10 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 								}
 								t(e, r), r = r.sibling;
 							}
-							o.type === oe ? (c = Hi(o.props.children, e.mode, c, o.key), po(c, o), c.return = e, e = c) : (c = Vi(o.type, o.key, o.props, null, e.mode, c), po(c, o), c.return = e, e = c);
+							o.type === se ? (c = Hi(o.props.children, e.mode, c, o.key), po(c, o), c.return = e, e = c) : (c = Vi(o.type, o.key, o.props, null, e.mode, c), po(c, o), c.return = e, e = c);
 						}
 						return s(e);
-					case ae:
+					case oe:
 						a: {
 							for (l = o.key; r !== null;) {
 								if (r.key === l) {
@@ -2789,7 +2789,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 					return o = l.call(o), g(e, r, o, c);
 				}
 				if (typeof o.then == "function") return _(e, r, fo(o), c);
-				if (o.$$typeof === T) return _(e, r, Aa(e, o), c);
+				if (o.$$typeof === w) return _(e, r, Aa(e, o), c);
 				mo(e, o);
 			}
 			return typeof o == "string" && o !== "" || typeof o == "number" || typeof o == "bigint" ? (o = "" + o, r !== null && r.tag === 6 ? (n(e, r.sibling), c = a(r, o), c.return = e, e = c) : (n(e, r), c = Ui(o, e.mode, c), c.return = e, e = c), s(e)) : n(e, r);
@@ -2928,7 +2928,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 							case 3: m.flags = m.flags & -65537 | 128;
 							case 0:
 								if (m = h.payload, f = typeof m == "function" ? m.call(g, d, f) : m, f == null) break a;
-								d = C({}, d, f);
+								d = S({}, d, f);
 								break a;
 							case 2: vo = !0;
 						}
@@ -3108,7 +3108,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		if (typeof e == "object" && e) {
 			if (typeof e.then == "function") return ds(e);
 			if (e.$$typeof === ye) return;
-			if (e.$$typeof === T) return ka(e);
+			if (e.$$typeof === w) return ka(e);
 		}
 		throw Error(i(438, String(e)));
 	}
@@ -3880,7 +3880,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		useEffectEvent: Gs
 	};
 	function xc(e, t, n, r) {
-		t = e.memoizedState, n = n(r, t), n = n == null ? t : C({}, t, n), e.memoizedState = n, e.lanes === 0 && (e.updateQueue.baseState = n);
+		t = e.memoizedState, n = n(r, t), n = n == null ? t : S({}, t, n), e.memoizedState = n, e.lanes === 0 && (e.updateQueue.baseState = n);
 	}
 	var Sc = {
 		enqueueSetState: function(e, t, n) {
@@ -3908,7 +3908,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 	function Tc(e, t) {
 		var n = t;
 		if ("ref" in t) for (var r in n = {}, t) r !== "ref" && (n[r] = t[r]);
-		if (e = e.defaultProps) for (var i in n === t && (n = C({}, n)), e) n[i] === void 0 && (n[i] = e[i]);
+		if (e = e.defaultProps) for (var i in n === t && (n = S({}, n)), e) n[i] === void 0 && (n[i] = e[i]);
 		return n;
 	}
 	function Ec(e) {
@@ -4403,7 +4403,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 					else {
 						if (e != null) {
 							var a = e.$$typeof;
-							if (a === ue) {
+							if (a === T) {
 								t.tag = 11, t = Rc(null, t, e, r, n);
 								break a;
 							}
@@ -4411,7 +4411,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 								t.tag = 14, t = zc(null, t, e, r, n);
 								break a;
 							}
-							if (a === T) {
+							if (a === w) {
 								t.tag = 10, t.type = e, t = dl(null, t, n);
 								break a;
 							}
@@ -6921,7 +6921,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			if (!(t & 7)) {
 				a: {
 					if (l = e === "mouseover" || e === "pointerover", c = e === "mouseout" || e === "pointerout", l && n !== Tn && (u = n.relatedTarget || n.fromElement) && (Bt(u) || u[Nt])) break a;
-					(c || l) && (u = i.window === i ? i : (l = i.ownerDocument) ? l.defaultView || l.parentWindow : window, c ? (l = n.relatedTarget || n.toElement, c = r, l = l ? Bt(l) : null, l !== null && (f = o(l), d = l.tag, l !== f || d !== 5 && d !== 27 && d !== 6) && (l = null)) : (c = null, l = r), c !== l && (d = P, g = "onMouseLeave", p = "onMouseEnter", m = "mouse", (e === "pointerout" || e === "pointerover") && (d = lr, g = "onPointerLeave", p = "onPointerEnter", m = "pointer"), f = c == null ? u : Ht(c), h = l == null ? u : Ht(l), u = new d(g, m + "leave", c, n, i), u.target = f, u.relatedTarget = h, g = null, Bt(i) === r && (d = new d(p, m + "enter", l, n, i), d.target = h, d.relatedTarget = f, g = d), f = g, d = c && l ? re(c, l, Yf) : null, c !== null && Xf(s, u, c, d, !1), l !== null && f !== null && Xf(s, f, l, d, !0)));
+					(c || l) && (u = i.window === i ? i : (l = i.ownerDocument) ? l.defaultView || l.parentWindow : window, c ? (l = n.relatedTarget || n.toElement, c = r, l = l ? Bt(l) : null, l !== null && (f = o(l), d = l.tag, l !== f || d !== 5 && d !== 27 && d !== 6) && (l = null)) : (c = null, l = r), c !== l && (d = P, g = "onMouseLeave", p = "onMouseEnter", m = "mouse", (e === "pointerout" || e === "pointerover") && (d = lr, g = "onPointerLeave", p = "onPointerEnter", m = "pointer"), f = c == null ? u : Ht(c), h = l == null ? u : Ht(l), u = new d(g, m + "leave", c, n, i), u.target = f, u.relatedTarget = h, g = null, Bt(i) === r && (d = new d(p, m + "enter", l, n, i), d.target = h, d.relatedTarget = f, g = d), f = g, d = c && l ? ie(c, l, Yf) : null, c !== null && Xf(s, u, c, d, !1), l !== null && f !== null && Xf(s, f, l, d, !0)));
 				}
 				a: {
 					if (c = r ? Ht(r) : window, l = c.nodeName && c.nodeName.toLowerCase(), l === "select" || l === "input" && c.type === "file") var _ = Pr;
@@ -7756,7 +7756,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		this._scope = document.documentElement, this._selector = "::view-transition-" + e + "(" + t + ")";
 	}
 	Np.prototype.animate = function(e, t) {
-		return t = typeof t == "number" ? { duration: t } : C({}, t), t.pseudoElement = this._selector, this._scope.animate(e, t);
+		return t = typeof t == "number" ? { duration: t } : S({}, t), t.pseudoElement = this._selector, this._scope.animate(e, t);
 	}, Np.prototype.getAnimations = function() {
 		for (var e = this._scope, t = this._selector, n = e.getAnimations({ subtree: !0 }), r = [], i = 0; i < n.length; i++) {
 			var a = n[i].effect;
@@ -7979,7 +7979,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			}
 			return a;
 		}
-		return e & Node.DOCUMENT_POSITION_PRECEDING ? ((t = !!a) && !(t = a === n) && (t = re(n, a, S), t === null ? t = !1 : (h(t, !0, te, a, n), a = x, x = null, t = a !== null)), t) : e & Node.DOCUMENT_POSITION_FOLLOWING ? ((t = !!a) && !(t = a === r) && (t = re(r, a, S), t === null ? t = !1 : (h(t, !0, ne, a, r), a = x, ee = x = null, t = a !== null)), t) : !1;
+		return e & Node.DOCUMENT_POSITION_PRECEDING ? ((t = !!a) && !(t = a === n) && (t = ie(n, a, x), t === null ? t = !1 : (h(t, !0, ne, a, n), a = ee, ee = null, t = a !== null)), t) : e & Node.DOCUMENT_POSITION_FOLLOWING ? ((t = !!a) && !(t = a === r) && (t = ie(r, a, x), t === null ? t = !1 : (h(t, !0, re, a, r), a = ee, te = ee = null, t = a !== null)), t) : !1;
 	}
 	function Zp(e, t) {
 		var n = e.ownerDocument.createRange();
@@ -8256,7 +8256,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 					break;
 				case "script": a = Rm(e);
 			}
-			if (!(vm.has(a) || (e = C({
+			if (!(vm.has(a) || (e = S({
 				rel: "preload",
 				href: t === "image" && n && n.imageSrcSet ? void 0 : e,
 				as: t
@@ -8281,7 +8281,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 				case "worker":
 				case "script": a = Rm(e);
 			}
-			if (!vm.has(a) && (e = C({
+			if (!vm.has(a) && (e = S({
 				rel: "modulepreload",
 				href: e
 			}, t), vm.set(a, e), n.querySelector(i) === null)) {
@@ -8311,7 +8311,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 				};
 				if (o = r.querySelector(Fm(a))) s.loading = 5;
 				else {
-					e = C({
+					e = S({
 						rel: "stylesheet",
 						href: e,
 						"data-precedence": t
@@ -8339,7 +8339,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		var n = wm;
 		if (n && e) {
 			var r = Ut(n).hoistableScripts, i = Rm(e), a = r.get(i);
-			a || (a = n.querySelector(zm(i)), a || (e = C({
+			a || (a = n.querySelector(zm(i)), a || (e = S({
 				src: e,
 				async: !0
 			}, t), (t = vm.get(i)) && Um(e, t), a = n.createElement("script"), Wt(a), np(a, "link", e), n.head.appendChild(a)), a = {
@@ -8355,7 +8355,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		var n = wm;
 		if (n && e) {
 			var r = Ut(n).hoistableScripts, i = Rm(e), a = r.get(i);
-			a || (a = n.querySelector(zm(i)), a || (e = C({
+			a || (a = n.querySelector(zm(i)), a || (e = S({
 				src: e,
 				async: !0,
 				type: "module"
@@ -8431,7 +8431,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		return "link[rel=\"stylesheet\"][" + e + "]";
 	}
 	function Im(e) {
-		return C({}, e, {
+		return S({}, e, {
 			"data-precedence": e.precedence,
 			precedence: null
 		});
@@ -8460,7 +8460,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 			case "style":
 				var r = e.querySelector("style[data-href~=\"" + M(n.href) + "\"]");
 				if (r) return t.instance = r, Wt(r), r;
-				var a = C({}, n, {
+				var a = S({}, n, {
 					"data-href": n.href,
 					"data-precedence": n.precedence,
 					href: null,
@@ -8476,7 +8476,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 				return s._p = new Promise(function(e, t) {
 					s.onload = e, s.onerror = t;
 				}), np(o, "link", r), t.state.loading |= 4, Vm(o, n.precedence, e), t.instance = o;
-			case "script": return o = Rm(n.src), (a = e.querySelector(zm(o))) ? (t.instance = a, Wt(a), a) : (r = n, (a = vm.get(o)) && (r = C({}, n), Um(r, a)), e = e.ownerDocument || e, a = e.createElement("script"), Wt(a), np(a, "link", r), e.head.appendChild(a), t.instance = a);
+			case "script": return o = Rm(n.src), (a = e.querySelector(zm(o))) ? (t.instance = a, Wt(a), a) : (r = n, (a = vm.get(o)) && (r = S({}, n), Um(r, a)), e = e.ownerDocument || e, a = e.createElement("script"), Wt(a), np(a, "link", r), e.head.appendChild(a), t.instance = a);
 			case "void": return null;
 			default: throw Error(i(443, t.type));
 		}
@@ -8621,7 +8621,7 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		}
 	}
 	var sh = {
-		$$typeof: T,
+		$$typeof: w,
 		Provider: null,
 		Consumer: null,
 		_currentValue: Te,
@@ -9062,9 +9062,9 @@ for (var e = Object.create, t = Object.defineProperty, n = Object.getOwnProperty
 		}
 	}
 	n(), t.exports = h();
-})), _ = [], v = [], y = Uint8Array, b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", x = 0, ee = b.length; x < ee; ++x) _[x] = b[x], v[b.charCodeAt(x)] = x;
+})), _ = [], v = [], y = Uint8Array, b = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/", ee = 0, te = b.length; ee < te; ++ee) _[ee] = b[ee], v[b.charCodeAt(ee)] = ee;
 v[45] = 62, v[95] = 63;
-function te(e) {
+function ne(e) {
 	var t = e.length;
 	if (t % 4 > 0) throw Error("Invalid string. Length must be a multiple of 4");
 	var n = e.indexOf("=");
@@ -9072,32 +9072,32 @@ function te(e) {
 	var r = n === t ? 0 : 4 - n % 4;
 	return [n, r];
 }
-function ne(e, t, n) {
+function re(e, t, n) {
 	return (t + n) * 3 / 4 - n;
 }
-function S(e) {
-	for (var t, n = te(e), r = n[0], i = n[1], a = new y(ne(e, r, i)), o = 0, s = i > 0 ? r - 4 : r, c = 0; c < s; c += 4) t = v[e.charCodeAt(c)] << 18 | v[e.charCodeAt(c + 1)] << 12 | v[e.charCodeAt(c + 2)] << 6 | v[e.charCodeAt(c + 3)], a[o++] = t >> 16 & 255, a[o++] = t >> 8 & 255, a[o++] = t & 255;
+function x(e) {
+	for (var t, n = ne(e), r = n[0], i = n[1], a = new y(re(e, r, i)), o = 0, s = i > 0 ? r - 4 : r, c = 0; c < s; c += 4) t = v[e.charCodeAt(c)] << 18 | v[e.charCodeAt(c + 1)] << 12 | v[e.charCodeAt(c + 2)] << 6 | v[e.charCodeAt(c + 3)], a[o++] = t >> 16 & 255, a[o++] = t >> 8 & 255, a[o++] = t & 255;
 	return i === 2 && (t = v[e.charCodeAt(c)] << 2 | v[e.charCodeAt(c + 1)] >> 4, a[o++] = t & 255), i === 1 && (t = v[e.charCodeAt(c)] << 10 | v[e.charCodeAt(c + 1)] << 4 | v[e.charCodeAt(c + 2)] >> 2, a[o++] = t >> 8 & 255, a[o++] = t & 255), a;
 }
-function re(e) {
+function ie(e) {
 	return _[e >> 18 & 63] + _[e >> 12 & 63] + _[e >> 6 & 63] + _[e & 63];
 }
-function C(e, t, n) {
-	for (var r, i = [], a = t; a < n; a += 3) r = (e[a] << 16 & 16711680) + (e[a + 1] << 8 & 65280) + (e[a + 2] & 255), i.push(re(r));
+function S(e, t, n) {
+	for (var r, i = [], a = t; a < n; a += 3) r = (e[a] << 16 & 16711680) + (e[a + 1] << 8 & 65280) + (e[a + 2] & 255), i.push(ie(r));
 	return i.join("");
 }
-function ie(e) {
-	for (var t, n = e.length, r = n % 3, i = [], a = 16383, o = 0, s = n - r; o < s; o += a) i.push(C(e, o, o + a > s ? s : o + a));
+function ae(e) {
+	for (var t, n = e.length, r = n % 3, i = [], a = 16383, o = 0, s = n - r; o < s; o += a) i.push(S(e, o, o + a > s ? s : o + a));
 	return r === 1 ? (t = e[n - 1], i.push(_[t >> 2] + _[t << 4 & 63] + "==")) : r === 2 && (t = (e[n - 2] << 8) + e[n - 1], i.push(_[t >> 10] + _[t >> 4 & 63] + _[t << 2 & 63] + "=")), i.join("");
 }
 //#endregion
 //#region node_modules/convex/dist/esm/common/index.js
-function w(e) {
+function C(e) {
 	if (e === void 0) return {};
-	if (!oe(e)) throw Error(`The arguments to a Convex function must be an object. Received: ${e}`);
+	if (!se(e)) throw Error(`The arguments to a Convex function must be an object. Received: ${e}`);
 	return e;
 }
-function ae(e) {
+function oe(e) {
 	if (e === void 0) throw Error("Client created with undefined deployment address. If you used an environment variable, check that it's set.");
 	if (typeof e != "string") throw Error(`Invalid deployment address: found ${e}".`);
 	if (!(e.startsWith("http:") || e.startsWith("https:"))) throw Error(`Invalid deployment address: Must start with "https://" or "http://". Found "${e}".`);
@@ -9108,13 +9108,13 @@ function ae(e) {
 	}
 	if (e.endsWith(".convex.site")) throw Error(`Invalid deployment address: "${e}" ends with .convex.site, which is used for HTTP Actions. Convex deployment URLs typically end with .convex.cloud? If you believe this URL is correct, use the \`skipConvexDeploymentUrlCheck\` option to bypass this.`);
 }
-function oe(e) {
+function se(e) {
 	let t = typeof e == "object", n = Object.getPrototypeOf(e), r = n === null || n === Object.prototype || n?.constructor?.name === "Object";
 	return t && r;
 }
 //#endregion
 //#region node_modules/convex/dist/esm/values/value.js
-var se = !0, ce = BigInt("-9223372036854775808"), le = BigInt("9223372036854775807"), T = BigInt("0"), ue = BigInt("8"), de = BigInt("256"), fe = "This commit timestamp is unresolved: its value is assigned when the mutation commits. Read the document after the mutation completes to get its value.", pe = class {
+var ce = !0, le = BigInt("-9223372036854775808"), ue = BigInt("9223372036854775807"), w = BigInt("0"), T = BigInt("8"), de = BigInt("256"), fe = "This commit timestamp is unresolved: its value is assigned when the mutation commits. Read the document after the mutation completes to get its value.", pe = class {
 	[Symbol.toPrimitive](e) {
 		if (e === "string") return this.toString();
 		throw Error(fe);
@@ -9133,27 +9133,27 @@ function he(e) {
 	return Number.isNaN(e) || !Number.isFinite(e) || Object.is(e, -0);
 }
 function ge(e) {
-	e < T && (e -= ce + ce);
+	e < w && (e -= le + le);
 	let t = e.toString(16);
 	t.length % 2 == 1 && (t = "0" + t);
 	let n = new Uint8Array(/* @__PURE__ */ new ArrayBuffer(8)), r = 0;
-	for (let i of t.match(/.{2}/g).reverse()) n.set([parseInt(i, 16)], r++), e >>= ue;
-	return ie(n);
+	for (let i of t.match(/.{2}/g).reverse()) n.set([parseInt(i, 16)], r++), e >>= T;
+	return ae(n);
 }
 function _e(e) {
-	let t = S(e);
+	let t = x(e);
 	if (t.byteLength !== 8) throw Error(`Received ${t.byteLength} bytes, expected 8 for $integer`);
-	let n = T, r = T;
+	let n = w, r = w;
 	for (let e of t) n += BigInt(e) * de ** r, r++;
-	return n > le && (n += ce + ce), n;
+	return n > ue && (n += le + le), n;
 }
 function ve(e) {
-	if (e < ce || le < e) throw Error(`BigInt ${e} does not fit into a 64-bit signed integer.`);
+	if (e < le || ue < e) throw Error(`BigInt ${e} does not fit into a 64-bit signed integer.`);
 	let t = /* @__PURE__ */ new ArrayBuffer(8);
-	return new DataView(t).setBigInt64(0, e, !0), ie(new Uint8Array(t));
+	return new DataView(t).setBigInt64(0, e, !0), ae(new Uint8Array(t));
 }
 function ye(e) {
-	let t = S(e);
+	let t = x(e);
 	if (t.byteLength !== 8) throw Error(`Received ${t.byteLength} bytes, expected 8 for $integer`);
 	return new DataView(t.buffer).getBigInt64(0, !0);
 }
@@ -9175,7 +9175,7 @@ function we(e) {
 		let n = t[0][0];
 		if (n === "$bytes") {
 			if (typeof e.$bytes != "string") throw Error(`Malformed $bytes field on ${e}`);
-			return S(e.$bytes).buffer;
+			return x(e.$bytes).buffer;
 		}
 		if (n === "$integer") {
 			if (typeof e.$integer != "string") throw Error(`Malformed $integer field on ${e}`);
@@ -9183,9 +9183,9 @@ function we(e) {
 		}
 		if (n === "$float") {
 			if (typeof e.$float != "string") throw Error(`Malformed $float field on ${e}`);
-			let t = S(e.$float);
+			let t = x(e.$float);
 			if (t.byteLength !== 8) throw Error(`Received ${t.byteLength} bytes, expected 8 for $float`);
-			let n = new DataView(t.buffer).getFloat64(0, se);
+			let n = new DataView(t.buffer).getFloat64(0, ce);
 			if (!he(n)) throw Error(`Float ${n} should be encoded as a number`);
 			return n;
 		}
@@ -9216,23 +9216,23 @@ function Te(e, t, n, r) {
 	}
 	if (e === null) return e;
 	if (typeof e == "bigint") {
-		if (e < ce || le < e) throw Error(`BigInt ${e} does not fit into a 64-bit signed integer.`);
+		if (e < le || ue < e) throw Error(`BigInt ${e} does not fit into a 64-bit signed integer.`);
 		return { $integer: be(e) };
 	}
 	if (typeof e == "number") {
 		if (he(e)) {
 			let t = /* @__PURE__ */ new ArrayBuffer(8);
-			return new DataView(t).setFloat64(0, e, se), { $float: ie(new Uint8Array(t)) };
+			return new DataView(t).setFloat64(0, e, ce), { $float: ae(new Uint8Array(t)) };
 		}
 		return e;
 	}
 	if (typeof e == "boolean" || typeof e == "string") return e;
-	if (e instanceof ArrayBuffer) return { $bytes: ie(new Uint8Array(e)) };
+	if (e instanceof ArrayBuffer) return { $bytes: ae(new Uint8Array(e)) };
 	if (e instanceof pe) return { $commitTs: null };
 	if (Array.isArray(e)) return e.map((e, r) => Te(e, t, n + `[${r}]`, !1));
 	if (e instanceof Set) throw Error(Ee(n, "Set", [...e], t));
 	if (e instanceof Map) throw Error(Ee(n, "Map", [...e], t));
-	if (!oe(e)) {
+	if (!se(e)) {
 		let r = e?.constructor?.name, i = r ? `${r} ` : "";
 		throw Error(Ee(n, i, e, t));
 	}
@@ -9740,7 +9740,7 @@ var ft = dt(), pt = Object.defineProperty, mt = (e, t, n) => t in e ? pt(e, t, {
 		ht(this, "queryResults"), ht(this, "modifiedQueries"), this.queryResults = e, this.modifiedQueries = [];
 	}
 	getQuery(t, ...n) {
-		let r = w(n[0]), i = lt(t), a = this.queryResults.get(Je(i, r));
+		let r = C(n[0]), i = lt(t), a = this.queryResults.get(Je(i, r));
 		if (a !== void 0) return e.queryValue(a.result);
 	}
 	getAllQueries(t) {
@@ -9752,7 +9752,7 @@ var ft = dt(), pt = Object.defineProperty, mt = (e, t, n) => t in e ? pt(e, t, {
 		return n;
 	}
 	setQuery(e, t, n) {
-		let r = w(t), i = lt(e), a = Je(i, r), o;
+		let r = C(t), i = lt(e), a = Je(i, r), o;
 		o = n === void 0 ? void 0 : {
 			success: !0,
 			value: n,
@@ -9918,11 +9918,11 @@ var ft = dt(), pt = Object.defineProperty, mt = (e, t, n) => t in e ? pt(e, t, {
 //#endregion
 //#region node_modules/convex/dist/esm/browser/sync/protocol.js
 function jt(e) {
-	let t = S(e);
+	let t = x(e);
 	return xt.fromBytesLE(Array.from(t));
 }
 function Mt(e) {
-	return ie(new Uint8Array(e.toBytesLE()));
+	return ae(new Uint8Array(e.toBytesLE()));
 }
 function Nt(e) {
 	switch (e.type) {
@@ -10550,7 +10550,7 @@ var ln = Object.defineProperty, un = (e, t, n) => t in e ? ln(e, t, {
 		}), M(this, "mark", (e) => {
 			this.debug && on(e, this.sessionId);
 		}), typeof e == "object") throw Error("Passing a ClientConfig object is no longer supported. Pass the URL of the Convex deployment as a string directly.");
-		n?.skipConvexDeploymentUrlCheck !== !0 && ae(e), n = { ...n };
+		n?.skipConvexDeploymentUrlCheck !== !0 && oe(e), n = { ...n };
 		let r = n.authRefreshTokenLeewaySeconds ?? 10, i = n.webSocketConstructor;
 		if (!i && typeof WebSocket > "u") throw Error("No WebSocket global variable defined! To use Convex in an environment without WebSocket try the HTTP client: https://docs.convex.dev/api/classes/browser.ConvexHttpClient");
 		i ||= WebSocket, this.debug = n.reportDebugInfoToConvex ?? !1, this.address = e, this.logger = n.logger === !1 ? He({ verbose: n.verbose ?? !1 }) : n.logger !== !0 && n.logger ? n.logger : Ve({ verbose: n.verbose ?? !1 });
@@ -10714,7 +10714,7 @@ var ln = Object.defineProperty, un = (e, t, n) => t in e ? ln(e, t, {
 		this.webSocketManager.sendMessage(e);
 	}
 	subscribe(e, t, n) {
-		let r = w(t), { modification: i, queryToken: a, unsubscribe: o } = this.state.subscribe(e, r, n?.journal, n?.componentPath);
+		let r = C(t), { modification: i, queryToken: a, unsubscribe: o } = this.state.subscribe(e, r, n?.journal, n?.componentPath);
 		return i !== null && this.webSocketManager.sendMessage(i), {
 			queryToken: a,
 			unsubscribe: () => {
@@ -10724,7 +10724,7 @@ var ln = Object.defineProperty, un = (e, t, n) => t in e ? ln(e, t, {
 		};
 	}
 	localQueryResult(e, t) {
-		let n = Je(e, w(t));
+		let n = Je(e, C(t));
 		return this.optimisticQueryResults.queryResult(n);
 	}
 	localQueryResultByToken(e) {
@@ -10734,11 +10734,11 @@ var ln = Object.defineProperty, un = (e, t, n) => t in e ? ln(e, t, {
 		return this.optimisticQueryResults.hasQueryResult(e);
 	}
 	localQueryLogs(e, t) {
-		let n = Je(e, w(t));
+		let n = Je(e, C(t));
 		return this.optimisticQueryResults.queryLogs(n);
 	}
 	queryJournal(e, t) {
-		let n = Je(e, w(t));
+		let n = Je(e, C(t));
 		return this.state.queryJournal(n);
 	}
 	connectionState() {
@@ -10770,7 +10770,7 @@ var ln = Object.defineProperty, un = (e, t, n) => t in e ? ln(e, t, {
 		return i;
 	}
 	enqueueMutation(e, t, n, r) {
-		let i = w(t);
+		let i = C(t);
 		this.tryReportLongDisconnect();
 		let a = this.nextRequestId;
 		if (this._nextRequestId++, n !== void 0) {
@@ -10817,7 +10817,7 @@ var ln = Object.defineProperty, un = (e, t, n) => t in e ? ln(e, t, {
 		return n.value;
 	}
 	async actionInternal(e, t, n) {
-		let r = w(t), i = this.nextRequestId;
+		let r = C(t), i = this.nextRequestId;
 		this._nextRequestId++, this.tryReportLongDisconnect();
 		let a = {
 			type: "Action",
@@ -11078,7 +11078,7 @@ var pn = Object.defineProperty, mn = (e, t, n) => t in e ? pn(e, t, {
 }) : e[t] = n, yn = (e, t, n) => vn(e, typeof t == "symbol" ? t : t + "", n), bn = void 0, xn = class {
 	constructor(e, t) {
 		if (yn(this, "address"), yn(this, "auth"), yn(this, "adminAuth"), yn(this, "encodedTsPromise"), yn(this, "debug"), yn(this, "fetchOptions"), yn(this, "fetch"), yn(this, "logger"), yn(this, "mutationQueue", []), yn(this, "isProcessingQueue", !1), typeof t == "boolean") throw Error("skipConvexDeploymentUrlCheck as the second argument is no longer supported. Please pass an options object, `{ skipConvexDeploymentUrlCheck: true }`.");
-		(t ?? {}).skipConvexDeploymentUrlCheck !== !0 && ae(e), this.logger = t?.logger === !1 ? He({ verbose: !1 }) : t?.logger !== !0 && t?.logger ? t.logger : Ve({ verbose: !1 }), this.address = e, this.debug = !0, this.auth = void 0, this.adminAuth = void 0, this.fetch = t?.fetch, t?.auth && this.setAuth(t.auth);
+		(t ?? {}).skipConvexDeploymentUrlCheck !== !0 && oe(e), this.logger = t?.logger === !1 ? He({ verbose: !1 }) : t?.logger !== !0 && t?.logger ? t.logger : Ve({ verbose: !1 }), this.address = e, this.debug = !0, this.auth = void 0, this.adminAuth = void 0, this.fetch = t?.fetch, t?.auth && this.setAuth(t.auth);
 	}
 	backendUrl() {
 		return `${this.address}/api`;
@@ -11105,7 +11105,7 @@ var pn = Object.defineProperty, mn = (e, t, n) => t in e ? pn(e, t, {
 		this.fetchOptions = e;
 	}
 	async consistentQuery(e, ...t) {
-		let n = w(t[0]), r = this.getTimestamp();
+		let n = C(t[0]), r = this.getTimestamp();
 		return await this.queryInner(e, n, { timestampPromise: r });
 	}
 	async getTimestamp() {
@@ -11125,7 +11125,7 @@ var pn = Object.defineProperty, mn = (e, t, n) => t in e ? pn(e, t, {
 		return r;
 	}
 	async query(e, ...t) {
-		let n = w(t[0]);
+		let n = C(t[0]);
 		return await this.queryInner(e, n, {});
 	}
 	async queryInner(e, t, n) {
@@ -11203,11 +11203,11 @@ var pn = Object.defineProperty, mn = (e, t, n) => t in e ? pn(e, t, {
 		});
 	}
 	async mutation(e, ...t) {
-		let [n, r] = t, i = w(n);
+		let [n, r] = t, i = C(n);
 		return r?.skipQueue ? await this.mutationInner(e, i) : await this.enqueueMutation(e, i);
 	}
 	async action(e, ...t) {
-		let n = w(t[0]), r = lt(e), i = JSON.stringify({
+		let n = C(t[0]), r = lt(e), i = JSON.stringify({
 			path: r,
 			format: "convex_encoded_json",
 			args: [O(n)]
@@ -11232,7 +11232,7 @@ var pn = Object.defineProperty, mn = (e, t, n) => t in e ? pn(e, t, {
 		}
 	}
 	async function(e, t, ...n) {
-		let r = w(n[0]), i = typeof e == "string" ? e : lt(e), a = JSON.stringify({
+		let r = C(n[0]), i = typeof e == "string" ? e : lt(e), a = JSON.stringify({
 			componentPath: t,
 			path: i,
 			format: "convex_encoded_json",
@@ -11437,7 +11437,7 @@ function Mn() {
 }
 var Nn = ({ client: e, children: t }) => N.createElement(jn.Provider, { value: e }, t);
 function Pn(e, ...t) {
-	let n = t[0] === "skip", r = t[0] === "skip" ? {} : w(t[0]), i = typeof e == "string" ? ut(e) : e, a = lt(i), o = Hn((0, N.useMemo)(() => n ? {} : { query: {
+	let n = t[0] === "skip", r = t[0] === "skip" ? {} : C(t[0]), i = typeof e == "string" ? ut(e) : e, a = lt(i), o = Hn((0, N.useMemo)(() => n ? {} : { query: {
 		query: i,
 		args: r
 	} }, [
@@ -11643,302 +11643,194 @@ var Yn = /* @__PURE__ */ o(((e) => {
 	e.Fragment = n, e.jsx = r, e.jsxs = r;
 })), Xn = /* @__PURE__ */ o(((e, t) => {
 	t.exports = Yn();
-})), Zn = g(), P = Xn(), Qn = Object.prototype.toString, $n = (e) => Qn.call(e) === "[object Error]", er = /* @__PURE__ */ new Set([
-	"network error",
-	"NetworkError when attempting to fetch resource.",
-	"The Internet connection appears to be offline.",
-	"Network request failed",
-	"fetch failed",
-	"terminated",
-	" A network error occurred.",
-	"Network connection lost"
-]);
-function tr(e) {
-	if (!(e && $n(e) && e.name === "TypeError" && typeof e.message == "string")) return !1;
-	let { message: t, stack: n } = e;
-	return t === "Load failed" || t.startsWith("Load failed (") && t.endsWith(")") ? n === void 0 || "__sentry_captured__" in e : t.startsWith("error sending request for url") || t === "Failed to fetch" || t.startsWith("Failed to fetch (") && t.endsWith(")") ? !0 : er.has(t);
+})), Zn = g(), P = Xn(), Qn = (0, N.createContext)(void 0);
+(0, N.createContext)(void 0);
+var $n = (0, N.createContext)(null);
+//#endregion
+//#region node_modules/@convex-dev/auth/dist/react/index.js
+function er() {
+	return (0, N.useContext)(Qn);
+}
+function tr() {
+	return (0, N.useContext)($n);
 }
 //#endregion
-//#region node_modules/@convex-dev/auth/dist/react/client.js
-var nr = [500, 2e3], rr = 100, ir = (0, N.createContext)(void 0), ar = (0, N.createContext)(void 0);
-function or() {
-	return (0, N.useContext)(ar);
+//#region src/auth/sharedSession.ts
+var nr = (e) => "cuelo-shared-session:" + e;
+function rr(e) {
+	try {
+		return JSON.parse(atob(e.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).sub;
+	} catch {
+		return null;
+	}
 }
-var sr = (0, N.createContext)(null), cr = "__convexAuthOAuthVerifier", lr = "__convexAuthJWT", ur = "__convexAuthRefreshToken", dr = "__convexAuthServerStateFetchTime";
-function fr({ client: e, serverState: t, onChange: n, shouldHandleCode: r, storage: i, storageNamespace: a, replaceURL: o, children: s }) {
-	let c = (0, N.useRef)(t?._state.token ?? null), [l, u] = (0, N.useState)(c.current === null), [d, f] = (0, N.useState)(c.current), p = e.verbose ?? !1, m = (0, N.useCallback)((t) => {
-		p && (console.debug(`${(/* @__PURE__ */ new Date()).toISOString()} ${t}`), e.logger?.logVerbose(t));
-	}, [p]), { storageSet: h, storageGet: g, storageRemove: _, storageKey: v } = pr(i, a), [y, b] = (0, N.useState)(!1), x = (0, N.useCallback)(async (e) => {
-		let t = c.current !== null, r;
-		if (e.tokens === null) c.current = null, e.shouldStore && (await _(lr), await _(ur)), r = null;
-		else {
-			let { token: t } = e.tokens;
-			if (c.current = t, e.shouldStore) {
-				let { refreshToken: n } = e.tokens;
-				await h(lr, t), await h(ur, n);
+//#endregion
+//#region src/auth/transport.ts
+function ir(e) {
+	let t = globalThis.chrome;
+	return {
+		request: async (n) => {
+			let r = await t.runtime.sendMessage({
+				type: "shared-auth",
+				backend: e,
+				request: n
+			});
+			if (r?.error) throw Error(r.error);
+			if (!r?.state) throw Error("Shared sign-in is unavailable. Reload Cuelo.");
+			return r;
+		},
+		subscribe: (n) => {
+			let r = (t, r) => {
+				r === "local" && t[nr(e)] && n();
+			};
+			return t.storage.onChanged.addListener(r), () => t.storage.onChanged.removeListener(r);
+		}
+	};
+}
+//#endregion
+//#region src/auth/SharedAuth.tsx
+var ar = (0, N.createContext)(null), or = (0, N.createContext)(void 0);
+function sr() {
+	let e = (0, N.useContext)(ar), t = er();
+	return e ?? t;
+}
+function cr() {
+	let e = (0, N.useContext)(or), t = tr();
+	return e === void 0 ? t : e;
+}
+var lr = /* @__PURE__ */ new Map();
+function ur({ client: e, transport: t, initial: n, popup: r, children: i, handleCode: a = !1 }) {
+	let [o, s] = (0, N.useState)(n ?? {
+		token: null,
+		revision: -1,
+		established: !1
+	}), c = (0, N.useRef)(o), [l, u] = (0, N.useState)(!n), [d, f] = (0, N.useState)(""), p = (0, N.useCallback)((e) => {
+		e.revision < c.current.revision || (c.current = e, s(e), u(!1));
+	}, []), m = (0, N.useCallback)(async () => {
+		let e = await t.request({ operation: "state" });
+		p(e.state);
+	}, [t, p]);
+	(0, N.useEffect)(() => {
+		let e = !0, n = () => {
+			m().catch(() => {
+				e && f("Shared sign-in is unavailable. Reload this page or the Cuelo sidebar.");
+			});
+		}, r = t.subscribe(n);
+		return n(), () => {
+			e = !1, r();
+		};
+	}, [t, m]), (0, N.useEffect)(() => {
+		if (!a) return;
+		let n = new URLSearchParams(location.search).get("code"), r = sessionStorage.getItem("cuelo-website-login-verifier");
+		if (!n || !r) return;
+		let i = e.address + ":" + n;
+		lr.has(i) || lr.set(i, t.request({
+			operation: "signIn",
+			args: {
+				params: { code: n },
+				verifier: r
 			}
-			r = t;
-		}
-		t !== (r !== null) && await n?.(), f(r), u(!1);
-	}, [h, _]);
-	(0, N.useEffect)(() => {
-		let e = async (e) => {
-			if (y) return e.preventDefault(), e.returnValue = !0, "Are you sure you want to leave? Your changes may not be saved.";
-		};
-		return br("beforeunload", e), () => {
-			xr("beforeunload", e);
-		};
-	}), (0, N.useEffect)(() => {
-		let e = (e) => {
-			(async () => {
-				if (e.storageArea === i && e.key === v(lr)) {
-					let t = e.newValue;
-					m(`synced access token, is null: ${t === null}`), await x({
-						shouldStore: !1,
-						tokens: t === null ? null : { token: t }
-					});
-				}
-			})();
-		};
-		return br("storage", e), () => xr("storage", e);
-	}, [x]);
-	let ee = (0, N.useCallback)(async (t) => {
-		let n, r = 0;
-		for (; r < nr.length;) try {
-			return await e.unauthenticatedCall("auth:signIn", "code" in t ? {
-				params: { code: t.code },
-				verifier: t.verifier
-			} : t);
-		} catch (e) {
-			if (n = e, !tr(e)) break;
-			let t = nr[r] + rr * Math.random();
-			r++, m(`verifyCode failed with network error, retry ${r} of ${nr.length} in ${t}ms`), await new Promise((e) => setTimeout(e, t));
-		}
-		throw n;
-	}, [e]), te = (0, N.useCallback)(async (e) => {
-		let { tokens: t } = await ee(e);
-		return m(`retrieved tokens, is null: ${t === null}`), await x({
-			shouldStore: !0,
-			tokens: t ?? null
-		}), t !== null;
-	}, [e, x]), ne = (0, N.useCallback)(async (t, n) => {
-		let r = n instanceof FormData ? Array.from(n.entries()).reduce((e, [t, n]) => (e[t] = n, e), {}) : n ?? {}, i = await g(cr) ?? void 0;
-		await _(cr);
-		let a = await e.authenticatedCall("auth:signIn", {
-			provider: t,
-			params: r,
-			verifier: i
-		});
-		if (a.redirect !== void 0) {
-			let e = new URL(a.redirect);
-			return await h(cr, a.verifier), navigator.product !== "ReactNative" && (window.location.href = e.toString()), {
-				signingIn: !1,
-				redirect: e
-			};
-		}
-		if (a.tokens !== void 0) {
-			let { tokens: e } = a;
-			return m(`signed in and got tokens, is null: ${e === null}`), await x({
-				shouldStore: !0,
-				tokens: e
-			}), { signingIn: a.tokens !== null };
-		}
-		return { signingIn: !1 };
+		})), lr.get(i).then((e) => {
+			p(e.state), sessionStorage.removeItem("cuelo-website-login-verifier");
+			let t = new URL(location.href);
+			t.searchParams.delete("code"), history.replaceState({}, "", t.pathname + t.search + t.hash);
+		}).catch(() => f("Google sign-in could not complete. Return to the account page and try again."));
 	}, [
+		a,
+		t,
 		e,
-		x,
-		g
-	]), S = (0, N.useCallback)(async () => {
-		try {
-			await e.authenticatedCall("auth:signOut");
-		} catch {}
-		m("signed out, erasing tokens"), await x({
-			shouldStore: !0,
-			tokens: null
-		});
-	}, [x, e]), re = (0, N.useCallback)(async ({ forceRefreshToken: e }) => {
-		if (e) {
-			let e = c.current;
-			return await hr(ur, async () => {
-				let t = c.current;
-				if (t !== e) return m(`returning synced token, is null: ${t === null}`), t;
-				let n = await g(ur) ?? null;
-				return n === null ? (b(!1), m("returning null, there is no refresh token"), null) : (b(!0), await te({ refreshToken: n }).finally(() => {
-					b(!1);
-				}), m(`returning retrieved token, is null: ${t === null}`), c.current);
-			});
-		}
-		return c.current;
-	}, [
-		te,
-		S,
-		g
-	]), C = (0, N.useRef)(!1);
-	(0, N.useEffect)(() => {
-		if (i === void 0) throw Error("`localStorage` is not available in this environment, set the `storage` prop on `ConvexAuthProvider`!");
-		let e = async () => {
-			let e = await g(lr) ?? null;
-			m(`retrieved token from storage, is null: ${e === null}`), await x({
-				shouldStore: !1,
-				tokens: e === null ? null : { token: e }
-			});
-		};
-		if (t !== void 0) {
-			let n = g(dr), r = (n) => {
-				if (!n || t._timeFetched > +n) {
-					let { token: e, refreshToken: n } = t._state, r = e === null || n === null ? null : {
-						token: e,
-						refreshToken: n
-					};
-					h(dr, t._timeFetched.toString()), x({
-						tokens: r,
-						shouldStore: !0
-					});
-				} else e();
-			};
-			n instanceof Promise ? n.then(r) : r(n);
-			return;
-		}
-		let n = window?.location?.search === void 0 ? null : new URLSearchParams(window.location.search).get("code");
-		if (!C.current) {
-			if (n && (r === void 0 || (typeof r == "function" ? r() : r))) {
-				C.current = !0;
-				let e = new URL(window.location.href);
-				e.searchParams.delete("code"), (async () => {
-					await o(e.pathname + e.search + e.hash), await ne(void 0, { code: n }), C.current = !1;
-				})();
-			} else e();
-		}
-	}, [e, g]);
-	let ie = (0, N.useMemo)(() => ({
-		signIn: ne,
-		signOut: S
-	}), [ne, S]), w = d !== null, ae = (0, N.useMemo)(() => ({
-		isLoading: l,
-		isAuthenticated: w,
-		fetchAccessToken: re
-	}), [
-		re,
-		l,
-		w
+		p
 	]);
-	return (0, P.jsx)(ar.Provider, {
-		value: ae,
-		children: (0, P.jsx)(ir.Provider, {
-			value: ie,
-			children: (0, P.jsx)(sr.Provider, {
-				value: d,
-				children: s
+	let h = (0, N.useCallback)(async (e = "google", n = {}) => {
+		if (e !== "google") throw Error("Use Google sign-in only.");
+		f("");
+		let i = Array.from(crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32)), (e) => e.toString(16).padStart(2, "0")).join(""), a = await t.request({
+			operation: "signIn",
+			args: {
+				provider: "google",
+				params: {
+					...n,
+					redirectTo: r ? `/?view=extension-auth&state=${i}` : "/?view=account"
+				}
+			}
+		});
+		if (a.redirect) {
+			if (!a.verifier) throw Error("Google sign-in could not start.");
+			if (r) {
+				let e = await r(a.redirect, i), n = await t.request({
+					operation: "signIn",
+					args: {
+						params: { code: e },
+						verifier: a.verifier
+					}
+				});
+				return p(n.state), { signingIn: !!n.state.token };
+			}
+			return sessionStorage.setItem("cuelo-website-login-verifier", a.verifier), location.assign(a.redirect), {
+				signingIn: !1,
+				redirect: new URL(a.redirect)
+			};
+		}
+		return p(a.state), { signingIn: !!a.state.token };
+	}, [
+		t,
+		r,
+		p
+	]), g = (0, N.useCallback)(async () => {
+		let e = await t.request({ operation: "signOut" });
+		p(e.state);
+	}, [t, p]), _ = (0, N.useCallback)(async ({ forceRefreshToken: e }) => {
+		if (!e) return c.current.token;
+		let n = await t.request({
+			operation: "refresh",
+			token: c.current.token ?? void 0
+		});
+		return p(n.state), c.current.token;
+	}, [
+		t,
+		p,
+		rr(o.token)
+	]);
+	return d ? /* @__PURE__ */ (0, P.jsxs)("main", {
+		className: "account-page",
+		children: [/* @__PURE__ */ (0, P.jsx)("p", {
+			role: "alert",
+			children: d
+		}), /* @__PURE__ */ (0, P.jsx)("button", {
+			onClick: () => location.reload(),
+			children: "Reload"
+		})]
+	}) : /* @__PURE__ */ (0, P.jsx)(ar.Provider, {
+		value: {
+			signIn: h,
+			signOut: g
+		},
+		children: /* @__PURE__ */ (0, P.jsx)(or.Provider, {
+			value: o.token,
+			children: /* @__PURE__ */ (0, P.jsx)(Kn, {
+				client: e,
+				useAuth: () => ({
+					isLoading: l,
+					isAuthenticated: !!o.token,
+					fetchAccessToken: _
+				}),
+				children: i
 			})
 		})
 	});
 }
-function pr(e, t) {
-	let n = mr(), r = (0, N.useMemo)(() => e ?? n(), [e]), i = t.replace(/[^a-zA-Z0-9]/g, ""), a = (0, N.useCallback)((e) => `${e}_${i}`, [t]);
-	return {
-		storageSet: (0, N.useCallback)((e, t) => r.setItem(a(e), t), [r, a]),
-		storageGet: (0, N.useCallback)((e) => r.getItem(a(e)), [r, a]),
-		storageRemove: (0, N.useCallback)((e) => r.removeItem(a(e)), [r, a]),
-		storageKey: a
-	};
-}
-function mr() {
-	let [e, t] = (0, N.useState)({});
-	return () => ({
-		getItem: (t) => e[t],
-		setItem: (e, n) => {
-			t((t) => ({
-				...t,
-				[e]: n
-			}));
-		},
-		removeItem: (e) => {
-			t((t) => {
-				let { [e]: n, ...r } = t;
-				return r;
-			});
-		}
+function dr({ client: e, popup: t, children: n }) {
+	let [r] = (0, N.useState)(() => ir(e.address));
+	return /* @__PURE__ */ (0, P.jsx)(ur, {
+		client: e,
+		transport: r,
+		popup: t,
+		children: n
 	});
-}
-async function hr(e, t) {
-	let n = window?.navigator?.locks;
-	return n === void 0 ? await yr(e, t) : await n.request(e, t);
-}
-function gr(e) {
-	globalThis.__convexAuthMutexes === void 0 && (globalThis.__convexAuthMutexes = {});
-	let t = globalThis.__convexAuthMutexes[e];
-	return t === void 0 && (globalThis.__convexAuthMutexes[e] = {
-		currentlyRunning: null,
-		waiting: []
-	}), t = globalThis.__convexAuthMutexes[e], t;
-}
-function _r(e, t) {
-	globalThis.__convexAuthMutexes[e] = t;
-}
-async function vr(e, t) {
-	let n = gr(e);
-	n.currentlyRunning === null ? _r(e, {
-		currentlyRunning: t().finally(() => {
-			let t = gr(e).waiting.shift();
-			gr(e).currentlyRunning = null, _r(e, {
-				...gr(e),
-				currentlyRunning: t === void 0 ? null : vr(e, t)
-			});
-		}),
-		waiting: []
-	}) : _r(e, {
-		...n,
-		waiting: [...n.waiting, t]
-	});
-}
-async function yr(e, t) {
-	return new Promise((n, r) => {
-		vr(e, () => t().then((e) => n(e)).catch((e) => r(e)));
-	});
-}
-function br(e, t, n) {
-	typeof window < "u" && window.addEventListener?.(e, t, n);
-}
-function xr(e, t, n) {
-	typeof window < "u" && window.removeEventListener?.(e, t, n);
-}
-//#endregion
-//#region node_modules/@convex-dev/auth/dist/react/index.js
-function Sr() {
-	return (0, N.useContext)(ir);
-}
-function Cr(e) {
-	let { client: t, storage: n, storageNamespace: r, replaceURL: i, shouldHandleCode: a, children: o } = e, s = (0, N.useMemo)(() => ({
-		authenticatedCall(e, n) {
-			return t.action(e, n);
-		},
-		unauthenticatedCall(e, n) {
-			return new xn(t.address, { logger: t.logger }).action(e, n);
-		},
-		verbose: t.options?.verbose,
-		logger: t.logger
-	}), [t]);
-	return (0, P.jsx)(fr, {
-		client: s,
-		storage: n ?? (typeof window > "u" ? void 0 : window?.localStorage),
-		storageNamespace: r ?? t.address,
-		replaceURL: i ?? ((e) => {
-			window.history.replaceState({}, "", e);
-		}),
-		shouldHandleCode: a,
-		children: (0, P.jsx)(Kn, {
-			client: t,
-			useAuth: or,
-			children: o
-		})
-	});
-}
-function wr() {
-	return (0, N.useContext)(sr);
 }
 //#endregion
 //#region extension/src/accessIdentity.ts
-function Tr(e, t, n = Date.now()) {
+function fr(e, t, n = Date.now()) {
 	if (!e || e.length > 2e4) return null;
 	try {
 		let r = e.split(".");
@@ -11953,9 +11845,9 @@ function Tr(e, t, n = Date.now()) {
 }
 //#endregion
 //#region node_modules/convex/dist/esm/server/components/index.js
-function Er(e, t) {
+function pr(e, t) {
 	return new Proxy({}, { get(n, r) {
-		if (typeof r == "string") return Er(e, [...t, r]);
+		if (typeof r == "string") return pr(e, [...t, r]);
 		if (r === at) {
 			if (t.length < 1) {
 				let n = [e, ...t].join(".");
@@ -11965,16 +11857,16 @@ function Er(e, t) {
 		}
 	} });
 }
-var Dr = () => Er("components", []), Or = ft;
-Dr();
+var mr = () => pr("components", []), hr = ft;
+mr();
 //#endregion
 //#region src/SourceManager.tsx
-function kr() {
+function gr() {
 	let e = "cuelo-temporary-source", t = sessionStorage.getItem(e);
 	return (!t || !/^[a-f0-9]{64}$/.test(t)) && (t = Array.from(crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32)), (e) => e.toString(16).padStart(2, "0")).join(""), sessionStorage.setItem(e, t)), t;
 }
-function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConfirmed: r, onSourceChanged: i }) {
-	let { isAuthenticated: a } = Gn(), [o] = (0, N.useState)(kr), [s, c] = (0, N.useState)(!1), [l, u] = (0, N.useState)(!1), d = Pn(Or.sources.get, a ? {} : "skip"), f = Pn(Or.sources.get, t ? "skip" : { guestSecret: o }), p = t ? !1 : e ? !(!f || d && !l) : !(s && a), m = p ? { guestSecret: o } : {}, h = Pn(Or.sources.get, m), [g, _] = (0, N.useState)(() => Date.now()), v = h && h.expiresAt !== null && h.expiresAt <= g ? null : h, y = In(Or.sourceImport.paste), b = In(Or.sourceImport.webpage), x = In(Or.sourceImport.prepareUpload), ee = Fn(Or.sources.remove), te = Fn(Or.sources.keep), [ne, S] = (0, N.useState)("text"), [re, C] = (0, N.useState)(""), [ie, w] = (0, N.useState)(""), [ae, oe] = (0, N.useState)(""), [se, ce] = (0, N.useState)(null), [le, T] = (0, N.useState)(!1), [ue, de] = (0, N.useState)(!1), [fe, pe] = (0, N.useState)(""), [me, he] = (0, N.useState)(""), [ge, _e] = (0, N.useState)(!1), ve = Pn(Or.sources.passages, ge && v ? {
+function _r({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConfirmed: r, onSourceChanged: i }) {
+	let { isAuthenticated: a } = Gn(), [o] = (0, N.useState)(gr), [s, c] = (0, N.useState)(!1), [l, u] = (0, N.useState)(!1), d = Pn(hr.sources.get, a ? {} : "skip"), f = Pn(hr.sources.get, t ? "skip" : { guestSecret: o }), p = t ? !1 : e ? !(!f || d && !l) : !(s && a), m = p ? { guestSecret: o } : {}, h = Pn(hr.sources.get, m), [g, _] = (0, N.useState)(() => Date.now()), v = h && h.expiresAt !== null && h.expiresAt <= g ? null : h, y = In(hr.sourceImport.paste), b = In(hr.sourceImport.webpage), ee = In(hr.sourceImport.prepareUpload), te = Fn(hr.sources.remove), ne = Fn(hr.sources.keep), [re, x] = (0, N.useState)("text"), [ie, S] = (0, N.useState)(""), [ae, C] = (0, N.useState)(""), [oe, se] = (0, N.useState)(""), [ce, le] = (0, N.useState)(null), [ue, w] = (0, N.useState)(!1), [T, de] = (0, N.useState)(!1), [fe, pe] = (0, N.useState)(""), [me, he] = (0, N.useState)(""), [ge, _e] = (0, N.useState)(!1), ve = Pn(hr.sources.passages, ge && v ? {
 		...m,
 		id: v.id
 	} : "skip");
@@ -12011,33 +11903,33 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 				...m,
 				expectedId: v?.id ?? null
 			};
-			if (ne === "text") await y({
+			if (re === "text") await y({
 				...e,
-				title: re,
-				text: ie
+				title: ie,
+				text: ae
 			});
-			else if (ne === "webpage") await b({
+			else if (re === "webpage") await b({
 				...e,
-				url: ae
+				url: oe
 			});
 			else {
-				if (!se) throw Error("Choose a PDF or Word .docx file.");
-				if (se.size > 10485760) throw Error("Choose a file no larger than 10 MB.");
-				let t = await x({
+				if (!ce) throw Error("Choose a PDF or Word .docx file.");
+				if (ce.size > 10485760) throw Error("Choose a file no larger than 10 MB.");
+				let t = await ee({
 					...e,
-					name: se.name,
-					size: se.size
+					name: ce.name,
+					size: ce.size
 				}), n = await fetch(t.url, {
 					method: "POST",
 					headers: {
 						Authorization: `Bearer ${t.token}`,
 						"Content-Type": "application/octet-stream"
 					},
-					body: se
+					body: ce
 				}), r = await n.json();
 				if (!n.ok) throw Error(r.error || "Your file could not be read. Try again.");
 			}
-			T(!1), _e(!1), w(""), ce(null), he("Your source is ready. No answer has been generated.");
+			w(!1), _e(!1), C(""), le(null), he("Your source is ready. No answer has been generated.");
 		} catch (e) {
 			be(e);
 		} finally {
@@ -12048,7 +11940,7 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 		if (v) {
 			de(!0), pe("");
 			try {
-				await ee({
+				await te({
 					...m,
 					expectedId: v.id
 				}), he("Source deleted, including its readable text and search entries."), _e(!1);
@@ -12063,7 +11955,7 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 		if (v) {
 			de(!0), pe("");
 			try {
-				await te({
+				await ne({
 					...m,
 					expectedId: v.id,
 					replaceSaved: !!(d && d.id !== v.id)
@@ -12083,7 +11975,7 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 			e && f && d && f.id !== d.id && /* @__PURE__ */ (0, P.jsx)("button", {
 				type: "button",
 				className: "text-button",
-				disabled: ue,
+				disabled: T,
 				onClick: () => u(!l),
 				children: l ? "Show account source" : "Show the source from this visit"
 			}),
@@ -12114,23 +12006,23 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 							/* @__PURE__ */ (0, P.jsx)("button", {
 								type: "button",
 								className: "text-button",
-								disabled: ue,
+								disabled: T,
 								onClick: () => _e(!ge),
 								children: ge ? "Hide readable text" : "Inspect readable text"
 							}),
 							/* @__PURE__ */ (0, P.jsx)("button", {
 								type: "button",
 								className: "text-button",
-								disabled: ue,
+								disabled: T,
 								onClick: () => {
-									T(!0), pe("");
+									w(!0), pe("");
 								},
 								children: "Replace source"
 							}),
 							/* @__PURE__ */ (0, P.jsx)("button", {
 								type: "button",
 								className: "text-button",
-								disabled: ue,
+								disabled: T,
 								onClick: Se,
 								children: "Delete source"
 							})
@@ -12146,7 +12038,7 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 					!v.saved && (a ? /* @__PURE__ */ (0, P.jsx)("button", {
 						type: "button",
 						className: "cancel-button",
-						disabled: ue,
+						disabled: T,
 						onClick: Ce,
 						children: d && d.id !== v.id ? "Keep this source and replace saved source" : "Keep this source"
 					}) : /* @__PURE__ */ (0, P.jsxs)("p", {
@@ -12159,12 +12051,12 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 					r && /* @__PURE__ */ (0, P.jsx)("button", {
 						type: "button",
 						className: "primary",
-						disabled: ue,
+						disabled: T,
 						onClick: () => r(v, m),
 						children: "Use this source"
 					})
 				]
-			}), (!v || le || n) && /* @__PURE__ */ (0, P.jsxs)("form", {
+			}), (!v || ue || n) && /* @__PURE__ */ (0, P.jsxs)("form", {
 				onSubmit: xe,
 				children: [
 					n && v && /* @__PURE__ */ (0, P.jsx)("p", {
@@ -12180,25 +12072,25 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 						].map(([e, t]) => /* @__PURE__ */ (0, P.jsxs)("label", { children: [/* @__PURE__ */ (0, P.jsx)("input", {
 							type: "radio",
 							name: "source-method",
-							checked: ne === e,
-							disabled: ue,
+							checked: re === e,
+							disabled: T,
 							onChange: () => {
-								S(e), pe("");
+								x(e), pe("");
 							}
 						}), t] }, e))]
 					}),
-					ne === "text" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
+					re === "text" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
 						/* @__PURE__ */ (0, P.jsx)("label", {
 							htmlFor: "source-name",
 							children: "Source name"
 						}),
 						/* @__PURE__ */ (0, P.jsx)("input", {
 							id: "source-name",
-							value: re,
+							value: ie,
 							maxLength: 160,
 							required: !0,
-							disabled: ue,
-							onChange: (e) => C(e.target.value)
+							disabled: T,
+							onChange: (e) => S(e.target.value)
 						}),
 						/* @__PURE__ */ (0, P.jsx)("label", {
 							htmlFor: "source-text",
@@ -12207,12 +12099,12 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 						/* @__PURE__ */ (0, P.jsx)("textarea", {
 							id: "source-text",
 							rows: 7,
-							value: ie,
+							value: ae,
 							required: !0,
-							disabled: ue,
-							onChange: (e) => w(e.target.value)
+							disabled: T,
+							onChange: (e) => C(e.target.value)
 						})
-					] }) : ne === "webpage" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
+					] }) : re === "webpage" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
 						/* @__PURE__ */ (0, P.jsx)("label", {
 							htmlFor: "source-link",
 							children: "Public webpage link"
@@ -12220,12 +12112,12 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 						/* @__PURE__ */ (0, P.jsx)("input", {
 							id: "source-link",
 							type: "url",
-							value: ae,
+							value: oe,
 							maxLength: 2048,
 							required: !0,
-							disabled: ue,
+							disabled: T,
 							placeholder: "https://example.com/help/product",
-							onChange: (e) => oe(e.target.value)
+							onChange: (e) => se(e.target.value)
 						}),
 						/* @__PURE__ */ (0, P.jsx)("p", {
 							className: "supporting",
@@ -12241,8 +12133,8 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 							type: "file",
 							accept: ".pdf,.docx",
 							required: !0,
-							disabled: ue,
-							onChange: (e) => ce(e.target.files?.[0] ?? null)
+							disabled: T,
+							onChange: (e) => le(e.target.files?.[0] ?? null)
 						}),
 						/* @__PURE__ */ (0, P.jsx)("p", {
 							className: "supporting",
@@ -12255,14 +12147,14 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 					}),
 					/* @__PURE__ */ (0, P.jsx)("button", {
 						className: "primary",
-						disabled: ue,
-						children: ue ? "Reading your source…" : v && !n ? "Replace source" : "Read source"
+						disabled: T,
+						children: T ? "Reading your source…" : v && !n ? "Replace source" : "Read source"
 					}),
-					le && /* @__PURE__ */ (0, P.jsx)("button", {
+					ue && /* @__PURE__ */ (0, P.jsx)("button", {
 						type: "button",
 						className: "text-button",
-						disabled: ue,
-						onClick: () => T(!1),
+						disabled: T,
+						onClick: () => w(!1),
 						children: "Cancel replacement"
 					})
 				]
@@ -12281,7 +12173,7 @@ function Ar({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 }
 //#endregion
 //#region src/AnswerCheck.tsx
-function jr({ result: e, elapsedMs: t, sourceLinks: n = !0 }) {
+function vr({ result: e, elapsedMs: t, sourceLinks: n = !0 }) {
 	return /* @__PURE__ */ (0, P.jsxs)("section", {
 		className: "answer-panel selected-answer-card",
 		"aria-label": "Answer",
@@ -12331,33 +12223,18 @@ function jr({ result: e, elapsedMs: t, sourceLinks: n = !0 }) {
 }
 //#endregion
 //#region extension/src/sidebarState.ts
-function Mr(e) {
-	return e.checking ? "checking-meeting" : e.meeting ? e.authLoading ? "checking-account" : e.authenticated ? e.accessLoading ? "checking-access" : "setup" : "sign-in" : "no-meeting";
+function yr(e) {
+	return e.authLoading ? "checking-account" : e.authenticated ? e.checking ? "checking-meeting" : e.meeting ? e.accessLoading ? "checking-access" : "setup" : "no-meeting" : "sign-in";
 }
-function Nr(e) {
+function br(e) {
 	return e.busy ? "Connecting…" : e.eligible ? e.invited ? e.enabled ? e.mode ? e.mode === "document" && e.sourceLoading ? "Your source is still loading." : e.mode === "document" && !e.sourceSelected ? "Choose a ready source to enable Start." : null : "Choose how Cuelo should answer." : "Live listening is not enabled for this test account yet." : "Your account needs invited tester access before listening can start." : "Join a Meet call before starting Cuelo.";
 }
 //#endregion
 //#region extension/src/chrome.ts
-var Pr = globalThis.chrome;
-function Fr(e) {
-	return {
-		getItem: async (t) => {
-			let n = await e.storage.local.get(t);
-			return typeof n[t] == "string" ? n[t] : null;
-		},
-		setItem: async (t, n) => {
-			await e.storage.local.set({ [t]: n });
-		},
-		removeItem: async (t) => {
-			await e.storage.local.remove(t);
-		}
-	};
-}
-var Ir = Fr(Pr);
-function Lr(e, t) {
+var xr = globalThis.chrome;
+function Sr(e, t) {
 	return new Promise((n, r) => {
-		let i = Pr.runtime.connect({ name: "cuelo-signin" }), a = !1, o = setInterval(() => {
+		let i = xr.runtime.connect({ name: "cuelo-signin" }), a = !1, o = setInterval(() => {
 			if (!a) try {
 				i.postMessage({ type: "ping" });
 			} catch {
@@ -12379,63 +12256,15 @@ function Lr(e, t) {
 		}
 	});
 }
-function Rr() {
-	let e = crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32));
-	return Array.from(e, (e) => e.toString(16).padStart(2, "0")).join("");
-}
-function zr(e, t, n, r) {
-	let i = (e, i) => {
-		if (i !== "local" || !Object.hasOwn(e, r)) return;
-		let a = e[r].newValue;
-		if (a !== void 0 && typeof a != "string") return;
-		let o = new Event("storage");
-		Object.defineProperties(o, {
-			storageArea: { value: t },
-			key: { value: r },
-			newValue: { value: a ?? null }
-		}), n.dispatchEvent(o);
-	};
-	return e.storage.onChanged.addListener(i), () => e.storage.onChanged.removeListener(i);
-}
-//#endregion
-//#region extension/src/authFlow.ts
-async function Br(e) {
-	if (e.args.provider !== "google" || e.args.params?.code !== void 0) return e.call(e.args);
-	let t = e.nonce(), n = await e.call({
-		...e.args,
-		params: {
-			...e.args.params,
-			redirectTo: `/?view=extension-auth&state=${encodeURIComponent(t)}`
-		}
-	});
-	if (!n.redirect) return n;
-	if (typeof n.verifier != "string" || !n.verifier) throw Error("Google sign-in could not start safely.");
-	let r = await e.popup(n.redirect, t);
-	if (!r || r.length > 2048) throw Error("Google sign-in did not return a valid code.");
-	let i = await e.call({
-		params: { code: r },
-		verifier: n.verifier
-	});
-	if (i.redirect || !i.tokens?.token || !i.tokens.refreshToken) throw Error("Google sign-in did not complete. Try again.");
-	return i;
-}
 //#endregion
 //#region extension/src/client.ts
-var Vr = "https://calculating-gecko-263.convex.cloud", Hr = `cuelo-sidebar-${Vr}`;
-function Ur() {
-	let e = new An(Vr), t = e.action.bind(e);
-	return e.action = ((e, ...n) => lt(e) === "auth:signIn" ? Br({
-		args: n[0] ?? {},
-		call: (e) => t(Or.auth.signIn, e),
-		popup: Lr,
-		nonce: Rr
-	}) : t(e, ...n)), e;
-}
+var Cr = "https://calculating-gecko-263.convex.cloud";
+`${Cr}`;
 //#endregion
 //#region extension/src/runtime.ts
-var Wr = globalThis.chrome.runtime;
-async function Gr(e, t = {}) {
-	let n = await Wr.sendMessage({
+var wr = globalThis.chrome.runtime;
+async function Tr(e, t = {}) {
+	let n = await wr.sendMessage({
 		type: e,
 		...t
 	});
@@ -12444,7 +12273,7 @@ async function Gr(e, t = {}) {
 }
 //#endregion
 //#region extension/src/callEngine.tsx
-var Kr = {
+var Er = {
 	state: "idle",
 	message: "Choose how Cuelo should answer, then Start.",
 	busy: !1,
@@ -12457,12 +12286,8 @@ var Kr = {
 };
 //#endregion
 //#region extension/src/main.tsx
-function qr() {
-	(0, N.useEffect)(() => {
-		let e = Pr.storage.onChanged;
-		if (e) return zr({ storage: { onChanged: e } }, Ir, window, `__convexAuthJWT_${Hr.replace(/[^a-zA-Z0-9]/g, "")}`);
-	}, []);
-	let { isAuthenticated: e, isLoading: t } = Gn(), { signIn: n, signOut: r } = Sr(), i = Pn(Or.callAccess.status, e ? {} : "skip"), a = wr(), [o, s] = (0, N.useState)(null), [c, l] = (0, N.useState)(!1), [u, d] = (0, N.useState)(""), f = o ?? i, p = f?.signedIn ? Tr(a, Vr) : null;
+function Dr() {
+	let { isAuthenticated: e, isLoading: t } = Gn(), { signIn: n, signOut: r } = sr(), i = Pn(hr.callAccess.status, e ? {} : "skip"), a = cr(), [o, s] = (0, N.useState)(null), [c, l] = (0, N.useState)(!1), [u, d] = (0, N.useState)(""), f = o ?? i, p = f?.signedIn ? fr(a, Cr) : null;
 	(0, N.useEffect)(() => {
 		s(null), d("");
 	}, [i, a]);
@@ -12470,9 +12295,9 @@ function qr() {
 		l(!0), d("");
 		try {
 			if (!a) throw Error("Sign in again to check your account.");
-			let e = new xn(Vr);
+			let e = new xn(Cr);
 			e.setAuth(a);
-			let t = await e.query(Or.callAccess.status, {});
+			let t = await e.query(hr.callAccess.status, {});
 			s(t), d(t.invited ? "Tester access confirmed." : t.signedIn ? "The server still reports no tester access for this account. Match the account ID below in the live dashboard." : "Your sign-in could not be confirmed. Sign out and sign in again.");
 		} catch {
 			d("Could not reach Cuelo to check access. Your permissions have not changed.");
@@ -12480,17 +12305,17 @@ function qr() {
 			l(!1);
 		}
 	}
-	let h = Pn(Or.sources.get, e ? {} : "skip"), g = (0, N.useRef)(0), [_, v] = (0, N.useState)(!1), [y, b] = (0, N.useState)(""), [x, ee] = (0, N.useState)(!1), [te, ne] = (0, N.useState)(!1), [S, re] = (0, N.useState)(!0), [C, ie] = (0, N.useState)(Kr), [w, ae] = (0, N.useState)(null), [oe, se] = (0, N.useState)(""), [ce, le] = (0, N.useState)(!1), [T, ue] = (0, N.useState)(null);
+	let h = Pn(hr.sources.get, e ? {} : "skip"), g = (0, N.useRef)(0), [_, v] = (0, N.useState)(!1), [y, b] = (0, N.useState)(""), [ee, te] = (0, N.useState)(!1), [ne, re] = (0, N.useState)(!1), [x, ie] = (0, N.useState)(!0), [S, ae] = (0, N.useState)(Er), [C, oe] = (0, N.useState)(null), [se, ce] = (0, N.useState)(""), [le, ue] = (0, N.useState)(!1), [w, T] = (0, N.useState)(null);
 	(0, N.useEffect)(() => {
 		let e = !0, t = !1;
 		async function n() {
 			if (!t) {
 				t = !0;
 				try {
-					let t = await Gr("sidebar-status");
-					e && (ee(t.eligible === !0), ne(t.meeting === !0), ie(t.view ?? Kr), re(!1));
+					let t = await Tr("sidebar-status");
+					e && (te(t.eligible === !0), re(t.meeting === !0), ae(t.view ?? Er), ie(!1));
 				} catch (t) {
-					e && (b(t instanceof Error ? t.message : "Cuelo could not connect."), re(!1));
+					e && (b(t instanceof Error ? t.message : "Cuelo could not connect."), ie(!1));
 				} finally {
 					t = !1;
 				}
@@ -12504,75 +12329,75 @@ function qr() {
 			e = !1, clearInterval(r);
 		};
 	}, []), (0, N.useEffect)(() => {
-		ce || ue(h ?? null);
-	}, [h, ce]), (0, N.useEffect)(() => {
-		T?.id !== oe && se("");
-	}, [T?.id]);
+		le || T(h ?? null);
+	}, [h, le]), (0, N.useEffect)(() => {
+		w?.id !== se && ce("");
+	}, [w?.id]);
 	async function de(e) {
 		let t = ++g.current;
 		v(!0), b("");
 		try {
-			e === "signin" ? await n("google") : e === "signout" ? (await Gr("stop"), await r()) : e === "start" ? await Gr("start", {
-				resume: C.state === "paused",
-				mode: w,
-				...w === "document" && T ? {
-					sourceId: T.id,
-					sourceTitle: T.title
+			e === "signin" ? await n("google") : e === "signout" ? (await Tr("stop"), await r()) : e === "start" ? await Tr("start", {
+				resume: S.state === "paused",
+				mode: C,
+				...C === "document" && w ? {
+					sourceId: w.id,
+					sourceTitle: w.title
 				} : {}
-			}) : await Gr(e);
+			}) : await Tr(e);
 		} catch (e) {
 			b(e instanceof Error ? e.message : "This action could not finish. Try again.");
 		} finally {
 			t === g.current && v(!1);
 		}
 	}
-	let fe = Mr({
-		checking: S,
-		meeting: te,
+	let fe = yr({
+		checking: x,
+		meeting: ne,
 		authLoading: t,
 		authenticated: e,
 		accessLoading: f === void 0
-	}), pe = Nr({
-		eligible: x,
+	}), pe = br({
+		eligible: ee,
 		invited: !!f?.invited,
 		enabled: !!f?.liveEnabled,
-		busy: _ || C.controlsBusy,
-		mode: w,
-		sourceSelected: !!T && oe === T.id,
-		sourceLoading: h === void 0 && !ce
-	}), me = Vr.includes("calculating-gecko-263"), he = C.state !== "idle";
-	return /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsxs)("header", { children: [/* @__PURE__ */ (0, P.jsx)("strong", { children: "Cuelo" }), /* @__PURE__ */ (0, P.jsx)("span", { children: me ? `Test version${he ? ` · ${C.state}` : ""}` : he ? C.state : "Beside your call" })] }), /* @__PURE__ */ (0, P.jsxs)("main", { children: [
+		busy: _ || S.controlsBusy,
+		mode: C,
+		sourceSelected: !!w && se === w.id,
+		sourceLoading: h === void 0 && !le
+	}), me = Cr.includes("calculating-gecko-263"), he = S.state !== "idle";
+	return /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsxs)("header", { children: [/* @__PURE__ */ (0, P.jsx)("strong", { children: "Cuelo" }), /* @__PURE__ */ (0, P.jsx)("span", { children: me ? `Test version${he ? ` · ${S.state}` : ""}` : he ? S.state : "Beside your call" })] }), /* @__PURE__ */ (0, P.jsxs)("main", { children: [
 		he ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
 			/* @__PURE__ */ (0, P.jsx)("p", {
 				role: "status",
-				children: C.message
+				children: S.message
 			}),
-			C.warning && /* @__PURE__ */ (0, P.jsx)("p", {
+			S.warning && /* @__PURE__ */ (0, P.jsx)("p", {
 				id: "warning",
 				children: "Five minutes remain. Cuelo stops at 60 minutes; Meet can continue."
 			}),
 			/* @__PURE__ */ (0, P.jsx)("p", {
 				className: "supporting",
-				children: C.mode === "generic" ? "Generic answers · Not from your document" : `Answers from ${C.sourceTitle ?? "your selected source"}`
+				children: S.mode === "generic" ? "Generic answers · Not from your document" : `Answers from ${S.sourceTitle ?? "your selected source"}`
 			}),
-			C.audioStats && /* @__PURE__ */ (0, P.jsxs)("details", { children: [
+			S.audioStats && /* @__PURE__ */ (0, P.jsxs)("details", { children: [
 				/* @__PURE__ */ (0, P.jsx)("summary", { children: "Check audio continuity" }),
-				C.audioStats.meetingTracks !== void 0 && /* @__PURE__ */ (0, P.jsxs)("p", { children: [
-					C.audioStats.meetingTracks,
+				S.audioStats.meetingTracks !== void 0 && /* @__PURE__ */ (0, P.jsxs)("p", { children: [
+					S.audioStats.meetingTracks,
 					" meeting audio tracks · Your microphone: ",
-					C.audioStats.microphoneState === "unmuted" ? "on" : C.audioStats.microphoneState === "muted" ? "muted in Meet" : "off — Meet mute state could not be confirmed"
+					S.audioStats.microphoneState === "unmuted" ? "on" : S.audioStats.microphoneState === "muted" ? "muted in Meet" : "off — Meet mute state could not be confirmed"
 				] }),
 				/* @__PURE__ */ (0, P.jsxs)("p", { children: [
 					"Meeting frames: ",
-					C.audioStats.customerFrames,
+					S.audioStats.customerFrames,
 					" · Microphone frames: ",
-					C.audioStats.microphoneFrames
+					S.audioStats.microphoneFrames
 				] }),
 				/* @__PURE__ */ (0, P.jsxs)("p", { children: [
 					"Largest gap: meeting ",
-					C.audioStats.customerMaxGapMs,
+					S.audioStats.customerMaxGapMs,
 					" ms · microphone ",
-					C.audioStats.microphoneMaxGapMs,
+					S.audioStats.microphoneMaxGapMs,
 					" ms"
 				] }),
 				/* @__PURE__ */ (0, P.jsx)("p", {
@@ -12580,87 +12405,87 @@ function qr() {
 					children: "Only audio delivery counts are shown. No call text or audio is saved here."
 				})
 			] }),
-			me && C.answerDiagnostics && /* @__PURE__ */ (0, P.jsxs)("details", { children: [
+			me && S.answerDiagnostics && /* @__PURE__ */ (0, P.jsxs)("details", { children: [
 				/* @__PURE__ */ (0, P.jsx)("summary", { children: "Check answer attempts" }),
 				/* @__PURE__ */ (0, P.jsxs)("p", { children: [
 					"Speech starts: ",
-					C.answerDiagnostics.speechStarts,
+					S.answerDiagnostics.speechStarts,
 					" · Requests sent: ",
-					C.answerDiagnostics.requests,
+					S.answerDiagnostics.requests,
 					" · Responses received: ",
-					C.answerDiagnostics.responses,
+					S.answerDiagnostics.responses,
 					" · Answers displayed: ",
-					C.answerDiagnostics.displayed
+					S.answerDiagnostics.displayed
 				] }),
-				/* @__PURE__ */ (0, P.jsx)("ol", { children: C.answerDiagnostics.events.map((e, t) => /* @__PURE__ */ (0, P.jsx)("li", { children: e }, t)) }),
+				/* @__PURE__ */ (0, P.jsx)("ol", { children: S.answerDiagnostics.events.map((e, t) => /* @__PURE__ */ (0, P.jsx)("li", { children: e }, t)) }),
 				/* @__PURE__ */ (0, P.jsx)("p", {
 					className: "supporting",
 					children: "Latest events first. No audio or conversation text is stored in this check. Conversation, recognised questions and interrupted requests are reported separately."
 				})
 			] }),
-			C.questionQueue && /* @__PURE__ */ (0, P.jsxs)("section", {
+			S.questionQueue && /* @__PURE__ */ (0, P.jsxs)("section", {
 				"aria-label": "Waiting questions",
-				children: [C.questionQueue.checking > 0 && /* @__PURE__ */ (0, P.jsxs)("p", {
+				children: [S.questionQueue.checking > 0 && /* @__PURE__ */ (0, P.jsxs)("p", {
 					role: "status",
 					children: [
 						"Checking ",
-						C.questionQueue.checking,
+						S.questionQueue.checking,
 						" customer speech segment",
-						C.questionQueue.checking === 1 ? "" : "s",
+						S.questionQueue.checking === 1 ? "" : "s",
 						" for questions."
 					]
-				}), C.questionQueue.questions.length > 0 && /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsx)("h2", { children: "Questions to answer" }), /* @__PURE__ */ (0, P.jsx)("ol", { children: C.questionQueue.questions.map((e, t) => /* @__PURE__ */ (0, P.jsxs)("li", { children: [e, t === 0 && C.questionQueue?.answering ? " — finding the answer" : ""] }, t)) })] })]
+				}), S.questionQueue.questions.length > 0 && /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsx)("h2", { children: "Questions to answer" }), /* @__PURE__ */ (0, P.jsx)("ol", { children: S.questionQueue.questions.map((e, t) => /* @__PURE__ */ (0, P.jsxs)("li", { children: [e, t === 0 && S.questionQueue?.answering ? " — finding the answer" : ""] }, t)) })] })]
 			}),
-			C.answerNotice && /* @__PURE__ */ (0, P.jsxs)("p", {
+			S.answerNotice && /* @__PURE__ */ (0, P.jsxs)("p", {
 				role: "status",
 				children: [
-					C.answerNotice.message,
+					S.answerNotice.message,
 					/* @__PURE__ */ (0, P.jsx)("br", {}),
 					"Question: ",
-					C.answerNotice.question
+					S.answerNotice.question
 				]
 			}),
 			/* @__PURE__ */ (0, P.jsxs)("section", {
 				"aria-label": "Current answer",
-				"aria-busy": C.busy,
-				children: [C.busy && /* @__PURE__ */ (0, P.jsx)("p", {
+				"aria-busy": S.busy,
+				children: [S.busy && /* @__PURE__ */ (0, P.jsx)("p", {
 					role: "status",
 					children: "Finding the answer…"
-				}), C.result ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsx)("p", {
+				}), S.result ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsx)("p", {
 					className: "answer-question",
-					children: C.result.question
-				}), /* @__PURE__ */ (0, P.jsx)(jr, {
-					result: C.result,
+					children: S.result.question
+				}), /* @__PURE__ */ (0, P.jsx)(vr, {
+					result: S.result,
 					sourceLinks: !1
 				})] }) : /* @__PURE__ */ (0, P.jsxs)("section", {
 					className: "answer-panel",
 					"aria-label": "Answer",
-					children: [/* @__PURE__ */ (0, P.jsx)("h2", { children: "Cuelo’s answer" }), /* @__PURE__ */ (0, P.jsx)("p", { children: C.busy ? "Finding your first answer…" : "The customer’s next question will appear here with its answer." })]
+					children: [/* @__PURE__ */ (0, P.jsx)("h2", { children: "Cuelo’s answer" }), /* @__PURE__ */ (0, P.jsx)("p", { children: S.busy ? "Finding your first answer…" : "The customer’s next question will appear here with its answer." })]
 				})]
 			}),
-			(C.previousAnswers ?? []).length > 0 && /* @__PURE__ */ (0, P.jsxs)("section", {
+			(S.previousAnswers ?? []).length > 0 && /* @__PURE__ */ (0, P.jsxs)("section", {
 				"aria-label": "Previous answers",
-				children: [/* @__PURE__ */ (0, P.jsx)("h2", { children: "Previous answers" }), C.previousAnswers.map((e, t) => /* @__PURE__ */ (0, P.jsxs)("div", {
+				children: [/* @__PURE__ */ (0, P.jsx)("h2", { children: "Previous answers" }), S.previousAnswers.map((e, t) => /* @__PURE__ */ (0, P.jsxs)("div", {
 					className: "previous-answer",
 					children: [/* @__PURE__ */ (0, P.jsx)("p", {
 						className: "answer-question",
 						children: e.question
-					}), /* @__PURE__ */ (0, P.jsx)(jr, {
+					}), /* @__PURE__ */ (0, P.jsx)(vr, {
 						result: e,
 						sourceLinks: !1
 					})]
-				}, C.previousAnswers.length - t))]
+				}, S.previousAnswers.length - t))]
 			}),
 			/* @__PURE__ */ (0, P.jsx)("button", {
-				disabled: _ || C.controlsBusy || C.state === "connecting" || C.state === "limited",
+				disabled: _ || S.controlsBusy || S.state === "connecting" || S.state === "limited",
 				onClick: () => {
-					de(C.state === "paused" ? "start" : "pause");
+					de(S.state === "paused" ? "start" : "pause");
 				},
-				children: C.state === "paused" ? "Resume" : "Pause"
+				children: S.state === "paused" ? "Resume" : "Pause"
 			}),
 			/* @__PURE__ */ (0, P.jsx)("button", {
 				className: "secondary",
-				disabled: C.controlsBusy,
+				disabled: S.controlsBusy,
 				onClick: () => {
 					de("stop");
 				},
@@ -12669,7 +12494,14 @@ function qr() {
 		] }) : fe === "checking-meeting" ? /* @__PURE__ */ (0, P.jsx)("p", {
 			role: "status",
 			children: "Checking your meeting…"
-		}) : fe === "no-meeting" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsx)("h1", { children: "Start a Meet call to use Cuelo." }), /* @__PURE__ */ (0, P.jsx)("p", { children: "Join your meeting. Cuelo will detect it here automatically." })] }) : fe === "checking-account" ? /* @__PURE__ */ (0, P.jsx)("p", {
+		}) : fe === "no-meeting" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
+			/* @__PURE__ */ (0, P.jsx)("h1", { children: "You’re signed in to Cuelo." }),
+			/* @__PURE__ */ (0, P.jsx)("p", { children: "Join a Meet call. Cuelo will detect it here automatically." }),
+			/* @__PURE__ */ (0, P.jsx)("p", {
+				className: "supporting",
+				children: "You’re also signed in on the Cuelo website in this Chrome profile. Audio is off until you start Cuelo."
+			})
+		] }) : fe === "checking-account" ? /* @__PURE__ */ (0, P.jsx)("p", {
 			role: "status",
 			children: "Checking your remembered sign-in…"
 		}) : fe === "sign-in" ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
@@ -12692,57 +12524,57 @@ function qr() {
 				/* @__PURE__ */ (0, P.jsxs)("label", { children: [/* @__PURE__ */ (0, P.jsx)("input", {
 					type: "radio",
 					name: "mode",
-					checked: w === "generic",
-					onChange: () => ae("generic")
+					checked: C === "generic",
+					onChange: () => oe("generic")
 				}), " Generic answers"] }),
 				/* @__PURE__ */ (0, P.jsxs)("label", { children: [/* @__PURE__ */ (0, P.jsx)("input", {
 					type: "radio",
 					name: "mode",
-					checked: w === "document",
-					onChange: () => ae("document")
+					checked: C === "document",
+					onChange: () => oe("document")
 				}), " Answers from my document"] })
 			] }),
-			w === "generic" && /* @__PURE__ */ (0, P.jsx)("p", {
+			C === "generic" && /* @__PURE__ */ (0, P.jsx)("p", {
 				className: "supporting",
 				children: "Every answer says “Not from your document”."
 			}),
-			w === "document" && /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
+			C === "document" && /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
 				/* @__PURE__ */ (0, P.jsx)("label", {
 					htmlFor: "source",
 					children: "Choose your source"
 				}),
 				/* @__PURE__ */ (0, P.jsxs)("select", {
 					id: "source",
-					disabled: h === void 0 && !ce,
-					value: oe,
-					onChange: (e) => se(e.target.value),
+					disabled: h === void 0 && !le,
+					value: se,
+					onChange: (e) => ce(e.target.value),
 					children: [/* @__PURE__ */ (0, P.jsx)("option", {
 						value: "",
-						children: h === void 0 && !ce ? "Loading your saved source…" : T ? "Select a source" : "No saved source found"
-					}), T && /* @__PURE__ */ (0, P.jsxs)("option", {
-						value: T.id,
-						children: [T.title, T.saved ? "" : " (temporary)"]
+						children: h === void 0 && !le ? "Loading your saved source…" : w ? "Select a source" : "No saved source found"
+					}), w && /* @__PURE__ */ (0, P.jsxs)("option", {
+						value: w.id,
+						children: [w.title, w.saved ? "" : " (temporary)"]
 					})]
 				}),
-				T && oe === T.id && /* @__PURE__ */ (0, P.jsxs)("p", {
+				w && se === w.id && /* @__PURE__ */ (0, P.jsxs)("p", {
 					role: "status",
-					children: ["Source ready: ", T.title]
+					children: ["Source ready: ", w.title]
 				}),
-				h === null && !T && /* @__PURE__ */ (0, P.jsx)("p", {
+				h === null && !w && /* @__PURE__ */ (0, P.jsx)("p", {
 					className: "supporting",
 					children: "No source is saved to this Google account. Use the same account you used on the Cuelo website, or add a source here."
 				}),
 				/* @__PURE__ */ (0, P.jsx)("button", {
 					className: "secondary",
-					onClick: () => le(!ce),
-					children: ce ? "Return to source selection" : "Add a new source"
+					onClick: () => ue(!le),
+					children: le ? "Return to source selection" : "Add a new source"
 				}),
-				ce && /* @__PURE__ */ (0, P.jsx)(Ar, {
+				le && /* @__PURE__ */ (0, P.jsx)(_r, {
 					accountOnly: !0,
 					savedOnly: !0,
 					sidebarAdd: !0,
 					onSourceChanged: (e) => {
-						ue(e), e && e.id !== T?.id && (se(e.id), le(!1));
+						T(e), e && e.id !== w?.id && (ce(e.id), ue(!1));
 					}
 				})
 			] }),
@@ -12794,9 +12626,9 @@ function qr() {
 				children: u
 			})
 		] }),
-		!he && C.message !== Kr.message && /* @__PURE__ */ (0, P.jsx)("p", {
+		!he && S.message !== Er.message && /* @__PURE__ */ (0, P.jsx)("p", {
 			role: "status",
-			children: C.message
+			children: S.message
 		}),
 		_ && !he && e && /* @__PURE__ */ (0, P.jsx)("button", {
 			className: "secondary",
@@ -12819,11 +12651,9 @@ function qr() {
 		})
 	] })] });
 }
-(0, Zn.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, P.jsx)(N.StrictMode, { children: /* @__PURE__ */ (0, P.jsx)(Cr, {
-	client: Ur(),
-	storage: Ir,
-	storageNamespace: Hr,
-	shouldHandleCode: !1,
-	children: /* @__PURE__ */ (0, P.jsx)(qr, {})
+(0, Zn.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, P.jsx)(N.StrictMode, { children: /* @__PURE__ */ (0, P.jsx)(dr, {
+	client: new An(Cr),
+	popup: Sr,
+	children: /* @__PURE__ */ (0, P.jsx)(Dr, {})
 }) }));
 //#endregion

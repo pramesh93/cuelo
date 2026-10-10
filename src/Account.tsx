@@ -1,10 +1,10 @@
 import {Topbar} from "./Topbar";
 import {useEffect, useState} from "react";
-import {useAuthActions} from "@convex-dev/auth/react";
+import {useAuthActions} from "./auth/SharedAuth";
 import {useConvexAuth, useMutation, useQuery} from "convex/react";
-import {ConvexError} from "convex/values";
 import {api} from "../convex/_generated/api";
 
+import {SidebarInstructions} from './SidebarGuide';
 import {SourceManager} from "./SourceManager";
 
 type Mode = "generic" | "document";
@@ -17,13 +17,12 @@ export function Account() {
   const save = useMutation(api.accountSetup.save);
   // Always ask explicitly; a saved document or prior mode never selects the mode.
   const [mode, setMode] = useState<Mode | null>(null);
-  const [meetingUrl, setMeetingUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
-  const [step, setStep] = useState<"mode" | "source" | "meeting">("mode");
+  const [step, setStep] = useState<"mode" | "source" | "sidebar">("mode");
   useEffect(() => {
-    if (!isAuthenticated) {setMode(null); setStep("mode"); setMeetingUrl(""); setMessage("");}
+    if (!isAuthenticated) {setMode(null); setStep("mode"); setMessage("");}
   }, [isAuthenticated]);
   async function login() {
     setBusy(true); setError("");
@@ -35,18 +34,6 @@ export function Account() {
     try {await signOut();}
     catch {setError("We couldn’t sign you out. Please try again.");}
     finally {setBusy(false);}
-  }
-  async function saveSetup(event: React.FormEvent) {
-    event.preventDefault();
-    if (!mode) return;
-    setBusy(true); setMessage(""); setError("");
-    try {
-      const result = await save({mode, meetingUrl});
-      setMeetingUrl(result.meetingUrl ?? "");
-      setMessage("Your call setup is saved. Audio is not connected.");
-    } catch (error) {
-      setError(error instanceof ConvexError && typeof error.data === "string" ? error.data : "Your setup couldn’t be saved. Check your connection and try again.");
-    } finally {setBusy(false);}
   }
   const loading = isLoading || access === undefined;
   return <>
@@ -73,20 +60,16 @@ export function Account() {
           <button type="button" className="primary" disabled={!mode || busy} onClick={async () => {
             if (!mode) return;
             setBusy(true); setError("");
-            try {await save({mode, meetingUrl: saved?.meetingUrl ?? ""}); setMeetingUrl(saved?.meetingUrl ?? ""); setStep(mode === "document" ? "source" : "meeting");}
+            try {await save({mode, meetingUrl: saved?.meetingUrl ?? ""}); setStep(mode === "document" ? "source" : "sidebar");}
             catch {setError("Your choice couldn’t be saved. Please try again.");}
             finally {setBusy(false);}
           }}>{busy ? "Saving your choice…" : "Continue"}</button>
-        </> : step === "source" ? <SourceManager savedOnly onConfirmed={() => setStep("meeting")}/> : <>
-          <h2>Connect your Google Meet call</h2>
+        </> : step === "source" ? <SourceManager savedOnly onConfirmed={() => setStep("sidebar")}/> : <>
           <p className="mode-summary">{mode === "generic" ? "Generic answers · Not from your document" : "Answers from my document"} <button className="text-button" type="button" onClick={() => {setStep("mode"); setMode(null); setMessage("");}}>Change</button></p>
-          {mode === "document" && <p className="setup-notice">Your source was selected. Confirm it again before live listening starts.</p>}
-          <form onSubmit={saveSetup}><label htmlFor="meet-link">Google Meet link</label><input id="meet-link" type="url" value={meetingUrl} onChange={event => {setMeetingUrl(event.target.value); setMessage("");}} placeholder="https://meet.google.com/abc-defg-hij" maxLength={256} required/>
-            <p className="supporting">A link does not connect audio. You’ll select the Meet tab and enable tab audio separately.</p>
-            <button className="primary" disabled={busy || !meetingUrl.trim()}>{busy ? "Saving your setup…" : "Save call setup"}</button>
-          </form>
+          <SidebarInstructions/>
           {!access.invited && <p className="setup-notice">Your account doesn’t have invited live-call access yet.</p>}
-          <p className="supporting">No microphone or meeting audio is connected here.</p><a className="primary" href="/?view=live">Set up live listening</a>
+          <p className="supporting">No microphone or meeting audio is connected here.</p>
+          <a className="text-button" href="/?view=sources">Manage your saved source</a>
         </>}
       </section>}
       {message && <p className="account-feedback" role="status">{message}</p>}
