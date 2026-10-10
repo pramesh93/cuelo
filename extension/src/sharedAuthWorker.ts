@@ -29,5 +29,6 @@ browser.runtime.onMessage.addListener((message:any,sender:any,reply:any)=>{
 browser.storage.onChanged.addListener((changes:any,area:string)=>{
  if(area!=='local'||!changes[key])return;
  // Notifications contain no tokens; each authorised surface requests its own state.
+ void browser.runtime.sendMessage({type:'shared-auth-changed',backend}).catch(()=>{});
  void browser.tabs.query({}).then((tabs:any[])=>Promise.allSettled(tabs.filter(tab=>{try{return allowedWebsite(new URL(tab.url).origin,backend);}catch{return false;}}).map(tab=>browser.tabs.sendMessage(tab.id,{type:'shared-auth-changed',backend})))).catch(()=>{});
 });

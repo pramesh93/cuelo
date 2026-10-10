@@ -18,11 +18,11 @@ Implementation approved 10 October 2026. User confirmed real Google sign-in and 
 5. Sign in again, close/reopen the sidebar, then restart Chrome and reopen both. Confirm remembered identity matches. Browser profile/extension removal or expired credentials can require a fresh sign-in.
 6. On the website, continue with generic mode or confirm a source. Confirm it shows sidebar instructions, without a Meet-link form, sharing picker or floating-card button. Direct /?view=live must show the same guidance and “Audio is off.”
 
-No real active-call logout/identity-switch test has been run; the worker is designed to stop and clean up capture before changing shared identity. That check needs existing approved call capacity if performed live, rather than silently spending another test session.
+User confirmed website sign-out during active listening stops Cuelo while Meet continues, after the hidden-page login fix. Active-call account switching remains unverified.
 
 ## Unpaid automated proof
 
-- npm test — 142 tests pass, including shared sessions, logout, central refresh, migration, expired/cancelled callbacks and sender/environment isolation.
+- npm test — 143 tests pass, including shared sessions, logout, central refresh, migration, expired/cancelled callbacks and sender/environment isolation.
 - npm run build and npm run build:extension pass (sidebar, offscreen owner, shared auth worker, website bridge).
 - npx tsx tests/check-shared-signin-browser.mts — actual Chrome website guidance and DOM message bridge; extension APIs and session data simulated, remote browser requests blocked. It does NOT prove Google sign-in or installation.
 - Original auth provider, Google-only signup, session duration, invitation rules, source ownership, model providers and paid limits unchanged.
@@ -34,6 +34,6 @@ The implementation uses the installed Convex Auth/Convex clients and Chrome's do
 - Website sign-in signs the sidebar in; website sign-out signs the sidebar out.
 - Sidebar sign-in signs the website in; sidebar sign-out signs the website out.
 - Website and sidebar remember sign-in after restarting Chrome.
-- Sign-in is now available before joining Meet; automated regression passes, but the updated no-Meet screen has not been explicitly confirmed in Chrome.
+- User confirmed Continue with Google appears after signing out with no Meet call open.
 - Google sign-in continues using its temporary popup window, as requested.
-- Active-call logout/account switching and the remaining parked call tests are not confirmed by these checks.
+- User confirmed Start works and website sign-out during listening stops Cuelo while Meet continues. Active-call account switching and the remaining parked call tests are unverified.

@@ -1,10 +1,11 @@
-import {sessionKey,type AuthRequest,type AuthResult} from './sharedSession';
+import {type AuthRequest,type AuthResult} from './sharedSession';
 export type Transport={request:(request:AuthRequest)=>Promise<AuthResult>;subscribe:(listener:()=>void)=>()=>void};
 export function extensionTransport(backend:string):Transport{
  const browser=(globalThis as any).chrome;
  return {
   request:async request=>{const result=await browser.runtime.sendMessage({type:'shared-auth',backend,request});if(result?.error)throw Error(result.error);if(!result?.state)throw Error('Shared sign-in is unavailable. Reload Cuelo.');return result;},
-  subscribe:listener=>{const changed=(changes:any,area:string)=>{if(area==='local'&&changes[sessionKey(backend)])listener();};browser.storage.onChanged.addListener(changed);return()=>browser.storage.onChanged.removeListener(changed);},
+  // Offscreen listening documents support runtime messages, but not storage APIs.
+  subscribe:listener=>{const changed=(message:any,sender:any)=>{if(sender.id===browser.runtime.id&&message?.type==='shared-auth-changed'&&message.backend===backend)listener();};browser.runtime.onMessage.addListener(changed);return()=>browser.runtime.onMessage.removeListener(changed);},
  };
 }
 export function websiteTransport(backend:string):Transport{

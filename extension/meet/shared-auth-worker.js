@@ -140,7 +140,7 @@ async function ne(e) {
 		for (let e = 0; e < 100; e++) {
 			if (t !== o) throw Error("Start cancelled.");
 			if ((await m({ type: "status" }).catch(() => null))?.ready) break;
-			if (e === 99) throw Error("Your sign-in could not be confirmed. Try again.");
+			if (e === 99) throw Error("Cuelo’s listening page could not get ready. Reload the extension and try again.");
 			await new Promise((e) => setTimeout(e, 100));
 		}
 		if (t !== o || !await f(r.tabId)) throw Error("The meeting ended before Cuelo connected.");
@@ -1008,7 +1008,10 @@ X.runtime.onMessage.addListener((e, t, n) => {
 	}
 	return Ze.run(r).then(n).catch(() => n({ error: "Cuelo could not update your sign-in. Check your connection and try again." })), !0;
 }), X.storage.onChanged.addListener((e, t) => {
-	t === "local" && e[Q] && X.tabs.query({}).then((e) => Promise.allSettled(e.filter((e) => {
+	t === "local" && e[Q] && (X.runtime.sendMessage({
+		type: "shared-auth-changed",
+		backend: Z
+	}).catch(() => {}), X.tabs.query({}).then((e) => Promise.allSettled(e.filter((e) => {
 		try {
 			return Je(new URL(e.url).origin, Z);
 		} catch {
@@ -1017,6 +1020,6 @@ X.runtime.onMessage.addListener((e, t, n) => {
 	}).map((e) => X.tabs.sendMessage(e.id, {
 		type: "shared-auth-changed",
 		backend: Z
-	})))).catch(() => {});
+	})))).catch(() => {}));
 });
 //#endregion
