@@ -86,7 +86,7 @@ export function Account() {
             <button className="primary" disabled={busy || !meetingUrl.trim()}>{busy ? "Saving your setup…" : "Save call setup"}</button>
           </form>
           {!access.invited && <p className="setup-notice">Your account doesn’t have invited live-call access yet.</p>}
-          <p className="supporting">Live listening is not enabled yet. No microphone or meeting audio is being captured.</p>
+          <p className="supporting">No microphone or meeting audio is connected here.</p><a className="primary" href="/?view=live">Set up live listening</a>
         </>}
       </section>}
       {message && <p className="account-feedback" role="status">{message}</p>}

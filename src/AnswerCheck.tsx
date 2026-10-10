@@ -7,14 +7,14 @@ import {SourceManager,getSourceVisitSecret} from './SourceManager';
 type Source=NonNullable<FunctionReturnType<typeof api.sources.get>>;
 type Result=FunctionReturnType<typeof api.selectedAnswers.ask>;
 type Selection={source:Source;guestSecret?:string};
-export function AnswerCard({result,elapsedMs}:{result:Result;elapsedMs?:number}){
+export function AnswerCard({result,elapsedMs,sourceLinks=true}:{result:Result;elapsedMs?:number;sourceLinks?:boolean}){
  return <section className="answer-panel selected-answer-card" aria-label="Answer" aria-live="polite">
  <h2>Cuelo’s answer</h2>
  {result.mode==='generic'&&<p className="provenance">Not from your document</p>}
  {result.bullets.length>0&&<ul className="answer">{result.bullets.map((text,i)=><li key={i}>{text}</li>)}</ul>}
  {result.message&&<p className={result.status==='error'?'error':''} role={result.status==='error'?'alert':undefined}>{result.message}</p>}
  {result.mode==='document'&&result.source&&result.citations.length>0&&<>
- <p className="citation">{[...new Set(result.citations.map(p=>p.reference))].join(', ')}<br/>{result.source.url?<a href={result.source.url} target="_blank" rel="noreferrer">{result.source.title}</a>:result.source.title}</p>
+ <p className="citation">{[...new Set(result.citations.map(p=>p.reference))].join(', ')}<br/>{sourceLinks&&result.source.url?<a href={result.source.url} target="_blank" rel="noreferrer">{result.source.title}</a>:result.source.title}</p>
  <details><summary>Open supporting passage</summary>{result.citations.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><blockquote>{p.text}</blockquote></div>)}</details>
  </>}
  {result.status!=='error'&&result.status!=='cancelled'&&<p className="timing">Measured response: {((elapsedMs??result.elapsedMs)/1000).toFixed(1)} seconds</p>}

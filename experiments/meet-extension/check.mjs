@@ -1,0 +1,22 @@
+// Simulated Chrome API: proves orchestration, not real permissions/Meet behaviour.
+import {readFile} from 'node:fs/promises';import vm from 'node:vm';import assert from 'node:assert/strict';
+const manifest=JSON.parse(await readFile(new URL('manifest.json',import.meta.url),'utf8'));assert.deepEqual(manifest.host_permissions,['https://meet.google.com/*']);assert.ok(!manifest.permissions.includes('debugger'));
+let listener,removed,allowed=false,captures=0,stops=0,contexts=0;
+const chrome={tabs:{query:async()=>[{id:1,url:'https://meet.google.com/abc-example'}],onRemoved:{addListener:f=>removed=f}},tabCapture:{getMediaStreamId:async()=>{if(!allowed)throw Error('Invocation required');captures++;return 'fake-local-stream-id';}},offscreen:{createDocument:async()=>contexts++},runtime:{getURL:path=>'chrome-extension://example/'+path,getContexts:async()=>contexts?[{}]:[],sendMessage:async m=>{if(m.type==='stop')stops++;return {ok:true};},onMessage:{addListener:f=>listener=f}}};
+vm.runInNewContext(await readFile(new URL('worker.js',import.meta.url),'utf8'),{chrome,console});
+const send=(type,sender={tab:{id:1,url:'https://meet.google.com/abc-example'}})=>new Promise(resolve=>listener({type},sender,resolve));
+assert.match((await send('prepare')).error,/Invocation/);assert.equal(captures,0);console.log('PASS simulated denied invocation does not start capture');
+allowed=true;assert.match((await send('prepare',{})).status,/started/);assert.equal(captures,1);assert.equal(contexts,1);console.log('PASS simulated toolbar path starts offscreen capture');
+assert.match((await send('prepare')).error,/previous probe/);assert.equal(captures,1);console.log('PASS duplicate capture refused');
+await send('left');assert.equal(stops,1);assert.match((await send('status')).status,/Stopped/);console.log('PASS simulated leave signal closes capture');
+await send('prepare',{});removed(1);await new Promise(r=>setTimeout(r,0));assert.equal(stops,2);console.log('PASS tab removal closes capture');
+assert.match((await send('prepare',{tab:{id:2,url:'https://example.com/'}})).error,/Meet/);console.log('PASS non-Meet target rejected');
+console.log('6 orchestration checks passed. Actual Chrome audio, permissions and real Meet remain untested.');
+let audioListener,cutoff,closed=0,tracksStopped=0,playbackConnections=0;const messages=[];
+const audioChrome={runtime:{onMessage:{addListener:f=>audioListener=f},sendMessage:async m=>{messages.push(m);return {};}}};
+const audioContext=class{destination={};state='running';createMediaStreamSource(){return {connect:destination=>{if(destination===this.destination)playbackConnections++;}};}createAnalyser(){return {fftSize:256,getFloatTimeDomainData:values=>values.fill(0)};}async resume(){}async close(){closed++;}};
+vm.runInNewContext(await readFile(new URL('audio.js',import.meta.url),'utf8'),{chrome:audioChrome,navigator:{mediaDevices:{getUserMedia:async()=>({getTracks:()=>[{stop:()=>tracksStopped++}]})}},AudioContext:audioContext,Float32Array,setInterval:()=>1,clearInterval:()=>{},setTimeout:(f,ms)=>{assert.equal(ms,60000);cutoff=f;return 2;},clearTimeout:()=>{}});
+const audioSend=type=>new Promise(resolve=>audioListener({to:'audio',type,streamId:'fake-local-id'},{},resolve));
+assert.equal((await audioSend('start')).ok,true);assert.equal(playbackConnections,1);console.log('PASS simulated capture preserves local playback');
+cutoff();await new Promise(r=>setTimeout(r,0));assert.equal(tracksStopped,1);assert.equal(closed,1);assert.equal(messages.at(-1).type,'ended');console.log('PASS accelerated local cutoff releases track and audio context');
+console.log('8 simulated orchestration/resource checks passed; not real Chrome permission or audio proof.');

@@ -5,7 +5,9 @@ import {MAX_SOURCE_BYTES} from './sourceLimits';
 function cors(request:Request) {
  const origin=request.headers.get('Origin')??'';
  const allowed=[process.env.CONVEX_SITE_URL,process.env.SITE_URL,'http://127.0.0.1:5173','http://localhost:5173'];
- if(origin&&!allowed.includes(origin))return null;
+ // A Chrome-assigned origin grants no access: uploads still need a one-use
+ // permission issued by the backend after checking source ownership.
+ if(origin&&!allowed.includes(origin)&&!/^chrome-extension:\/\/[a-p]{32}$/.test(origin))return null;
  return {'Access-Control-Allow-Origin':origin||'*','Access-Control-Allow-Methods':'POST, OPTIONS','Access-Control-Allow-Headers':'Authorization, Content-Type','Vary':'Origin'};
 }
 export const options=httpAction(async(_ctx,request)=>{const headers=cors(request);return new Response(null,{status:headers?204:403,headers:headers??{}});});

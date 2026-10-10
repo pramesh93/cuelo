@@ -121,27 +121,17 @@ Main action: **“Continue”** → for generic mode, Google Meet setup; for doc
 
 Empty: “Sign up or log in to continue.” · Loading: “Signing you in…” · Error: “We couldn’t sign you in. Please try again.” · Done: “You’re in. Let’s connect your call.”
 
-### Google Meet setup: for connecting the real call
+### Google Meet setup and native sidebar: quiet assistance during a live call
 
-Top to bottom: Meet link field → visible answer-mode choice (“Generic answers” / “Answers from my document”) → add, confirm or replace source only in document mode → Open Google Meet → Connect call audio instruction → separate microphone status → Open floating card. Anyone may sign up; users without invited live-call access see a clear testing-access message rather than a working Start control.
+Use the approved native Chrome sidebar, whether opened before or after joining Meet in the same window. Show meeting/account readiness, Google sign-in if needed, explicit generic/document mode, one selected or newly imported source for document mode, then Start. No persistent Cuelo website controller, tab-sharing picker, floating-card action or target-tab toolbar capture grant. Full source management remains on the website.
 
-Main action progresses: **“Open Google Meet”** → meeting tab; **“Connect call audio”** → Chrome picker; **“Open floating card”** → Document Picture-in-Picture after user click. Tell the rep to select the Meet tab and enable tab audio. A link alone never marks the audio connected.
+During listening: truthful status → recognised question and short answer → section/page then source name last with expandable exact supporting passages, or a visible “Not from your document” label on every generic card → earlier answers below → Pause/Resume and Stop. New speech never cancels accepted questions. Waiting questions remain visible. Pause suspends work and retains cards; Stop clears the call.
 
-Empty: “Add your Google Meet link.” · Loading: “Connecting call audio…” · Error: “No meeting audio connected. Select your Meet tab and enable tab audio.” · Done: “Call audio connected.”
+At the test answer limit, stop listening and retain all completed cards on the same screen. Show “Four-answer test limit reached. Audio and transcription are off. Your answers remain below.” for the current four-answer configuration; disable Pause/Resume and new answers. Explicit Stop clears the cards.
 
-### Floating card: for quiet assistance during a live call
+Missing source, audio and service errors must name the actual issue. Unsupported document questions say “I couldn't find this in your source.” Never silently fall back to generic. A safely rejected answer shows a question-specific notice and preserves other work; fatal session/service failures stop capture with a visible reason.
 
-Top to bottom: small blob and truthful Listening/Paused/Disconnected status → recognised customer question → conversational bullet-point answer, at most 40 words → document section/page then source name last, or the visible label “Not from your document” in generic mode → Pause, Stop, Hide answers and source inspection controls.
-
-Main action: **“Start listening”** when ready; **“Pause”** while active. Stop releases audio capture. Hide answers clears the answer content; it does not pretend listening has stopped. Keep the app tab open. Closing the floating window returns the panel to the app and leaves an explicit active-listening indicator until stopped.
-
-Empty: “Listening for customer questions.” · Loading: “Finding the answer…” · Error: “Listening unavailable. Reconnect call audio.” · Done: show the selected-mode answer. In document mode, absent evidence says “I couldn’t find this in your source.” Never silently fall back to generic knowledge. Every generic result, including follow-ups, displays “Not from your document”.
-
-Show a calm warning at 55 minutes: “Cuelo will stop listening in 5 minutes.” At 60 minutes: “Cuelo has stopped listening. Your Meet call can continue.” Clear active listening status and stop capture.
-
-Waiting movement is gentle. While an answer is visible, reduce the blob to a tiny listening indicator. The whole card moves with its handle/blob using browser-supported window movement; the website cannot programmatically place a Document Picture-in-Picture window at arbitrary screen coordinates. Website dragging demonstrates the concept, not an identical positioning implementation.
-
-Fallback: two side-by-side windows when floating mode is unavailable but audio capture works. A layout fallback does not fix unsupported audio capture. Guaranteed screen-share invisibility is outside v1: full-screen sharing can expose the card. Recommend presenting a specific tab and verifying the participant view.
+The real 55-minute warning/60-minute cutoff check is parked, not passed. Page-controlled stopping has no independent browser-freeze guarantee. Screen sharing exposed Cuelo when sharing its window and did not when sharing a different window in the user's test; whole-screen sharing may expose it. No invisibility claim.
 
 ## 5. The first screen's words
 
@@ -178,7 +168,7 @@ After three questions: **Ready for your next call? Sign up and add Cuelo to a ca
 - Do not auto-start the microphone, autoplay the avatar before Start or open a floating window without user action.
 - Show failure honestly. Do not fake latency, recognition, source grounding, call connection or invisibility.
 - Keep the three-question demo accessible without an account. Ask for signup/login and the Meet link after its first-value experience.
-- Do not add database connectors, desktop downloads, browser extensions, pricing, fabricated testimonials or extra screens without asking.
+- Do not add database connectors, desktop downloads, additional extension features, pricing, fabricated testimonials or extra screens without asking.
 - v1 live calls target desktop Chrome; smaller screens need a usable reading layout, but mobile live-call support is not implied.
 - If a design or product choice is not covered here, ask before building it. Unresolved choices include the exact avatar illustration and additional navigation destinations. Authentication, upload limits and retention are specified above.
 
@@ -201,3 +191,7 @@ User clarified that the actual opening background should be an image, inspired b
 ## On-call animation — 7 October 2026
 
 User requested replacing the below-fold salesperson illustration with a Cluely-inspired animated call preview and explicitly authorised shipping. Remove cuelo-call.jpg. Use original Cuelo components: staged call-window reveal, animated audio bars, processing dots and a floating text card; pause/replay and reduced-motion support. Clearly label the entire preview as illustrative, the answer as prewritten and generic, and state no call/audio is connected. This supersedes earlier decorative call-image decisions. Preserve the architectural opening background and all existing answer/source paths.
+
+## Live sidebar surface — approved 8–10 October 2026
+
+Native Chrome sidebar replaces the floating card for the approved live-call path. Preserve charcoal (#202120), warm text (#f3f0eb), muted green primary action (#dbe3bc), light answer/evidence panel (#f5f2ec), existing typography and 44px controls. No decorative imagery or artificial typing delay. The sidebar now contains sign-in, source import/selection, controls and answers; the old sign-in-only and website-controller prototypes are retired. User-reported real Chrome behavior is recorded separately in PROGRESS.md.

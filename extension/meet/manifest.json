@@ -1,0 +1,53 @@
+{
+  "manifest_version": 3,
+  "name": "Cuelo \u2014 development",
+  "version": "0.1.0",
+  "minimum_chrome_version": "116",
+  "permissions": [
+    "sidePanel",
+    "storage",
+    "offscreen"
+  ],
+  "host_permissions": [
+    "https://calculating-gecko-263.convex.cloud/*",
+    "https://calculating-gecko-263.convex.site/*",
+    "https://deafening-frog-846.convex.cloud/*",
+    "https://deafening-frog-846.convex.site/*",
+    "http://127.0.0.1/*",
+    "https://meet.google.com/*"
+  ],
+  "background": {
+    "service_worker": "auth-worker.js",
+    "type": "module"
+  },
+  "action": {
+    "default_title": "Open Cuelo"
+  },
+  "side_panel": {
+    "default_path": "auth-check.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "https://meet.google.com/*"
+      ],
+      "js": [
+        "meeting-state.js",
+        "call-end.js",
+        "meet-audio-core.js",
+        "meet-audio.js"
+      ],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "meet-pcm.js"
+      ],
+      "matches": [
+        "https://meet.google.com/*"
+      ]
+    }
+  ]
+}

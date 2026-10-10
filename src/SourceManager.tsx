@@ -1,5 +1,5 @@
 import {Topbar} from "./Topbar";
-import {useEffect,useState} from 'react';
+import {useEffect,useRef,useState} from 'react';
 import {useAction,useMutation,useQuery,useConvexAuth} from 'convex/react';
 import {ConvexError} from 'convex/values';
 import {api} from '../convex/_generated/api';
@@ -10,13 +10,13 @@ export function getSourceVisitSecret() {
  const key='cuelo-temporary-source';let value=sessionStorage.getItem(key);
  if(!value||!/^[a-f0-9]{64}$/.test(value)){value=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');sessionStorage.setItem(key,value);}return value;
 }
-export function SourceManager({savedOnly=false,onConfirmed,onSourceChanged}:{savedOnly?:boolean;onConfirmed?:(source:Meta,scope:{guestSecret?:string})=>void;onSourceChanged?:(source:Meta|null,scope:{guestSecret?:string})=>void}) {
+export function SourceManager({savedOnly=false,accountOnly=false,sidebarAdd=false,onConfirmed,onSourceChanged}:{savedOnly?:boolean;accountOnly?:boolean;sidebarAdd?:boolean;onConfirmed?:(source:Meta,scope:{guestSecret?:string})=>void;onSourceChanged?:(source:Meta|null,scope:{guestSecret?:string})=>void}) {
  const {isAuthenticated}=useConvexAuth();
  const [secret]=useState(getSourceVisitSecret);
  const [kept,setKept]=useState(false),[preferGuest,setPreferGuest]=useState(false);
  const saved=useQuery(api.sources.get,isAuthenticated?{}:'skip');
- const temporary=useQuery(api.sources.get,{guestSecret:secret});
- const useGuest=savedOnly?Boolean(temporary&&(!saved||preferGuest)):!(kept&&isAuthenticated);
+ const temporary=useQuery(api.sources.get,accountOnly?'skip':{guestSecret:secret});
+ const useGuest=accountOnly?false:savedOnly?Boolean(temporary&&(!saved||preferGuest)):!(kept&&isAuthenticated);
  const scope=useGuest?{guestSecret:secret}:{};
  const storedSource=useQuery(api.sources.get,scope);
  const [now,setNow]=useState(()=>Date.now());
@@ -29,7 +29,10 @@ export function SourceManager({savedOnly=false,onConfirmed,onSourceChanged}:{sav
  const passages=useQuery(api.sources.passages,inspect&&source?{...scope,id:source.id}:'skip');
  useEffect(()=>{setInspect(false);},[source?.id]);
  useEffect(()=>{const expiresAt=storedSource?.expiresAt;if(expiresAt!==null&&expiresAt!==undefined){const timer=setTimeout(()=>{setNow(Date.now());setInspect(false);},Math.max(0,expiresAt-Date.now()));return()=>clearTimeout(timer);}},[storedSource?.id,storedSource?.expiresAt]);
- useEffect(()=>{if(storedSource!==undefined)onSourceChanged?.(source??null,scope);},[source?.id,source?.expiresAt,useGuest,secret,onSourceChanged,storedSource===undefined]);
+ // Parent renders can replace this callback without changing the selected source.
+ const sourceChanged=useRef(onSourceChanged);
+ useEffect(()=>{sourceChanged.current=onSourceChanged;},[onSourceChanged]);
+ useEffect(()=>{if(storedSource!==undefined)sourceChanged.current?.(source??null,scope);},[source?.id,source?.expiresAt,useGuest,secret,storedSource===undefined]);
  function fail(error:unknown){setError(error instanceof ConvexError&&typeof error.data==='string'?error.data:error instanceof Error?error.message:'Your source could not be saved. Check your connection and try again.');}
  async function submit(event:React.FormEvent){event.preventDefault();setBusy(true);setError('');setMessage('');
  try {const args={...scope,expectedId:source?.id??null};
@@ -45,18 +48,19 @@ export function SourceManager({savedOnly=false,onConfirmed,onSourceChanged}:{sav
  {savedOnly&&temporary&&saved&&temporary.id!==saved.id&&<button type="button" className="text-button" disabled={busy} onClick={()=>setPreferGuest(!preferGuest)}>{preferGuest?'Show account source':'Show the source from this visit'}</button>}
  <p className="supporting">One PDF, Word .docx file, pasted text or public webpage. Files: up to 10 MB and 50 pages. Readable text: up to 200,000 characters and 500 passages. Nothing is silently cut off.</p>
  {source===undefined?<p role="status">Checking your source…</p>:<>
- {source&&<div className="source-summary"><h3>{source.title}</h3><p>{source.passageCount} readable {source.passageCount===1?'passage':'passages'}{source.pageCount?` · ${source.pageCount} ${source.pageCount===1?'page':'pages'}${source.kind==='docx'?' reported by Word':''}`:''}</p>
+ {source&&!sidebarAdd&&<div className="source-summary"><h3>{source.title}</h3><p>{source.passageCount} readable {source.passageCount===1?'passage':'passages'}{source.pageCount?` · ${source.pageCount} ${source.pageCount===1?'page':'pages'}${source.kind==='docx'?' reported by Word':''}`:''}</p>
  <p className="supporting">{source.saved?'Saved to your account until replaced or deleted.':'Temporary for this session. Expires after one hour; cleanup removes expired text.'}</p>
  <div className="source-actions"><button type="button" className="text-button" disabled={busy} onClick={()=>setInspect(!inspect)}>{inspect?'Hide readable text':'Inspect readable text'}</button><button type="button" className="text-button" disabled={busy} onClick={()=>{setEditing(true);setError('');}}>Replace source</button><button type="button" className="text-button" disabled={busy} onClick={deleteSource}>Delete source</button></div>
  {inspect&&<div className="source-preview">{passages===undefined?<p role="status">Loading readable text…</p>:passages.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><p>{p.text}</p></div>)}</div>}
  {!source.saved&&(isAuthenticated?<button type="button" className="cancel-button" disabled={busy} onClick={saveSource}>{saved&&saved.id!==source.id?'Keep this source and replace saved source':'Keep this source'}</button>:<p className="supporting"><a href="/?view=account">Sign in with Google</a> to choose whether to keep this source.</p>)}
  {onConfirmed&&<button type="button" className="primary" disabled={busy} onClick={()=>onConfirmed(source,scope)}>Use this source</button>}
  </div>}
- {(!source||editing)&&<form onSubmit={submit}>
+ {(!source||editing||sidebarAdd)&&<form onSubmit={submit}>
+ {sidebarAdd&&source&&<p className="supporting">Adding a new source replaces your current source. You can inspect, replace or delete sources on the Cuelo website.</p>}
  <fieldset className="source-methods"><legend>How will you add your source?</legend>{([['text','Paste text'],['file','Upload file'],['webpage','Public webpage']] as const).map(([value,label])=><label key={value}><input type="radio" name="source-method" checked={method===value} disabled={busy} onChange={()=>{setMethod(value);setError('');}}/>{label}</label>)}</fieldset>
  {method==='text'?<><label htmlFor="source-name">Source name</label><input id="source-name" value={title} maxLength={160} required disabled={busy} onChange={e=>setTitle(e.target.value)}/><label htmlFor="source-text">Source text</label><textarea id="source-text" rows={7} value={text} required disabled={busy} onChange={e=>setText(e.target.value)}/></>:method==='webpage'?<><label htmlFor="source-link">Public webpage link</label><input id="source-link" type="url" value={url} maxLength={2048} required disabled={busy} placeholder="https://example.com/help/product" onChange={e=>setUrl(e.target.value)}/><p className="supporting">Cuelo reads this page only. Private pages and whole-site searches are outside this version.</p></>:<><label htmlFor="source-file">PDF or Word document</label><input id="source-file" type="file" accept=".pdf,.docx" required disabled={busy} onChange={e=>setFile(e.target.files?.[0]??null)}/><p className="supporting">Scans need a text-based PDF. Older .doc files need exporting as .docx or PDF. If Word’s saved page count is unavailable, export a PDF.</p></>}
  <p className="supporting">Your file is read to extract text; the original file is not kept. Temporary text is deleted when you delete it or when it expires. Signed-in sources are kept only when you choose to keep them.</p>
- <button className="primary" disabled={busy}>{busy?'Reading your source…':source?'Replace source':'Read source'}</button>{editing&&<button type="button" className="text-button" disabled={busy} onClick={()=>setEditing(false)}>Cancel replacement</button>}
+ <button className="primary" disabled={busy}>{busy?'Reading your source…':source&&!sidebarAdd?'Replace source':'Read source'}</button>{editing&&<button type="button" className="text-button" disabled={busy} onClick={()=>setEditing(false)}>Cancel replacement</button>}
  </form>}
  </>}
  {message&&<p role="status">{message}</p>}{error&&<p className="error" role="alert">{error}</p>}

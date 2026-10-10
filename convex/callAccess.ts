@@ -1,3 +1,4 @@
+import {liveCallConfig} from './liveCallPolicy';
 import {getAuthUserId} from "@convex-dev/auth/server";
 import {query,internalMutation} from "./_generated/server";
 import {v} from "convex/values";
@@ -9,7 +10,7 @@ export const status=query({
     const access=userId ? (await ctx.db.query("testerAccess").withIndex("by_user",q=>q.eq("userId",userId)).take(1))[0] : null;
     return {signedIn:!!userId,invited:access?.enabled===true,googleConfigured:!!process.env.AUTH_GOOGLE_ID && !!process.env.AUTH_GOOGLE_SECRET,
       // No paid live capture until the enforceable audio route and budget are approved.
-      liveEnabled:false};
+      liveEnabled:!!liveCallConfig()};
   },
 });
 

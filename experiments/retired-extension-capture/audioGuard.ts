@@ -1,0 +1,12 @@
+import type {CallCapture,CaptureStopReason} from '../../src/callCapture';
+export function guardNativeAudio(options:{meeting:MediaStream;microphone:MediaStream;deadline:number;signal:AbortSignal;onStop:(reason:CaptureStopReason)=>void;onWarning:()=>void;page?:EventTarget;now?:()=>number;monotonic?:()=>number;timer?:(callback:()=>void,delay:number)=>()=>void}):CallCapture{
+ const page=options.page??window,now=options.now??Date.now,monotonic=options.monotonic??(()=>performance.now()),timer=options.timer??((callback,delay)=>{const id=setTimeout(callback,delay);return()=>clearTimeout(id);});
+ const began=now(),beganMono=monotonic(),deadline=Math.min(options.deadline,began+3600000),streams=[options.meeting,options.microphone];let active=true,warned=false,cancel:(()=>void)|undefined;const listeners:Array<()=>void>=[];
+ const release=()=>streams.forEach(stream=>stream.getTracks().forEach(track=>track.stop()));
+ if(!Number.isFinite(deadline)||streams.some(stream=>!stream.getAudioTracks().length||stream.getTracks().some(track=>track.readyState!=='live'))||options.meeting.getAudioTracks().some(track=>options.microphone.getAudioTracks().includes(track))){release();throw Error('Separate live meeting audio and microphone are required.');}
+ function stop(reason:CaptureStopReason='user_stop'){if(!active)return;active=false;cancel?.();listeners.splice(0).forEach(remove=>remove());release();options.onStop(reason);}
+ const listen=(target:EventTarget,event:string,fn:()=>void)=>{target.addEventListener(event,fn);listeners.push(()=>target.removeEventListener(event,fn));};
+ function check(){if(!active)return;cancel?.();const remaining=deadline-Math.max(now(),began+Math.max(0,monotonic()-beganMono));if(remaining<=0){stop('time_limit');return;}if(options.meeting.getTracks().some(t=>t.readyState!=='live')){stop('meeting_disconnected');return;}if(options.microphone.getTracks().some(t=>t.readyState!=='live')){stop('microphone_disconnected');return;}if(remaining<=300000&&!warned){warned=true;options.onWarning();}cancel=timer(check,Math.min(1000,remaining));}
+ streams.forEach((stream,index)=>stream.getTracks().forEach(track=>listen(track,'ended',()=>stop(index===0?'meeting_disconnected':'microphone_disconnected'))));listen(options.signal,'abort',()=>stop());listen(page,'offline',()=>stop('connection_lost'));listen(page,'pagehide',()=>stop('page_left'));listen(page,'pageshow',check);
+ if(options.signal.aborted)stop();else check();return {meeting:options.meeting,microphone:options.microphone,get active(){return active;},stop};
+}

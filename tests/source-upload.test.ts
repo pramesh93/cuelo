@@ -28,3 +28,10 @@ test('upload grants are single-use, expire and delete abandoned original files',
  rows.get('grant').expiresAt=Date.now()-1;await assert.rejects(()=>read._handler(ctx,{token:args.token}),/expired/);await cleanup._handler(ctx,{});assert.equal(deleted,1);assert.equal(rows.size,0);
  await discard._handler(ctx,{token:args.token});assert.equal(deleted,1);
 });
+
+test('native sidebar upload still requires a backend-issued one-use grant',async()=>{
+ const origin=`chrome-extension://${'a'.repeat(32)}`;let claims=0,stores=0;const ctx={storage:{store:async()=>{stores++;return 'made-up-file';}},runMutation:async(fn:any)=>{if(getFunctionName(fn).endsWith(':claim')){claims++;return {size:3};}return null;},runAction:async()=>({id:'made-up-source'})} as any;
+ const missing=await upload._handler(ctx,new Request('https://example.com/sources/upload',{method:'POST',headers:{Origin:origin},body:new Uint8Array([1,2,3])}));assert.equal(missing.status,401);assert.equal(claims,0);assert.equal(stores,0);
+ const valid=await upload._handler(ctx,new Request('https://example.com/sources/upload',{method:'POST',headers:{Origin:origin,Authorization:`Bearer ${'a'.repeat(64)}`},body:new Uint8Array([1,2,3])}));assert.equal(valid.status,200);assert.equal(valid.headers.get('Access-Control-Allow-Origin'),origin);assert.equal(claims,1);assert.equal(stores,1);
+ const invalid=await upload._handler(ctx,new Request('https://example.com/sources/upload',{method:'POST',headers:{Origin:'chrome-extension://not-a-chrome-id'}}));assert.equal(invalid.status,403);
+});

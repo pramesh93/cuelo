@@ -1,0 +1,3 @@
+import {ConvexReactClient} from 'convex/react';import {getFunctionName} from 'convex/server';import {api} from '../../convex/_generated/api';import {signInThroughPopup,type AuthArgs} from './authFlow';import {googlePopup,randomNonce} from './chrome';
+export const backend=import.meta.env.VITE_CONVEX_URL;export const namespace=`cuelo-sidebar-${backend}`;
+export function sidebarClient(){const client=new ConvexReactClient(backend);const original=client.action.bind(client);client.action=((reference,...args)=>getFunctionName(reference)==='auth:signIn'?signInThroughPopup({args:(args[0]??{}) as AuthArgs,call:payload=>original(api.auth.signIn,payload),popup:googlePopup,nonce:randomNonce}):original(reference,...args)) as typeof client.action;return client;}

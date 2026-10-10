@@ -2,15 +2,22 @@
 
 Read this before building or changing Cuelo. If a product choice is not covered here or in the scope and design documents, ask instead of guessing.
 
+## User confirmation rule — updated 8 October 2026
+
+- Do not make changes without the user's explicit confirmation. Explain the proposed change first, then wait for confirmation before editing code, configuration, documents, account permissions or service settings, or committing, pushing or deploying.
+- Clarifications, preferences and statements such as “I don't need any permanent window” are not approval to implement a proposed change. Do not infer confirmation from them.
+- Read-only inspection and research may continue, but do not apply fixes automatically when a bug is reported.
+- This rule supersedes earlier instructions to act automatically or continue implementation without confirmation. It applies to all future work on this project. Saving this requested rule is explicitly authorized by the user.
+
 ## 1. How the product works
 
 ### Interface
 
-Cuelo is a website for desktop Chrome. It listens to a customer's question during a Google Meet call and quietly shows the salesperson a short answer in a floating card. Cuelo never speaks.
+Cuelo has a website and an approved native Chrome extension sidebar for English Google Meet calls on desktop Chrome. The sidebar listens to customer questions and quietly shows short text answers. Cuelo never speaks.
 
-Use Chrome's Document Picture-in-Picture for the floating card. It opens after a user click. If floating mode is unavailable but audio capture works, offer two windows side by side. Do not promise that the card is invisible during screen sharing. Sharing the whole screen may expose it.
+The current live-call path is sidebar-only: join Meet before or after opening Cuelo, sign in with Google if needed, explicitly choose generic/document mode, select or import one source in document mode, then click Start. No persistent Cuelo website tab, floating window, tab-sharing picker or target-tab toolbar permission is required. The hidden extension document owns the session; tested Meet-page audio supplies separate customer and salesperson inputs. Existing Meet microphone permission is required; handle missing audio, denied/revoked permission and closed tabs honestly. A Meet link alone never grants audio access.
 
-The user must select the Meet tab and enable tab audio. Capture the salesperson's microphone separately. A Meet link alone does not provide audio access or make Cuelo join the call. Keep the Cuelo page open during the session. Handle missing audio, revoked permission and closed tabs honestly.
+Earlier website floating-card and tabCapture designs are superseded for this extension path. Do not promise screen-share invisibility: the user observed Cuelo visible when sharing its window and absent when sharing a different window; whole-screen sharing may expose it.
 
 ### First experience
 
@@ -31,9 +38,9 @@ Remember the discussion from the beginning to the end of the current call, inclu
 
 Answers use conversational bullet points, normally no more than 40 words in total, excluding the citation. In document mode put the section reference after the answer and the source name last. Let the user open the supporting passage. Use a page reference when the document has no named section; never invent a section. In generic mode show “Not from your document” clearly on every answer card, with no document citation.
 
-In document mode, if the source does not support the answer, show “I couldn't find this in your source.” Conflicting passages must not turn into a confident answer. A new question cancels an obsolete pending answer.
+In document mode, if the source does not support the answer, show “I couldn't find this in your source.” Conflicting passages must not turn into a confident answer. In the approved extension call flow, every recognised customer question stays pending until answered or an explicit failure is shown. New speech and later questions do not cancel earlier questions; repeated questions receive fresh answers. Pause suspends waiting work; Stop and meeting end clear it.
 
-Calls last at most 60 minutes. Warn at 55 minutes. At 60 minutes stop Cuelo's capture, transcription and answers; the Google Meet call continues. Provide Pause and Stop controls and a way to hide the card. Stop capture immediately when the user stops the session.
+The approved restricted v1 uses page-controlled stopping; it cannot guarantee independent shutdown of an established provider stream if the browser freezes or is modified. Backend admission and spending checks remain required. The real cutoff test is parked, not passed. Calls last at most 60 minutes. Warn at 55 minutes. At 60 minutes stop Cuelo's capture, transcription and answers; the Google Meet call continues. Provide Pause and Stop controls and a way to hide the card. Stop capture immediately when the user stops the session. At the configured test answer limit, stop audio/transcription and waiting work, show the limit notice on the same screen and retain completed answers until explicit Stop or meeting end; no Resume or new answers. Four is the current test answer limit, not a permanent product allowance.
 
 ### Sources
 
@@ -61,7 +68,7 @@ These are the starting implementation choices. Confirm quality and latency throu
 
 | Service | What it does | Secret location |
 | --- | --- | --- |
-| React + TypeScript + Vite | Website and floating-card interface | No provider secret in the browser |
+| React + TypeScript + Vite | Website and native Chrome sidebar interface | No provider secret in the browser |
 | Convex | Backend functions, account access checks, storage and usage limits | Convex environment variables, separately for dev and production |
 | Convex Auth | Google sign-in | Auth configuration and signing secrets in Convex environment variables |
 | Google OAuth | Google sign-in only; no Calendar or Meet account access in v1 | AUTH_GOOGLE_ID and AUTH_GOOGLE_SECRET in Convex environment variables |
@@ -76,7 +83,7 @@ Convex Auth is currently beta. Test Google sign-in end to end before live testin
 
 ### Not in v1
 
-Desktop app, browser extension, mobile live calls, guaranteed screen-share invisibility, call recordings, past-call memory or history, multiple simultaneous sources, OCR, private database or Drive integrations, whole-site crawling, CRM integrations, call summaries, negotiation coaching, non-English support, and document owner/version/review-date approval workflows.
+Desktop app, mobile live calls, guaranteed screen-share invisibility, call recordings, past-call memory or history, multiple simultaneous sources, OCR, private database or Drive integrations, whole-site crawling, CRM integrations, call summaries, negotiation coaching, non-English support, and document owner/version/review-date approval workflows.
 
 When I report a bug, I will name the part. Look there first, and tell me if the evidence points to another part.
 
@@ -87,7 +94,7 @@ When I report a bug, I will name the part. Look there first, and tell me if the 
 - Before writing code, tell me in two or three sentences what you think I am after and how you will approach it. Wait for my yes. Do not guess.
 - Work on one milestone at a time. If I request something new mid-milestone, add it to the parked list in PLAN.md and carry on unless I explicitly redirect the current work.
 - Never say “done” until you have seen the relevant flow work and explained how I can check it. Screenshots prove appearance; real audio tests prove listening. Label simulations clearly.
-- Build and test the core call flow in desktop Chrome with Google Meet, real microphone input, tab audio and the floating card. Test the participant's screen-share view too. A phone screenshot cannot validate this flow. Check the website's narrow layout separately.
+- Build and test the core call flow in desktop Chrome with Google Meet, real microphone input, customer audio and the native sidebar. Test the participant's screen-share view too. A phone screenshot cannot validate this flow. Check the website's narrow layout separately.
 - Test the opening voice interaction and the three-question avatar demo independently. The avatar demo does not prove that real Meet capture or speaker separation works.
 - Measure answer correctness, unwanted triggers from salesperson speech and elapsed time from the end of a question to a useful answer. Aim for a complete short answer within five seconds, and report measured results instead of promising the target.
 - When I report a bug, find the cause before changing anything. Fix that cause and explain it.

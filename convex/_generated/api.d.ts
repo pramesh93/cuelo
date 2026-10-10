@@ -9,6 +9,7 @@
  */
 
 import type * as accountSetup from "../accountSetup.js";
+import type * as answerGeneration from "../answerGeneration.js";
 import type * as auth from "../auth.js";
 import type * as callAccess from "../callAccess.js";
 import type * as crons from "../crons.js";
@@ -16,6 +17,11 @@ import type * as evaluation from "../evaluation.js";
 import type * as evaluationBudget from "../evaluationBudget.js";
 import type * as evidence from "../evidence.js";
 import type * as http from "../http.js";
+import type * as liveAnswerValues from "../liveAnswerValues.js";
+import type * as liveAnswers from "../liveAnswers.js";
+import type * as liveCallPolicy from "../liveCallPolicy.js";
+import type * as liveCalls from "../liveCalls.js";
+import type * as liveSpeech from "../liveSpeech.js";
 import type * as meetingLink from "../meetingLink.js";
 import type * as preparedSourceValues from "../preparedSourceValues.js";
 import type * as preparedSources from "../preparedSources.js";
@@ -47,6 +53,7 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   accountSetup: typeof accountSetup;
+  answerGeneration: typeof answerGeneration;
   auth: typeof auth;
   callAccess: typeof callAccess;
   crons: typeof crons;
@@ -54,6 +61,11 @@ declare const fullApi: ApiFromModules<{
   evaluationBudget: typeof evaluationBudget;
   evidence: typeof evidence;
   http: typeof http;
+  liveAnswerValues: typeof liveAnswerValues;
+  liveAnswers: typeof liveAnswers;
+  liveCallPolicy: typeof liveCallPolicy;
+  liveCalls: typeof liveCalls;
+  liveSpeech: typeof liveSpeech;
   meetingLink: typeof meetingLink;
   preparedSourceValues: typeof preparedSourceValues;
   preparedSources: typeof preparedSources;

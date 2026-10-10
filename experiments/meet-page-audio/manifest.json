@@ -1,0 +1,12 @@
+{
+  "manifest_version": 3,
+  "name": "Cuelo — Meet audio check (no AI)",
+  "version": "0.0.1",
+  "minimum_chrome_version": "116",
+  "permissions": ["sidePanel", "storage"],
+  "host_permissions": ["https://meet.google.com/*"],
+  "background": {"service_worker": "worker.js"},
+  "action": {"default_title": "Open Cuelo audio check"},
+  "side_panel": {"default_path": "sidepanel.html"},
+  "content_scripts": [{"matches": ["https://meet.google.com/*"], "js": ["meeting-state.js", "audio-probe.js", "content.js"], "run_at": "document_idle"}]
+}

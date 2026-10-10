@@ -400,7 +400,7 @@ If that doesn't work reliably and quickly, nothing else matters.
 
 Approved release update on 6 October 2026, summarising AGENTS.md, PRODUCT.md, DESIGN.md and the user's approved v1 release plan. Earlier exploration above is preserved. These are requirements, not claims that the flows work.
 
-Cuelo helps salespeople answer customer questions during an English Google Meet call in desktop Chrome. It quietly displays short text answers in a floating card. The customer audio and salesperson microphone are separate inputs; salesperson speech supplies context but never triggers answers.
+Cuelo helps salespeople answer customer questions during an English Google Meet call in desktop Chrome. It quietly displays short text answers in the approved native Chrome sidebar (8–10 October revision). The customer audio and salesperson microphone are separate inputs; salesperson speech supplies context but never triggers answers.
 
 ## Required release
 
@@ -408,10 +408,10 @@ Cuelo helps salespeople answer customer questions during an English Google Meet 
 - Separate practice call: sample or one supplied source, exactly three supported spoken customer-avatar questions, answers generated from audio rather than a prepared answer key.
 - Google-only Convex Auth; anyone can sign up, invited testers alone can start real calls.
 - Explicit generic/document mode at signup continuation and again before listening. One PDF, Word document, pasted text or public webpage; uploads at most 10 MB/50 pages, no OCR or whole-site crawling.
-- Customer-question detection, continuous listening while answering, stale-answer cancellation and evidence inspection. Document mode safely refuses missing or conflicting evidence. Generic mode never pretends to verify company facts.
+- Customer-question detection, continuous listening while answering, independent ordered questions, fresh answers for repeats and evidence inspection. Document mode safely refuses missing or conflicting evidence. Generic mode never pretends to verify company facts.
 - Full temporary current-call transcript, no earlier calls, recordings or answer history; cleanup at session end and expiry for abandoned sessions.
-- Floating card with truthful state, Pause, Stop and Hide answers; side-by-side fallback. Background tab/window switches must not stop listening.
-- 55-minute warning and backend-enforced 60-minute cutoff, including transcription and spending. Meet continues.
+- Native sidebar with truthful state, Pause/Resume, Stop, retained earlier answers and a same-screen test-limit notice. Background tab/window switches must not stop listening.
+- 55-minute warning and page-controlled 60-minute stopping; real cutoff test is deferred. Independent provider shutdown is parked; no browser-freeze stopping guarantee. Meet continues.
 - Approved Nunito Sans, warm off-white/charcoal/violet design; original listening blob and illustrated customer; readable narrow layout with desktop requirement.
 - Backend ownership, allowances, invitations and cost reservations; initial aggregate monthly budget ₹5,000. No new paid test allowance without explicit approval.
 - GitHub https://github.com/pramesh93/cuelo and Convex https://deafening-frog-846.convex.site. Deploy explicitly with npm run deploy after user confirmation.
@@ -420,8 +420,8 @@ Cuelo helps salespeople answer customer questions during an English Google Meet 
 
 Extended performance testing, five-second optimisation and the OpenAI/Deepgram comparison. Preserve GPT-4.1 and Deepgram Nova-3 unless a provider change is separately approved. Report actual delays honestly.
 
-Desktop extensions/apps, mobile live calls, guaranteed screen-share invisibility, OCR, CRM/private database integrations, recordings, call history and summaries remain outside v1.
+Desktop apps, mobile live calls, guaranteed screen-share invisibility, OCR, CRM/private database integrations, recordings, call history and summaries remain outside v1.
 
 ## Outstanding release dependencies
 
-Secure continuous-audio route with enforceable provider shutdown; Google OAuth credentials in Convex dev/production; concrete paid-test allowance and initial tester capacity. No extra service is authorised by the release-plan approval.
+Production configuration/capacity review, remaining source/error/provenance verification and deferred context/cutoff tests. Independent enforceable provider shutdown is parked under the restricted v1 approval. No extra service is authorised by the release-plan approval.

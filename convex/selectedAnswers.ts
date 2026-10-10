@@ -1,9 +1,8 @@
 "use node";
 import {action} from './_generated/server';
-import {internal,components} from './_generated/api';
+import {internal} from './_generated/api';
 import {v,ConvexError} from 'convex/values';
-import {Agent} from '@convex-dev/agent';
-import {openai} from '@ai-sdk/openai';
+import {generateSelectedAnswer} from './answerGeneration';
 import {passageValue,sourceScopeArgs,sourceMetaValue} from './sourceValues';
 import type {Infer} from 'convex/values';
 import {checkSelectedAnswer,selectAnswerPassages,SELECTED_ANSWER_INSTRUCTIONS,MAX_ANSWER_INPUT_BYTES,MISSING_SOURCE_ANSWER} from './selectedAnswerPolicy';
@@ -35,10 +34,7 @@ export const ask=action({args:{...sourceScopeArgs,visitSecret:v.string(),request
   if(await cancelled())return failure('This answer was cancelled.','cancelled');
   timeout=setTimeout(()=>controller.abort(),30000);
   timer=setInterval(()=>{if(polling)return;polling=true;void cancelled().then(value=>{if(value)controller.abort();}).catch(()=>controller.abort()).finally(()=>{polling=false;});},500);
-  const agent=new Agent(components.agent,{name:'Cuelo selected-source answer',languageModel:openai.chat('gpt-4.1'),instructions:SELECTED_ANSWER_INSTRUCTIONS});
-  const {threadId}=await agent.createThread(ctx);let generated;
-  try {generated=await agent.generateText(ctx,{threadId},{prompt,maxOutputTokens:500,maxRetries:0,abortSignal:controller.signal,providerOptions:{openai:{store:false}}},{storageOptions:{saveMessages:'none'}});}
-  finally{await agent.deleteThreadAsync(ctx,{threadId});}
+  const generated=await generateSelectedAnswer(ctx,prompt,controller.signal);
   if(await cancelled())return failure('This answer was cancelled.','cancelled');
   if(source&&args.sourceId)await ctx.runQuery(internal.sources.answerSource,{guestSecret:args.guestSecret,id:args.sourceId});
   let raw:unknown;try{raw=JSON.parse(generated.text);}catch{return failure('The answer could not be checked. Try again.');}
