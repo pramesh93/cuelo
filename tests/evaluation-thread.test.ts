@@ -6,6 +6,7 @@ import {ask} from "../convex/evaluation";
 test("each question passes a fresh thread and removes it after success or failure", async (t) => {
   const originalKey = process.env.OPENAI_API_KEY;
   const originalSwitch = process.env.EVALUATION_TESTING_ENABLED;
+  const oldPaid=process.env.V1_PAID_TESTING_ENABLED;process.env.V1_PAID_TESTING_ENABLED="true";
   const created: string[] = [];
   const used: string[] = [];
   const removed: string[] = [];
@@ -37,6 +38,7 @@ test("each question passes a fresh thread and removes it after success or failur
     assert.deepEqual(used, created);
     assert.deepEqual(removed, created);
   } finally {
+    if(oldPaid===undefined)delete process.env.V1_PAID_TESTING_ENABLED;else process.env.V1_PAID_TESTING_ENABLED=oldPaid;
     if (originalKey === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = originalKey;
     if (originalSwitch === undefined) delete process.env.EVALUATION_TESTING_ENABLED; else process.env.EVALUATION_TESTING_ENABLED = originalSwitch;
   }

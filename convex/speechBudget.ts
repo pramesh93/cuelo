@@ -10,6 +10,7 @@ const state = v.union(v.literal("ready"), v.literal("busy"), v.literal("exhauste
 export const status = query({
   args: {}, returns: v.object({enabled: v.boolean(), message: v.string()}),
   handler: async ctx => {
+    if (process.env.V1_PAID_TESTING_ENABLED !== "true") return {enabled:false, message:"Paid testing is switched off. No microphone testing is available."};
     if (!process.env.DEEPGRAM_API_KEY || process.env.SPEECH_TESTING_ENABLED !== "true") {
       return {enabled:false, message:"Speech testing is not enabled yet. Add the Deepgram key and enable speech testing in Convex."};
     }
@@ -28,7 +29,7 @@ export const status = query({
 export const reserve = internalMutation({
   args: {lease: v.string()}, returns: state,
   handler: async (ctx,args) => {
-    if (!process.env.DEEPGRAM_API_KEY || process.env.SPEECH_TESTING_ENABLED !== "true" || !process.env.OPENAI_API_KEY || process.env.EVALUATION_TESTING_ENABLED !== "true") return "disabled" as const;
+    if (process.env.V1_PAID_TESTING_ENABLED !== "true" || !process.env.DEEPGRAM_API_KEY || process.env.SPEECH_TESTING_ENABLED !== "true" || !process.env.OPENAI_API_KEY || process.env.EVALUATION_TESTING_ENABLED !== "true") return "disabled" as const;
     const answers = (await ctx.db.query("evaluationUsage").withIndex("by_scope",q=>q.eq("scope","milestone1")).take(1))[0];
     if ((answers?.count ?? 0) >= answerAttemptLimit()) return "answers_exhausted" as const;
     const row = (await ctx.db.query("speechUsage").withIndex("by_scope",q=>q.eq("scope","mic-evaluation")).take(1))[0];

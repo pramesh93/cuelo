@@ -3,7 +3,7 @@ import assert from "node:assert/strict";
 import {reserve,release,status} from "../convex/speechBudget";
 
 test("speech spending is capped across visitors, blocks concurrency, and an old request cannot release a newer lease",async () => {
-  const original={key:process.env.DEEPGRAM_API_KEY,speech:process.env.SPEECH_TESTING_ENABLED,openai:process.env.OPENAI_API_KEY,answers:process.env.EVALUATION_TESTING_ENABLED};
+  const original={paid:process.env.V1_PAID_TESTING_ENABLED,key:process.env.DEEPGRAM_API_KEY,speech:process.env.SPEECH_TESTING_ENABLED,openai:process.env.OPENAI_API_KEY,answers:process.env.EVALUATION_TESTING_ENABLED};
   let row:Record<string,unknown> | undefined;
   let answerCount=0;
   const ctx={db:{
@@ -14,6 +14,7 @@ test("speech spending is capped across visitors, blocks concurrency, and an old 
   process.env.DEEPGRAM_API_KEY="fake-test-key";process.env.SPEECH_TESTING_ENABLED="true";
   process.env.OPENAI_API_KEY="fake-test-key";process.env.EVALUATION_TESTING_ENABLED="true";
   try {
+    process.env.V1_PAID_TESTING_ENABLED="true";
     assert.equal(await reserve._handler(ctx,{lease:"first"}),"ready");
     assert.equal(await reserve._handler(ctx,{lease:"second"}),"busy");
     assert.equal(row?.count,1);
@@ -34,7 +35,7 @@ test("speech spending is capped across visitors, blocks concurrency, and an old 
     answerCount=0;process.env.SPEECH_TESTING_ENABLED="false";
     assert.equal(await reserve._handler(ctx,{lease:"off"}),"disabled");
   } finally {
-    for(const [name,value] of Object.entries({DEEPGRAM_API_KEY:original.key,SPEECH_TESTING_ENABLED:original.speech,OPENAI_API_KEY:original.openai,EVALUATION_TESTING_ENABLED:original.answers})) {
+    for(const [name,value] of Object.entries({V1_PAID_TESTING_ENABLED:original.paid,DEEPGRAM_API_KEY:original.key,SPEECH_TESTING_ENABLED:original.speech,OPENAI_API_KEY:original.openai,EVALUATION_TESTING_ENABLED:original.answers})) {
       if(value===undefined) delete process.env[name];else process.env[name]=value;
     }
   }

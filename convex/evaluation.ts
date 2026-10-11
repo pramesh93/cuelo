@@ -23,6 +23,7 @@ export const ask = action({
     };
     const question = args.question.trim();
     if (!question || question.length > 1000) return error("Enter a question of 1–1,000 characters.");
+    if (process.env.V1_PAID_TESTING_ENABLED !== "true") return error("Paid testing is switched off. No paid request was made.");
     if (!process.env.OPENAI_API_KEY || process.env.EVALUATION_TESTING_ENABLED !== "true") {
       logFailure("testing_switch_check", {
         code: !process.env.OPENAI_API_KEY ? "missing_api_key" : "testing_disabled",

@@ -6,6 +6,7 @@ import {ask} from "../convex/evaluation";
 test("logs the failed step and safe reason for setup, source and OpenAI failures", async (t) => {
   const originalKey = process.env.OPENAI_API_KEY;
   const originalSwitch = process.env.EVALUATION_TESTING_ENABLED;
+  const oldPaid=process.env.V1_PAID_TESTING_ENABLED;process.env.V1_PAID_TESTING_ENABLED="true";
   const logs: unknown[][] = [];
   t.mock.method(console, "error", (...args: unknown[]) => { logs.push(args); });
   const ctx = {runMutation: async () => true} as unknown as Parameters<typeof ask._handler>[0];
@@ -34,6 +35,7 @@ test("logs the failed step and safe reason for setup, source and OpenAI failures
     assert.deepEqual(logs.at(-1)?.[1], {step: "openai_call", code: "insufficient_quota", status: 429, message: "Quota exhausted: [REDACTED]"});
     assert.equal(JSON.stringify(logs).includes("fake-test-key"), false);
   } finally {
+    if(oldPaid===undefined)delete process.env.V1_PAID_TESTING_ENABLED;else process.env.V1_PAID_TESTING_ENABLED=oldPaid;
     if (originalKey === undefined) delete process.env.OPENAI_API_KEY; else process.env.OPENAI_API_KEY = originalKey;
     if (originalSwitch === undefined) delete process.env.EVALUATION_TESTING_ENABLED; else process.env.EVALUATION_TESTING_ENABLED = originalSwitch;
   }

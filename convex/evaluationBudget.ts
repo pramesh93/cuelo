@@ -7,7 +7,7 @@ import { answerAttemptLimit } from "./testingLimits";
 export const reserve = internalMutation({
   args: {}, returns: v.boolean(),
   handler: async (ctx) => {
-    if (process.env.EVALUATION_TESTING_ENABLED !== "true") return false;
+    if (process.env.V1_PAID_TESTING_ENABLED !== "true" || process.env.EVALUATION_TESTING_ENABLED !== "true") return false;
     const row = await ctx.db.query("evaluationUsage").withIndex("by_scope", q => q.eq("scope", "milestone1")).take(1);
     const used = row[0];
     if ((used?.count ?? 0) >= answerAttemptLimit()) return false;

@@ -35,6 +35,7 @@ test("prepared source is owned, single-use, expires and is removed on cancellati
 
 test("preloaded answers skip downloading but retain the model and evidence refusal",async t=>{
   const oldKey=process.env.OPENAI_API_KEY,oldSwitch=process.env.EVALUATION_TESTING_ENABLED;
+  const oldPaid=process.env.V1_PAID_TESTING_ENABLED;process.env.V1_PAID_TESTING_ENABLED="true";
   process.env.OPENAI_API_KEY="fake-test-key";process.env.EVALUATION_TESTING_ENABLED="true";
   let fetches=0;let modelCalls=0;let sourceAvailable=true;
   t.mock.method(globalThis,"fetch",async()=>{fetches++;throw new Error("Should use the prepared source");});
@@ -55,6 +56,7 @@ test("preloaded answers skip downloading but retain the model and evidence refus
     const expired=await ask._handler(ctx,{question:"Public question",sourceTicket:ticket});
     assert.equal(expired.status,"error");assert.match(expired.answer,/expired/);assert.equal(fetches,0);assert.equal(modelCalls,1);
   } finally {
+    if(oldPaid===undefined)delete process.env.V1_PAID_TESTING_ENABLED;else process.env.V1_PAID_TESTING_ENABLED=oldPaid;
     if(oldKey===undefined) delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=oldKey;
     if(oldSwitch===undefined) delete process.env.EVALUATION_TESTING_ENABLED;else process.env.EVALUATION_TESTING_ENABLED=oldSwitch;
   }
