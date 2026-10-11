@@ -31,6 +31,13 @@ const view=v.object({state:v.union(v.literal('active'),v.literal('paused')),dead
 export const get=query({args:sessionArg,returns:v.union(view,v.null()),handler:async(ctx,args)=>{try{const row=await ownedCall(ctx,args.sessionId,false);if(row.deadline<=Date.now()||row.expiresAt<=Date.now())return null;return {state:row.state,deadline:row.deadline,mode:row.mode,sourceId:row.sourceId,generation:row.generation,customerRevision:row.customerRevision};}catch{return null;}}});
 export const heartbeat=mutation({args:sessionArg,returns:v.null(),handler:async(ctx,args)=>{const row=await ownedCall(ctx,args.sessionId);await invited(ctx);if(!liveCallConfig())throw new ConvexError('Live testing was switched off. Stop Cuelo.');if(row.sourceId){const source=await ctx.db.get(row.sourceId);if(!source||source.ownerKey!==row.sourceOwnerKey)throw new ConvexError('Your source changed. Stop Cuelo and confirm it again.');}await ctx.db.patch(row._id,{heartbeatAt:Date.now(),expiresAt:Math.min(row.deadline,Date.now()+120000)});return null;}});
 export const change=mutation({args:{...sessionArg,state:v.union(v.literal('paused'),v.literal('active'),v.literal('stopped'))},returns:v.null(),handler:async(ctx,args)=>{
+ // Credential failure or expiry cleanup may already have removed this call.
+ // A signed-in repeat Stop has nothing left to delete; existing rows still
+ // pass the same ownership check below, and real deletion errors propagate.
+ if(args.state==='stopped'){
+  if(!await getAuthUserId(ctx))throw new ConvexError('This call is unavailable.');
+  if(!await ctx.db.get(args.sessionId))return null;
+ }
  const row=await ownedCall(ctx,args.sessionId,false);if(args.state==='stopped'){await removeText(ctx,row);if(row.sourceId){const source=await ctx.db.get(row.sourceId);if(source&&!source.saved&&source.ownerKey===row.sourceOwnerKey){for(const p of await ctx.db.query('sourcePassages').withIndex('by_source',q=>q.eq('sourceId',source._id)).take(501))await ctx.db.delete(p._id);await ctx.db.delete(source._id);}}return null;}
  if(row.deadline<=Date.now()||row.expiresAt<=Date.now())throw new ConvexError('This call expired. Start a new session.');if(args.state==='active'){await invited(ctx);if(!liveCallConfig())throw new ConvexError('Live listening testing is not enabled yet.');}
  await ctx.db.patch(row._id,{state:args.state,generation:row.generation+1,customerRevision:row.customerRevision+1,expiresAt:args.state==='paused'?row.deadline:Math.min(row.deadline,Date.now()+120000)});return null;

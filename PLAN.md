@@ -1,6 +1,16 @@
 # Cuelo plan
 
-## Current sidebar checkpoint — 10 October 2026
+## Current production status — 11 October 2026
+
+Website/backend commit 403187a deployed to deafening-frog-846 with explicit approval. Live Chrome checks confirmed the logged-out Google sign-in button and sidebar guidance replacing the retired live route. User confirmed production website/sidebar Google sign-in and sign-out in both directions. Production extension is prepared at artifacts/cuelo-production-preview-403187a; the development extension remains separate. Production preparation initially used external folders; after the user objected and approved cleanup, the extension was moved inside this project and both temporary build folders were removed. AGENTS.md records the explicit prohibition on any external folder use without approval; the existing Convex login-file exception was subsequently approved for the stated checks.
+
+User confirmed the production four-answer limit retained all cards, Stop cleared the cards, and Meet continued. This does not establish per-answer correctness, evidence accuracy, production Pause/Resume, measured latency or the 60-minute cutoff. Initial production Start failed while requesting a Deepgram temporary credential; that session was removed but consumed the first allowance and retained its reservation. User updated the production Deepgram key; the temporary-credential endpoint then returned success without starting transcription. Production session allowance was explicitly raised to two total calls for one retry, preserving four answers, 20 detection checks, two connections and a ₹500 reservation per admission. No counts were reset.
+
+At the user's request, production LIVE_CALL_TESTING_ENABLED and V1_PAID_TESTING_ENABLED are now false; backend status confirmed liveEnabled=false. Development paid testing was switched off before production activation. Website/sign-in remain available. Last verified combined reservations before the retry: ₹3,180, leaving ₹1,320 after the ₹500 safety buffer; the retry's actual ledger and provider charges have not been reconciled. Separate deployment ledgers do not enforce a combined monthly cap automatically. Recheck both before any further paid activation.
+
+Before wider use: review the misleading cleanup warning after credential rejection (server call removal was confirmed), verify combined spending controls and agree ongoing call/answer limits, verify source ownership/deletion and failures with real accounts, and arrange a repeatable production extension build/install process. Parked context usefulness, multi-part answers, full-duration stopping, latency and independent provider shutdown remain unverified. User's development Pause/Resume and other prior audio checks remain recorded separately. Do not claim a full v1 release from this bounded production check.
+
+## Prior sidebar checkpoint — 10 October 2026
 
 Shared website/sidebar sign-in change approved for commit and GitHub push on 10 October 2026; deployment is not authorised. User confirmed real Google sign-in/sign-out in both directions and remembered login after restarting Chrome. Website call setup now gives sidebar instructions. User confirmed sign-in appears without Meet after signing out. All 143 automated tests, website/four extension builds and simulated Chrome message checks pass. User confirmed Start and website sign-out during listening stop Cuelo while Meet continues after fixing hidden-page login updates to use runtime messages. Active-call account switching remains unverified. Production, provider secrets, paid limits and deployment settings are unchanged. See SHARED_SIGNIN_CHECK.md.
 
@@ -57,6 +67,8 @@ The user approved the six-round, 30-minute human-practice plan on 6 October 2026
 - Attention recall later confirmed for all four rounds; user attributes it to time available while waiting. Answer use and explicit Salesforce qualification remain unconfirmed. Read-only diagnosis in LATENCY_FINDINGS.md found answer preparation/generation is the larger measured stage; repeated source loading occurs after transcription. User approved loading the source while speaking. Development implementation, 17 tests, compilation and Chrome simulations passed. Live speed is unmeasured; a paid speed retest remains unapproved. Existing answer cap is exhausted and stays unchanged.
 
 ## Parked
+
+- v2 call transcripts and analysis — requested 11 October 2026: show the entire call conversation transcript on the Cuelo website with analysis. Storage duration, deletion, access and participant-consent choices remain to be agreed. This is parked for v2; v1 call conversation remains temporary and is removed at session end.
 
 - Deferred real Chrome 60-minute cutoff test — user parked this check on 10 October 2026. Later verify the 55-minute warning and stopping Cuelo's capture, transcription and answers at the original 60-minute deadline, including across Pause/Resume, while Meet continues. Current page-controlled enforcement limitations still apply; real cutoff behavior remains unverified. No call-duration setting is changed by deferring the test.
 

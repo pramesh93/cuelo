@@ -37,3 +37,7 @@ The implementation uses the installed Convex Auth/Convex clients and Chrome's do
 - User confirmed Continue with Google appears after signing out with no Meet call open.
 - Google sign-in continues using its temporary popup window, as requested.
 - User confirmed Start works and website sign-out during listening stops Cuelo while Meet continues. Active-call account switching and the remaining parked call tests are unverified.
+
+## Production confirmation — 11 October 2026
+
+After the approved website/backend deployment and installation of the production extension, the user confirmed website-to-sidebar and sidebar-to-website Google sign-in and sign-out. Production Chrome restart persistence and logout during active listening were not independently confirmed; the earlier development confirmations remain separate. Production listening and paid testing are now off at the user's request. The extension folder is artifacts/cuelo-production-preview-403187a inside this project. See PLAN.md for bounded call results and pending release checks.

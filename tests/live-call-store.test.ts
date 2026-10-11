@@ -11,6 +11,25 @@ test('session admission reserves once, rejects concurrency/source smuggling, pau
  await change._handler(f.ctx,{sessionId:session.sessionId,state:'paused'});assert.equal(row.deadline,session.deadline);assert.equal(await check._handler(f.ctx,{sessionId:session.sessionId,revision:customer.revision}),false);await change._handler(f.ctx,{sessionId:session.sessionId,state:'active'});await assert.rejects(()=>append._handler(f.ctx,{sessionId:session.sessionId,generation:grant.generation,speaker:'customer',text:'old audio'}),/Old audio/);await change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'});assert.equal(f.table('callText').size,0);assert.equal(f.table('liveCalls').size,0);assert.equal(f.table('spendingReservations').size,1);});});
 test('other accounts, newer questions, revoked access and expired deadlines invalidate pending work',async()=>{await configured(async()=>{const f=fixture();const session=await start._handler(f.ctx,{mode:'generic'});const grant=await credentialAdmission._handler(f.ctx,{sessionId:session.sessionId});const first=await append._handler(f.ctx,{sessionId:session.sessionId,generation:grant.generation,speaker:'customer',text:'First question?'});assert.equal(await check._handler(f.ctx,{sessionId:session.sessionId,revision:first.revision}),true);await append._handler(f.ctx,{sessionId:session.sessionId,generation:grant.generation,speaker:'customer',text:'New question?'});assert.equal(await check._handler(f.ctx,{sessionId:session.sessionId,revision:first.revision}),false);f.setSubject('another-user|another-session');await assert.rejects(()=>change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'}),/unavailable/);f.setSubject('fictional-user|fictional-session');f.table('testerAccess').get('invite').enabled=false;assert.equal(await check._handler(f.ctx,{sessionId:session.sessionId}),false);await assert.rejects(()=>heartbeat._handler(f.ctx,{sessionId:session.sessionId}),/invited/);f.table('testerAccess').get('invite').enabled=true;f.table('liveCalls').get(session.sessionId).deadline=Date.now()-1;assert.equal(await check._handler(f.ctx,{sessionId:session.sessionId}),false);await change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'});assert.equal(f.table('callText').size,0);});});
 
+test('repeated Stop succeeds after server cleanup without weakening ownership or hiding failures',async()=>{await configured(async()=>{
+ const f=fixture(),session=await start._handler(f.ctx,{mode:'generic'});
+ f.setSubject('another-user|another-session');
+ await assert.rejects(()=>change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'}),/unavailable/);
+ assert.equal(f.table('liveCalls').size,1);
+ f.setSubject('fictional-user|fictional-session');
+ await change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'});
+ assert.equal(await change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'}),null);
+ assert.equal(f.table('liveCalls').size,0);assert.equal(f.table('callText').size,0);
+ assert.equal(f.table('spendingReservations').size,1);
+ await assert.rejects(()=>change._handler(f.ctx,{sessionId:session.sessionId,state:'paused'}),/unavailable/);
+ f.setSubject(null);
+ await assert.rejects(()=>change._handler(f.ctx,{sessionId:session.sessionId,state:'stopped'}),/unavailable/);
+ f.setSubject('fictional-user|fictional-session');
+ const next=await start._handler(f.ctx,{mode:'generic'});
+ f.ctx.db.delete=async()=>{throw Error('SIMULATED deletion failed');};
+ await assert.rejects(()=>change._handler(f.ctx,{sessionId:next.sessionId,state:'stopped'}),/deletion failed/);
+});});
+
 test('queued questions survive later speech, reserve once across Pause, and clear at Stop',async()=>{await configured(async()=>{
  const f=fixture(),session=await start._handler(f.ctx,{mode:'generic'}),grant=await credentialAdmission._handler(f.ctx,{sessionId:session.sessionId});
  const first=await append._handler(f.ctx,{sessionId:session.sessionId,generation:grant.generation,speaker:'customer',text:'What is the price?'});

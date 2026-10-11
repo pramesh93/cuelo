@@ -9,6 +9,12 @@ Read this before building or changing Cuelo. If a product choice is not covered 
 - Read-only inspection and research may continue, but do not apply fixes automatically when a bug is reported.
 - This rule supersedes earlier instructions to act automatically or continue implementation without confirmation. It applies to all future work on this project. Saving this requested rule is explicitly authorized by the user.
 
+## Project folder restriction — 10 October 2026
+
+- Do not use any folder outside `/Users/avantikamishra/build-sprint-app` for project work without the user’s explicit approval. This includes reading or writing files, development copies, builds, temporary files, browser profiles, caches and generated artifacts.
+- Keep production extension preparations and other generated artifacts inside the project, such as `artifacts/`. Do not choose an external folder automatically.
+- If a tool requires using another folder, explain the exact folder and purpose and obtain approval before running it.
+
 ## 1. How the product works
 
 ### Interface
