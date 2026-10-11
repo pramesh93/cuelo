@@ -3,6 +3,7 @@ import {ConvexProviderWithAuth,type ConvexReactClient} from 'convex/react';
 import {ConvexAuthProvider,useAuthActions as nativeActions,useAuthToken as nativeToken} from '@convex-dev/auth/react';
 import {extensionTransport,websiteTransport,type Transport} from './transport';
 import {sessionSubject,type Session} from './sharedSession';
+import {websiteReturnPath} from './navigation';
 type Actions={signIn:(provider?:string,args?:Record<string,unknown>)=>Promise<{signingIn:boolean;redirect?:URL}>;signOut:()=>Promise<void>};
 const ActionsContext=createContext<Actions|null>(null),TokenContext=createContext<string|null|undefined>(undefined);
 export function useAuthActions(){const shared=useContext(ActionsContext),native=nativeActions();return shared??native;}
@@ -26,7 +27,7 @@ export function SharedAuthProvider({client,transport,initial,popup,children,hand
   if(provider!=='google')throw Error('Use Google sign-in only.');
   setError('');
   const nonce=Array.from(crypto.getRandomValues(new Uint8Array(32)),x=>x.toString(16).padStart(2,'0')).join('');
-  const result=await transport.request({operation:'signIn',args:{provider:'google',params:{...args,redirectTo:popup?`/?view=extension-auth&state=${nonce}`:'/?view=account'}}});
+  const result=await transport.request({operation:'signIn',args:{provider:'google',params:{...args,redirectTo:popup?`/?view=extension-auth&state=${nonce}`:websiteReturnPath(args.redirectTo)}}});
   if(result.redirect){
    if(!result.verifier)throw Error('Google sign-in could not start.');
    if(popup){const code=await popup(result.redirect,nonce);const completed=await transport.request({operation:'signIn',args:{params:{code},verifier:result.verifier}});accept(completed.state);return {signingIn:!!completed.state.token};}

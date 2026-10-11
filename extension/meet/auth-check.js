@@ -11687,18 +11687,23 @@ function rr(e) {
 	}
 }
 //#endregion
+//#region src/auth/navigation.ts
+function ir(e) {
+	return e === "/?view=sources" ? "/?view=sources" : "/?view=account";
+}
+//#endregion
 //#region src/auth/SharedAuth.tsx
-var ir = (0, N.createContext)(null), ar = (0, N.createContext)(void 0);
-function or() {
-	let e = (0, N.useContext)(ir), t = er();
+var ar = (0, N.createContext)(null), or = (0, N.createContext)(void 0);
+function sr() {
+	let e = (0, N.useContext)(ar), t = er();
 	return e ?? t;
 }
-function sr() {
-	let e = (0, N.useContext)(ar), t = tr();
+function cr() {
+	let e = (0, N.useContext)(or), t = tr();
 	return e === void 0 ? t : e;
 }
-var cr = /* @__PURE__ */ new Map();
-function lr({ client: e, transport: t, initial: n, popup: r, children: i, handleCode: a = !1 }) {
+var lr = /* @__PURE__ */ new Map();
+function ur({ client: e, transport: t, initial: n, popup: r, children: i, handleCode: a = !1 }) {
 	let [o, s] = (0, N.useState)(n ?? {
 		token: null,
 		revision: -1,
@@ -11723,13 +11728,13 @@ function lr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 		let n = new URLSearchParams(location.search).get("code"), r = sessionStorage.getItem("cuelo-website-login-verifier");
 		if (!n || !r) return;
 		let i = e.address + ":" + n;
-		cr.has(i) || cr.set(i, t.request({
+		lr.has(i) || lr.set(i, t.request({
 			operation: "signIn",
 			args: {
 				params: { code: n },
 				verifier: r
 			}
-		})), cr.get(i).then((e) => {
+		})), lr.get(i).then((e) => {
 			p(e.state), sessionStorage.removeItem("cuelo-website-login-verifier");
 			let t = new URL(location.href);
 			t.searchParams.delete("code"), history.replaceState({}, "", t.pathname + t.search + t.hash);
@@ -11749,7 +11754,7 @@ function lr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 				provider: "google",
 				params: {
 					...n,
-					redirectTo: r ? `/?view=extension-auth&state=${i}` : "/?view=account"
+					redirectTo: r ? `/?view=extension-auth&state=${i}` : ir(n.redirectTo)
 				}
 			}
 		});
@@ -11799,12 +11804,12 @@ function lr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 			onClick: () => location.reload(),
 			children: "Reload"
 		})]
-	}) : /* @__PURE__ */ (0, P.jsx)(ir.Provider, {
+	}) : /* @__PURE__ */ (0, P.jsx)(ar.Provider, {
 		value: {
 			signIn: h,
 			signOut: g
 		},
-		children: /* @__PURE__ */ (0, P.jsx)(ar.Provider, {
+		children: /* @__PURE__ */ (0, P.jsx)(or.Provider, {
 			value: o.token,
 			children: /* @__PURE__ */ (0, P.jsx)(Kn, {
 				client: e,
@@ -11818,9 +11823,9 @@ function lr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 		})
 	});
 }
-function ur({ client: e, popup: t, children: n }) {
+function dr({ client: e, popup: t, children: n }) {
 	let [r] = (0, N.useState)(() => nr(e.address));
-	return /* @__PURE__ */ (0, P.jsx)(lr, {
+	return /* @__PURE__ */ (0, P.jsx)(ur, {
 		client: e,
 		transport: r,
 		popup: t,
@@ -11829,7 +11834,7 @@ function ur({ client: e, popup: t, children: n }) {
 }
 //#endregion
 //#region extension/src/accessIdentity.ts
-function dr(e, t, n = Date.now()) {
+function fr(e, t, n = Date.now()) {
 	if (!e || e.length > 2e4) return null;
 	try {
 		let r = e.split(".");
@@ -11844,9 +11849,9 @@ function dr(e, t, n = Date.now()) {
 }
 //#endregion
 //#region node_modules/convex/dist/esm/server/components/index.js
-function fr(e, t) {
+function pr(e, t) {
 	return new Proxy({}, { get(n, r) {
-		if (typeof r == "string") return fr(e, [...t, r]);
+		if (typeof r == "string") return pr(e, [...t, r]);
 		if (r === at) {
 			if (t.length < 1) {
 				let n = [e, ...t].join(".");
@@ -11856,16 +11861,53 @@ function fr(e, t) {
 		}
 	} });
 }
-var pr = () => fr("components", []), mr = ft;
-pr();
+var mr = () => pr("components", []), hr = ft;
+mr();
+//#endregion
+//#region src/temporarySourceVisit.ts
+var gr = "cuelo-temporary-source-handoff", _r = "cuelo-temporary-source";
+function vr({ storage: e, href: t, referrer: n, navigation: r, random: i, now: a = Date.now }) {
+	let o = i();
+	try {
+		let i = e.getItem(gr);
+		if (e.removeItem(gr), e.removeItem(_r), i) {
+			let e = JSON.parse(i);
+			r === "navigate" && n && new URL(n).origin === new URL(t).origin && e.destination === t && e.expires > a() && /^[a-f0-9]{64}$/.test(e.secret) && (o = e.secret);
+		}
+	} catch {}
+	return {
+		secret: o,
+		transfer(n) {
+			try {
+				e.removeItem(gr), new URL(n).origin === new URL(t).origin && e.setItem(gr, JSON.stringify({
+					secret: o,
+					destination: n,
+					expires: a() + 1e4
+				}));
+			} catch {}
+		}
+	};
+}
+var yr;
+function br() {
+	return yr || (yr = vr({
+		storage: sessionStorage,
+		href: location.href,
+		referrer: document.referrer,
+		navigation: performance.getEntriesByType("navigation")[0]?.type ?? "navigate",
+		random: () => Array.from(crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32)), (e) => e.toString(16).padStart(2, "0")).join("")
+	}), window.addEventListener("click", (e) => {
+		if (e.defaultPrevented || e.button !== 0 || e.metaKey || e.ctrlKey || e.shiftKey || e.altKey) return;
+		let t = e.target instanceof Element ? e.target.closest("a") : null;
+		t?.href && !t.hasAttribute("download") && (!t.target || t.target === "_self") && yr.transfer(t.href);
+	}), window.addEventListener("pageshow", (e) => {
+		e.persisted && location.reload();
+	})), yr.secret;
+}
 //#endregion
 //#region src/SourceManager.tsx
-function hr() {
-	let e = "cuelo-temporary-source", t = sessionStorage.getItem(e);
-	return (!t || !/^[a-f0-9]{64}$/.test(t)) && (t = Array.from(crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32)), (e) => e.toString(16).padStart(2, "0")).join(""), sessionStorage.setItem(e, t)), t;
-}
-function gr({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConfirmed: r, onSourceChanged: i }) {
-	let { isAuthenticated: a } = Gn(), [o] = (0, N.useState)(hr), [s, c] = (0, N.useState)(!1), [l, u] = (0, N.useState)(!1), d = Pn(mr.sources.get, a ? {} : "skip"), f = Pn(mr.sources.get, t ? "skip" : { guestSecret: o }), p = t ? !1 : e ? !(!f || d && !l) : !(s && a), m = p ? { guestSecret: o } : {}, h = Pn(mr.sources.get, m), [g, _] = (0, N.useState)(() => Date.now()), v = h && h.expiresAt !== null && h.expiresAt <= g ? null : h, y = In(mr.sourceImport.paste), b = In(mr.sourceImport.webpage), ee = In(mr.sourceImport.prepareUpload), te = Fn(mr.sources.remove), ne = Fn(mr.sources.keep), [re, x] = (0, N.useState)("text"), [ie, S] = (0, N.useState)(""), [ae, C] = (0, N.useState)(""), [oe, se] = (0, N.useState)(""), [ce, le] = (0, N.useState)(null), [ue, w] = (0, N.useState)(!1), [T, de] = (0, N.useState)(!1), [fe, pe] = (0, N.useState)(""), [me, he] = (0, N.useState)(""), [ge, _e] = (0, N.useState)(!1), ve = Pn(mr.sources.passages, ge && v ? {
+function xr({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConfirmed: r, onSourceChanged: i }) {
+	let { isAuthenticated: a } = Gn(), [o] = (0, N.useState)(br), [s, c] = (0, N.useState)(!1), [l, u] = (0, N.useState)(!1), d = Pn(hr.sources.get, a ? {} : "skip"), f = Pn(hr.sources.get, t ? "skip" : { guestSecret: o }), p = t ? !1 : e ? !(!f || d && !l) : !(s && a), m = p ? { guestSecret: o } : {}, h = Pn(hr.sources.get, m), [g, _] = (0, N.useState)(() => Date.now()), v = h && h.expiresAt !== null && h.expiresAt <= g ? null : h, y = In(hr.sourceImport.paste), b = In(hr.sourceImport.webpage), ee = In(hr.sourceImport.prepareUpload), te = Fn(hr.sources.remove), ne = Fn(hr.sources.keep), [re, x] = (0, N.useState)("text"), [ie, S] = (0, N.useState)(""), [ae, C] = (0, N.useState)(""), [oe, se] = (0, N.useState)(""), [ce, le] = (0, N.useState)(null), [ue, w] = (0, N.useState)(!1), [T, de] = (0, N.useState)(!1), [fe, pe] = (0, N.useState)(""), [me, he] = (0, N.useState)(""), [ge, _e] = (0, N.useState)(!1), ve = Pn(hr.sources.passages, ge && v ? {
 		...m,
 		id: v.id
 	} : "skip");
@@ -12172,7 +12214,7 @@ function gr({ savedOnly: e = !1, accountOnly: t = !1, sidebarAdd: n = !1, onConf
 }
 //#endregion
 //#region src/AnswerCheck.tsx
-function _r({ result: e, elapsedMs: t, sourceLinks: n = !0 }) {
+function Sr({ result: e, elapsedMs: t, sourceLinks: n = !0 }) {
 	return /* @__PURE__ */ (0, P.jsxs)("section", {
 		className: "answer-panel selected-answer-card",
 		"aria-label": "Answer",
@@ -12222,18 +12264,18 @@ function _r({ result: e, elapsedMs: t, sourceLinks: n = !0 }) {
 }
 //#endregion
 //#region extension/src/sidebarState.ts
-function vr(e) {
+function Cr(e) {
 	return e.authLoading ? "checking-account" : e.authenticated ? e.checking ? "checking-meeting" : e.meeting ? e.accessLoading ? "checking-access" : "setup" : "no-meeting" : "sign-in";
 }
-function yr(e) {
+function wr(e) {
 	return e.busy ? "Connecting…" : e.eligible ? e.invited ? e.enabled ? e.mode ? e.mode === "document" && e.sourceLoading ? "Your source is still loading." : e.mode === "document" && !e.sourceSelected ? "Choose a ready source to enable Start." : null : "Choose how Cuelo should answer." : "Live listening is not enabled for this test account yet." : "Your account needs invited tester access before listening can start." : "Join a Meet call before starting Cuelo.";
 }
 //#endregion
 //#region extension/src/chrome.ts
-var br = globalThis.chrome;
-function xr(e, t) {
+var Tr = globalThis.chrome;
+function Er(e, t) {
 	return new Promise((n, r) => {
-		let i = br.runtime.connect({ name: "cuelo-signin" }), a = !1, o = setInterval(() => {
+		let i = Tr.runtime.connect({ name: "cuelo-signin" }), a = !1, o = setInterval(() => {
 			if (!a) try {
 				i.postMessage({ type: "ping" });
 			} catch {
@@ -12257,13 +12299,13 @@ function xr(e, t) {
 }
 //#endregion
 //#region extension/src/client.ts
-var Sr = "https://calculating-gecko-263.convex.cloud";
-`${Sr}`;
+var Dr = "https://calculating-gecko-263.convex.cloud";
+`${Dr}`;
 //#endregion
 //#region extension/src/runtime.ts
-var Cr = globalThis.chrome.runtime;
-async function wr(e, t = {}) {
-	let n = await Cr.sendMessage({
+var Or = globalThis.chrome.runtime;
+async function kr(e, t = {}) {
+	let n = await Or.sendMessage({
 		type: e,
 		...t
 	});
@@ -12272,7 +12314,7 @@ async function wr(e, t = {}) {
 }
 //#endregion
 //#region extension/src/callEngine.tsx
-var Tr = {
+var Ar = {
 	state: "idle",
 	message: "Choose how Cuelo should answer, then Start.",
 	busy: !1,
@@ -12285,8 +12327,8 @@ var Tr = {
 };
 //#endregion
 //#region extension/src/main.tsx
-function Er() {
-	let { isAuthenticated: e, isLoading: t } = Gn(), { signIn: n, signOut: r } = or(), i = Pn(mr.callAccess.status, e ? {} : "skip"), a = sr(), [o, s] = (0, N.useState)(null), [c, l] = (0, N.useState)(!1), [u, d] = (0, N.useState)(""), f = o ?? i, p = f?.signedIn ? dr(a, Sr) : null;
+function jr() {
+	let { isAuthenticated: e, isLoading: t } = Gn(), { signIn: n, signOut: r } = sr(), i = Pn(hr.callAccess.status, e ? {} : "skip"), a = cr(), [o, s] = (0, N.useState)(null), [c, l] = (0, N.useState)(!1), [u, d] = (0, N.useState)(""), f = o ?? i, p = f?.signedIn ? fr(a, Dr) : null;
 	(0, N.useEffect)(() => {
 		s(null), d("");
 	}, [i, a]);
@@ -12294,9 +12336,9 @@ function Er() {
 		l(!0), d("");
 		try {
 			if (!a) throw Error("Sign in again to check your account.");
-			let e = new xn(Sr);
+			let e = new xn(Dr);
 			e.setAuth(a);
-			let t = await e.query(mr.callAccess.status, {});
+			let t = await e.query(hr.callAccess.status, {});
 			s(t), d(t.invited ? "Tester access confirmed." : t.signedIn ? "The server still reports no tester access for this account. Match the account ID below in the live dashboard." : "Your sign-in could not be confirmed. Sign out and sign in again.");
 		} catch {
 			d("Could not reach Cuelo to check access. Your permissions have not changed.");
@@ -12304,15 +12346,15 @@ function Er() {
 			l(!1);
 		}
 	}
-	let h = Pn(mr.sources.get, e ? {} : "skip"), g = (0, N.useRef)(0), [_, v] = (0, N.useState)(!1), [y, b] = (0, N.useState)(""), [ee, te] = (0, N.useState)(!1), [ne, re] = (0, N.useState)(!1), [x, ie] = (0, N.useState)(!0), [S, ae] = (0, N.useState)(Tr), [C, oe] = (0, N.useState)(null), [se, ce] = (0, N.useState)(""), [le, ue] = (0, N.useState)(!1), [w, T] = (0, N.useState)(null);
+	let h = Pn(hr.sources.get, e ? {} : "skip"), g = (0, N.useRef)(0), [_, v] = (0, N.useState)(!1), [y, b] = (0, N.useState)(""), [ee, te] = (0, N.useState)(!1), [ne, re] = (0, N.useState)(!1), [x, ie] = (0, N.useState)(!0), [S, ae] = (0, N.useState)(Ar), [C, oe] = (0, N.useState)(null), [se, ce] = (0, N.useState)(""), [le, ue] = (0, N.useState)(!1), [w, T] = (0, N.useState)(null);
 	(0, N.useEffect)(() => {
 		let e = !0, t = !1;
 		async function n() {
 			if (!t) {
 				t = !0;
 				try {
-					let t = await wr("sidebar-status");
-					e && (te(t.eligible === !0), re(t.meeting === !0), ae(t.view ?? Tr), ie(!1));
+					let t = await kr("sidebar-status");
+					e && (te(t.eligible === !0), re(t.meeting === !0), ae(t.view ?? Ar), ie(!1));
 				} catch (t) {
 					e && (b(t instanceof Error ? t.message : "Cuelo could not connect."), ie(!1));
 				} finally {
@@ -12336,27 +12378,27 @@ function Er() {
 		let t = ++g.current;
 		v(!0), b("");
 		try {
-			e === "signin" ? await n("google") : e === "signout" ? (await wr("stop"), await r()) : e === "start" ? await wr("start", {
+			e === "signin" ? await n("google") : e === "signout" ? (await kr("stop"), await r()) : e === "start" ? await kr("start", {
 				resume: S.state === "paused",
 				mode: C,
 				...C === "document" && w ? {
 					sourceId: w.id,
 					sourceTitle: w.title
 				} : {}
-			}) : await wr(e);
+			}) : await kr(e);
 		} catch (e) {
 			b(e instanceof Error ? e.message : "This action could not finish. Try again.");
 		} finally {
 			t === g.current && v(!1);
 		}
 	}
-	let fe = vr({
+	let fe = Cr({
 		checking: x,
 		meeting: ne,
 		authLoading: t,
 		authenticated: e,
 		accessLoading: f === void 0
-	}), pe = yr({
+	}), pe = wr({
 		eligible: ee,
 		invited: !!f?.invited,
 		enabled: !!f?.liveEnabled,
@@ -12364,7 +12406,7 @@ function Er() {
 		mode: C,
 		sourceSelected: !!w && se === w.id,
 		sourceLoading: h === void 0 && !le
-	}), me = Sr.includes("calculating-gecko-263"), he = S.state !== "idle";
+	}), me = Dr.includes("calculating-gecko-263"), he = S.state !== "idle";
 	return /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsxs)("header", { children: [/* @__PURE__ */ (0, P.jsx)("strong", { children: "Cuelo" }), /* @__PURE__ */ (0, P.jsx)("span", { children: me ? `Test version${he ? ` · ${S.state}` : ""}` : he ? S.state : "Beside your call" })] }), /* @__PURE__ */ (0, P.jsxs)("main", { children: [
 		he ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [
 			/* @__PURE__ */ (0, P.jsx)("p", {
@@ -12453,7 +12495,7 @@ function Er() {
 				}), S.result ? /* @__PURE__ */ (0, P.jsxs)(P.Fragment, { children: [/* @__PURE__ */ (0, P.jsx)("p", {
 					className: "answer-question",
 					children: S.result.question
-				}), /* @__PURE__ */ (0, P.jsx)(_r, {
+				}), /* @__PURE__ */ (0, P.jsx)(Sr, {
 					result: S.result,
 					sourceLinks: !1
 				})] }) : /* @__PURE__ */ (0, P.jsxs)("section", {
@@ -12469,7 +12511,7 @@ function Er() {
 					children: [/* @__PURE__ */ (0, P.jsx)("p", {
 						className: "answer-question",
 						children: e.question
-					}), /* @__PURE__ */ (0, P.jsx)(_r, {
+					}), /* @__PURE__ */ (0, P.jsx)(Sr, {
 						result: e,
 						sourceLinks: !1
 					})]
@@ -12568,7 +12610,7 @@ function Er() {
 					onClick: () => ue(!le),
 					children: le ? "Return to source selection" : "Add a new source"
 				}),
-				le && /* @__PURE__ */ (0, P.jsx)(gr, {
+				le && /* @__PURE__ */ (0, P.jsx)(xr, {
 					accountOnly: !0,
 					savedOnly: !0,
 					sidebarAdd: !0,
@@ -12625,7 +12667,7 @@ function Er() {
 				children: u
 			})
 		] }),
-		!he && S.message !== Tr.message && /* @__PURE__ */ (0, P.jsx)("p", {
+		!he && S.message !== Ar.message && /* @__PURE__ */ (0, P.jsx)("p", {
 			role: "status",
 			children: S.message
 		}),
@@ -12650,9 +12692,9 @@ function Er() {
 		})
 	] })] });
 }
-(0, Zn.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, P.jsx)(N.StrictMode, { children: /* @__PURE__ */ (0, P.jsx)(ur, {
-	client: new An(Sr),
-	popup: xr,
-	children: /* @__PURE__ */ (0, P.jsx)(Er, {})
+(0, Zn.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, P.jsx)(N.StrictMode, { children: /* @__PURE__ */ (0, P.jsx)(dr, {
+	client: new An(Dr),
+	popup: Er,
+	children: /* @__PURE__ */ (0, P.jsx)(jr, {})
 }) }));
 //#endregion

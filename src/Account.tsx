@@ -5,11 +5,12 @@ import {useConvexAuth, useMutation, useQuery} from "convex/react";
 import {api} from "../convex/_generated/api";
 
 import {SidebarInstructions} from './SidebarGuide';
+import {websiteReturnPath} from './auth/navigation';
 import {SourceManager} from "./SourceManager";
 
 type Mode = "generic" | "document";
 
-export function Account() {
+export function Account({returnToSources=false}:{returnToSources?:boolean}) {
   const {signIn, signOut} = useAuthActions();
   const {isLoading, isAuthenticated} = useConvexAuth();
   const access = useQuery(api.callAccess.status);
@@ -21,12 +22,16 @@ export function Account() {
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
   const [step, setStep] = useState<"mode" | "source" | "sidebar">("mode");
+  const params=new URLSearchParams(location.search);
+  const signup=params.get('intent')==='signup';
+  const destination=websiteReturnPath(returnToSources||params.get('next')==='sources'?'/?view=sources':undefined);
+  useEffect(()=>{if(isAuthenticated&&destination==='/?view=sources')location.replace(destination);},[isAuthenticated,destination]);
   useEffect(() => {
     if (!isAuthenticated) {setMode(null); setStep("mode"); setMessage("");}
   }, [isAuthenticated]);
   async function login() {
     setBusy(true); setError("");
-    try {await signIn("google", {redirectTo: "/?view=account"});}
+    try {await signIn("google", {redirectTo: destination});}
     catch {setError("We couldn’t sign you in. Please try again."); setBusy(false);}
   }
   async function logout() {
@@ -39,16 +44,17 @@ export function Account() {
   return <>
     <Topbar/>
     <main className="account-page">
-      <h1>Add Cuelo to your next call.</h1>
+      <h1>{!isLoading&&!isAuthenticated?(returnToSources?'Sign in to manage your source.':signup?'Create your Cuelo account.':'Welcome back to Cuelo.'):'Add Cuelo to your next call.'}</h1>
       <p className="intro">Short answers in text, while you stay in the conversation.</p>
       {loading ? <p role="status">Checking your account…</p> : !isAuthenticated ? <section className="account-content" aria-label="Google sign-in">
-        <p>Sign up or log in to continue.</p>
+        <p>{returnToSources?'Your saved source belongs to your account. Sign in with Google to view or manage it.':signup?'Continue with Google to create your account. If you already have an account, you’ll be signed in.':'Continue with Google to sign in. New here? The same button creates your account.'}</p>
         <button className="primary google-button" type="button" disabled={busy || !access.googleConfigured} onClick={login}>
           <svg aria-hidden="true" viewBox="0 0 24 24" width="20" height="20"><path fill="currentColor" d="M21.6 12.2c0-.7-.1-1.5-.2-2.2H12v4h5.4a4.6 4.6 0 0 1-2 3c-1 .7-2.1 1-3.4 1-3.4 0-6.2-2.8-6.2-6.2S8.6 5.6 12 5.6c1.6 0 3 .6 4.1 1.6l3-3A10.3 10.3 0 0 0 12 1.4 10.6 10.6 0 1 0 12 22.6c6.1 0 9.6-4.2 9.6-10.4Z"/></svg>
           {busy ? "Signing you in…" : "Continue with Google"}
         </button>
         {!access.googleConfigured && <p className="setup-notice" role="status">Google sign-in isn’t available yet. Please come back when setup is complete.</p>}
         <p className="supporting">Anyone can sign up. Live calls are currently available to invited testers.</p>
+        {returnToSources&&<p><a href="/?view=demo-source">Try a temporary demo source without signing in</a></p>}
       </section> : <section className="account-content" aria-label="Call setup">
         <div className="account-session"><p>You’re signed in.</p><button type="button" className="text-button" disabled={busy} onClick={logout}>Sign out</button></div>
         {step === "mode" ? <>

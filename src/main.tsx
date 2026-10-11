@@ -4,11 +4,12 @@ import {ConvexHttpClient} from "convex/browser";
 import {ConvexReactClient} from "convex/react";
 import {WebsiteAuthProvider} from "./auth/SharedAuth";
 import {Home} from "./Home";
+import {Topbar} from "./Topbar";
 import {PracticeSetup} from "./PracticeSetup";
 import {SidebarGuide} from './SidebarGuide';
 import {Account} from "./Account";
 import {AnswerCheck} from "./AnswerCheck";
-import {SourcesPage} from "./SourceManager";
+import {SourcesPage,DemoSourcesPage} from "./SourceManager";
 import {api} from "../convex/_generated/api";
 import type {FunctionReturnType} from "convex/server";
 import "@fontsource/nunito-sans/400.css";
@@ -49,7 +50,7 @@ function App() {
     } finally { if (id === requestId.current) setBusy(false); }
   }
   return <>
-    <header><span className="wordmark">Cuelo</span><nav aria-label="Main"><span>Source evaluation</span><a href="/?view=account">Log in</a></nav></header>
+    <Topbar/>
     <main>
       <h1>An answer you can check.</h1>
       <p className="intro">Speak or type one question about Slack’s SAML single sign-on. Cuelo uses only this article and shows the evidence beside its answer.</p>
@@ -93,4 +94,4 @@ const answersView = view === "answers";
 const practiceView = view === "practice";
 const CaptureCheck = import.meta.env.DEV ? React.lazy(() => import("./CaptureCheck")) : null;
 const captureCheckView = import.meta.env.DEV && view === "capture-check";
-createRoot(document.getElementById("root")!).render(url ? <React.StrictMode><WebsiteAuthProvider client={accountClient!}>{captureCheckView && CaptureCheck ? <Suspense fallback={<main><p role="status">Opening capture check…</p></main>}><CaptureCheck/></Suspense> : practiceView ? <PracticeSetup/> : answersView ? <AnswerCheck/> : sourcesView ? <SourcesPage/> : view === "live" ? <SidebarGuide/> : accountView ? <Account/> : view === "evaluation" ? <App/> : <Home/>}</WebsiteAuthProvider></React.StrictMode> : <main><h1>Connect the development backend</h1><p>Set CONVEX_URL in .env.local, then restart the app.</p></main>);
+createRoot(document.getElementById("root")!).render(url ? <React.StrictMode><WebsiteAuthProvider client={accountClient!}>{captureCheckView && CaptureCheck ? <Suspense fallback={<main><p role="status">Opening capture check…</p></main>}><CaptureCheck/></Suspense> : practiceView ? <PracticeSetup/> : answersView ? <AnswerCheck/> : sourcesView ? <SourcesPage/> : view === "demo-source" ? <DemoSourcesPage/> : view === "live" ? <SidebarGuide/> : accountView ? <Account/> : view === "evaluation" ? <App/> : <Home/>}</WebsiteAuthProvider></React.StrictMode> : <main><h1>Connect the development backend</h1><p>Set CONVEX_URL in .env.local, then restart the app.</p></main>);

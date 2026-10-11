@@ -4,12 +4,11 @@ import {useAction,useMutation,useQuery,useConvexAuth} from 'convex/react';
 import {ConvexError} from 'convex/values';
 import {api} from '../convex/_generated/api';
 import type {FunctionReturnType} from 'convex/server';
+import {Account} from './Account';
 
 type Meta=NonNullable<FunctionReturnType<typeof api.sources.get>>;
-export function getSourceVisitSecret() {
- const key='cuelo-temporary-source';let value=sessionStorage.getItem(key);
- if(!value||!/^[a-f0-9]{64}$/.test(value)){value=Array.from(crypto.getRandomValues(new Uint8Array(32)),b=>b.toString(16).padStart(2,'0')).join('');sessionStorage.setItem(key,value);}return value;
-}
+import {getSourceVisitSecret} from './temporarySourceVisit';
+export {getSourceVisitSecret} from './temporarySourceVisit';
 export function SourceManager({savedOnly=false,accountOnly=false,sidebarAdd=false,onConfirmed,onSourceChanged}:{savedOnly?:boolean;accountOnly?:boolean;sidebarAdd?:boolean;onConfirmed?:(source:Meta,scope:{guestSecret?:string})=>void;onSourceChanged?:(source:Meta|null,scope:{guestSecret?:string})=>void}) {
  const {isAuthenticated}=useConvexAuth();
  const [secret]=useState(getSourceVisitSecret);
@@ -66,4 +65,10 @@ export function SourceManager({savedOnly=false,accountOnly=false,sidebarAdd=fals
  {message&&<p role="status">{message}</p>}{error&&<p className="error" role="alert">{error}</p>}
  </section>;
 }
-export function SourcesPage(){return <><Topbar/><main className="account-page"><h1>Answers start with your source.</h1><p className="intro">Add a source and check its readable text. This step does not connect a call or generate answers.</p><SourceManager/><p><a href="/?view=answers">Try answers with your selected source</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}
+export function SourcesPage(){
+ const {isLoading,isAuthenticated}=useConvexAuth();
+ if(isLoading)return <><Topbar/><main className="account-page"><p role="status">Checking your account…</p></main></>;
+ if(!isAuthenticated)return <Account returnToSources/>;
+ return <><Topbar/><main className="account-page"><h1>Your account source.</h1><p className="intro">View, add or manage the source for this Google account. A new source stays temporary until you choose to keep it. Your saved source remains until you replace or delete it.</p><SourceManager accountOnly/><p><a href="/?view=account">Set up Cuelo for a call</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;
+}
+export function DemoSourcesPage(){return <><Topbar/><main className="account-page"><h1>Try a temporary demo source.</h1><p className="intro">No account needed. This upload is private to this visit. Closing, refreshing or returning to Cuelo starts empty. Temporary server copies expire after one hour. Saving to your account is a separate choice.</p><SourceManager/><p><a href="/?view=answers">Try answers with this demo source</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}
