@@ -3,7 +3,7 @@ import {resolve,join,relative} from 'node:path';
 import {execFileSync} from 'node:child_process';
 import {createHash} from 'node:crypto';
 import {zipSync,unzipSync} from 'fflate';
-import {releaseManifest,RELEASE_VERSION} from '../extension/releaseManifest';
+import {releaseManifest,RELEASE_VERSION,STORE_EXTENSION_ID} from '../extension/releaseManifest';
 
 const root=resolve(import.meta.dirname,'..');
 const folder=join(root,'artifacts',`cuelo-chrome-store-${RELEASE_VERSION}`),output=join(folder,'extension');
@@ -19,11 +19,15 @@ for(const weight of [400,600,700])copyFileSync(join(root,'extension','meet','fon
 copyFileSync(join(root,'extension','meet','fonts','OFL.txt'),join(output,'fonts','OFL.txt'));
 mkdirSync(join(output,'icons'),{recursive:true});
 for(const size of [16,32,48,128])execFileSync('sips',['-z',String(size),String(size),join(root,'public','favicon.png'),'--out',join(output,'icons',`icon-${size}.png`)],{stdio:'ignore'});
-const manifest=releaseManifest();writeFileSync(join(output,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
+const manifest=releaseManifest();
+const derivedId=createHash('sha256').update(Buffer.from(manifest.key,'base64')).digest('hex').slice(0,32).replace(/[0-9a-f]/g,c=>String.fromCharCode(97+parseInt(c,16)));
+if(derivedId!==STORE_EXTENSION_ID)throw Error('Package ID differs from the published Store extension.');
+if(!manifest.permissions.includes('tabCapture')||!manifest.permissions.includes('activeTab'))throw Error('Direct meeting-audio permissions are missing.');
+writeFileSync(join(output,'manifest.json'),JSON.stringify(manifest,null,2)+'\n');
 const entries=Object.fromEntries(filesUnder(output).sort().map(file=>[relative(output,file).replaceAll('\\','/'),new Uint8Array(readFileSync(file))]));
 const zip=zipSync(entries,{level:9}),archive=join(folder,`cuelo-${RELEASE_VERSION}-review.zip`);writeFileSync(archive,zip);
 const unpacked=unzipSync(zip);if(!unpacked['manifest.json'])throw Error('ZIP must have manifest.json at its root.');
-const required=[manifest.background.service_worker,manifest.side_panel.default_path,...Object.values(manifest.icons),...manifest.content_scripts.flatMap(script=>script.js),...manifest.web_accessible_resources.flatMap(resource=>resource.resources)];
+const required=['brand.css','fonts/OFL.txt',...([400,600,700].map(weight=>`fonts/nunito-${weight}.woff2`)),manifest.background.service_worker,manifest.side_panel.default_path,...Object.values(manifest.icons),...manifest.content_scripts.flatMap(script=>script.js),...manifest.web_accessible_resources.flatMap(resource=>resource.resources)];
 for(const file of required)if(!unpacked[file])throw Error(`Missing package asset: ${file}`);
 for(const name of Object.keys(unpacked)){
  if(/(^|\/)(?:\.env|node_modules|tests?|README|artifacts)/i.test(name))throw Error(`Unexpected file: ${name}`);
@@ -33,6 +37,6 @@ for(const size of [16,32,48,128]){const png=readFileSync(join(output,'icons',`ic
 const worker=readFileSync(join(output,'shared-auth-worker.js'),'utf8');
 if(!worker.includes('https://deafening-frog-846.convex.site'))throw Error('Production sign-in return missing.');
 if(checksum(join(root,'extension','meet'))!==original)throw Error('Packaging changed the installed development extension.');
-const report={version:RELEASE_VERSION,environment:'production',archive:relative(root,archive),files:Object.keys(unpacked),bytes:zip.length,sha256:createHash('sha256').update(zip).digest('hex'),developmentBuildUnchanged:true,syntaxAndAssetChecksPassed:true,releaseReady:false,blockers:['Latest trial backend is not deployed to production.','Live listening and release capacity require approved activation.','Privacy/support pages are drafts and not publicly hosted.','Google/store-assigned extension and real-call acceptance are not yet tested.','User review required before upload or store submission.']};
+const report={version:RELEASE_VERSION,extensionId:derivedId,permissions:manifest.permissions,environment:'production',archive:relative(root,archive),files:Object.keys(unpacked),bytes:zip.length,sha256:createHash('sha256').update(zip).digest('hex'),developmentBuildUnchanged:true,syntaxAndAssetChecksPassed:true,releaseReady:false,blockers:['Production website/backend must receive compatible workspace/source-library/onboarding/typed-question changes and live-admission allocation guard before this package is used.','Production listening remains off; exact-package real sign-in/Meet/source/trial acceptance requires separately approved test activation.','Review the proposed privacy-provider disclosure, publish approved policy changes and update Store privacy/permission fields before submission.','Refresh and review listing screenshots against this interface; illustrative screenshots are not proof of a real call.','User review and explicit approval are required before upload, submission or publication.']};
 writeFileSync(join(folder,'package-review.json'),JSON.stringify(report,null,2)+'\n');
 console.log(`Prepared ${relative(root,archive)} (${zip.length} bytes). Development build unchanged. Review-only; not uploaded or deployed.`);
