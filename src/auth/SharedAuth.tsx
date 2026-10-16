@@ -3,6 +3,7 @@ import {ConvexProviderWithAuth,type ConvexReactClient} from 'convex/react';
 import {ConvexAuthProvider,useAuthActions as nativeActions,useAuthToken as nativeToken} from '@convex-dev/auth/react';
 import {extensionTransport,websiteTransport,type Transport} from './transport';
 import {sessionSubject,type Session} from './sharedSession';
+import {SignInLoader} from '../SignInLoader';
 import {websiteReturnPath} from './navigation';
 type Actions={signIn:(provider?:string,args?:Record<string,unknown>)=>Promise<{signingIn:boolean;redirect?:URL}>;signOut:()=>Promise<void>};
 const ActionsContext=createContext<Actions|null>(null),TokenContext=createContext<string|null|undefined>(undefined);
@@ -18,7 +19,8 @@ export function SharedAuthProvider({client,transport,initial,popup,children,hand
  useEffect(()=>{
   if(!handleCode)return;
   const code=new URLSearchParams(location.search).get('code'),verifier=sessionStorage.getItem('cuelo-website-login-verifier');
-  if(!code||!verifier)return;
+  if(!code)return;
+  if(!verifier){setError('Your sign-in could not be completed. Return to sign in and try again.');return;}
   const backend=(client as any).address,key=backend+':'+code;
   if(!completions.has(key))completions.set(key,transport.request({operation:'signIn',args:{params:{code},verifier}}));
   void completions.get(key)!.then(result=>{accept(result.state);sessionStorage.removeItem('cuelo-website-login-verifier');const url=new URL(location.href);url.searchParams.delete('code');history.replaceState({},'',url.pathname+url.search+url.hash);}).catch(()=>setError('Google sign-in could not complete. Return to the account page and try again.'));
@@ -41,15 +43,24 @@ export function SharedAuthProvider({client,transport,initial,popup,children,hand
   const result=await transport.request({operation:'refresh',token:current.current.token??undefined});accept(result.state);return current.current.token;
  },[transport,accept,sessionSubject(state.token)]);
  const useSharedAuth=()=>({isLoading:loading,isAuthenticated:!!state.token,fetchAccessToken});
- if(error)return <main className="account-page"><p role="alert">{error}</p><button onClick={()=>location.reload()}>Reload</button></main>;
+ if(error)return <main className="account-page"><p role="alert">{error}</p><button onClick={()=>location.reload()}>Reload</button>{handleCode&&<p><a href="/?view=account&intent=login">Return to sign in</a></p>}</main>;
  return <ActionsContext.Provider value={{signIn,signOut}}><TokenContext.Provider value={state.token}><ConvexProviderWithAuth client={client} useAuth={useSharedAuth}>{children}</ConvexProviderWithAuth></TokenContext.Provider></ActionsContext.Provider>;
 }
 export function ExtensionAuthProvider({client,popup,children}:{client:ConvexReactClient;popup?:(url:string,nonce:string)=>Promise<string>;children:ReactNode}){
  const [transport]=useState(()=>extensionTransport((client as any).address));
  return <SharedAuthProvider client={client} transport={transport} popup={popup}>{children}</SharedAuthProvider>;
 }
-export function WebsiteAuthProvider({client,children}:{client:ConvexReactClient;children:ReactNode}){
+const usePendingWebsiteAuth=()=>({isLoading:true,isAuthenticated:false,fetchAccessToken:async()=>null});
+const pendingWebsiteActions:Actions={signIn:async()=>{throw Error('Sign-in is getting ready. Try again in a moment.');},signOut:async()=>{throw Error('Sign-in is getting ready. Try again in a moment.');}};
+export function WebsiteAuthProvider({client,children,publicOpening=false,publicSignIn=false}:{client:ConvexReactClient;children:ReactNode;publicOpening?:boolean;publicSignIn?:boolean}){
+ const [connectionAttempt,setConnectionAttempt]=useState(0);
+ const connecting=useRef(false);
  const [ready,setReady]=useState<{transport:Transport;state:Session;conflict?:boolean;migrationFailed?:boolean}|{error:string}|false|null>(null);
+ useEffect(()=>{if(ready!==false)return;
+  const connected=()=>{if(connecting.current)return;connecting.current=true;setConnectionAttempt(value=>value+1);};
+  window.addEventListener('cuelo-extension-connected',connected);
+  return()=>window.removeEventListener('cuelo-extension-connected',connected);
+ },[ready]);
  useEffect(()=>{let alive=true;
   const backend=(client as any).address as string,transport=websiteTransport(backend),suffix=backend.replace(/[^a-zA-Z0-9]/g,''),jwt='__convexAuthJWT_'+suffix,refresh='__convexAuthRefreshToken_'+suffix;
   void transport.request({operation:'probe'}).then(()=>transport.request({operation:'state'})).then(async result=>{
@@ -64,10 +75,11 @@ export function WebsiteAuthProvider({client,children}:{client:ConvexReactClient;
    }
    localStorage.removeItem(jwt);localStorage.removeItem(refresh);
    if(alive)setReady({transport,state:result.state});
-  }).catch(error=>{if(alive)setReady(String(error.message).includes('extension did not respond')?false:{error:'Cuelo could not check the shared sign-in. Reload this page and the extension.'});});
+  }).catch(error=>{if(alive)setReady(String(error.message).includes('extension did not respond')?false:{error:'Cuelo could not check the shared sign-in. Reload this page and the extension.'});}).finally(()=>{connecting.current=false;});
   return()=>{alive=false;};
- },[client]);
- if(ready===null)return <main><p role="status">Checking your Cuelo sign-in…</p></main>;
+ },[client,connectionAttempt]);
+ if(ready===null&&typeof location!=='undefined'&&new URLSearchParams(location.search).has('code'))return <SignInLoader message="Signing you in…"/>;
+ if(ready===null)return publicOpening||publicSignIn?<ActionsContext.Provider value={pendingWebsiteActions}><ConvexProviderWithAuth client={client} useAuth={usePendingWebsiteAuth}>{children}</ConvexProviderWithAuth></ActionsContext.Provider>:null;
  if(ready===false)return <ConvexAuthProvider client={client}>{children}</ConvexAuthProvider>;
  if('error' in ready)return <main className="account-page"><p role="alert">{ready.error}</p><button onClick={()=>location.reload()}>Reload</button></main>;
  if(ready.conflict||ready.migrationFailed)return <main className="account-page"><h1>{ready.conflict?'Choose one Cuelo account.':'Connect your Cuelo sign-in.'}</h1><p>{ready.conflict?'Your website and sidebar were signed into different accounts.':'Your previous website sign-in could not be connected. Reload to retry, or sign out of both and sign in again.'}</p>{ready.conflict&&<button onClick={()=>{const suffix=((client as any).address as string).replace(/[^a-zA-Z0-9]/g,'');localStorage.removeItem('__convexAuthJWT_'+suffix);localStorage.removeItem('__convexAuthRefreshToken_'+suffix);setReady({...ready,conflict:false});}}>Use the sidebar account</button>}<button onClick={()=>{void ready.transport.request({operation:'signOut'}).then(result=>{const suffix=((client as any).address as string).replace(/[^a-zA-Z0-9]/g,'');localStorage.removeItem('__convexAuthJWT_'+suffix);localStorage.removeItem('__convexAuthRefreshToken_'+suffix);setReady({transport:ready.transport,state:result.state});}).catch(()=>setReady({error:'Cuelo could not sign out. Check your connection and reload.'}));}}>Sign out of both</button></main>;

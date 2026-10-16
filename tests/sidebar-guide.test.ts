@@ -10,5 +10,5 @@ test('old live URL shows sidebar guidance with no capture, reservation or floati
  assert.match(entry,/view === "live" \? <SidebarGuide\/>/);
  assert.doesNotMatch(entry,/import.*LiveCall/);
  const account=await readFile('src/Account.tsx','utf8');
- assert.match(account,/<SidebarInstructions\/>/);assert.doesNotMatch(account,/view=live|Google Meet link|enable tab audio separately/);
+ assert.match(account,/<Workspace initialPage=/);assert.doesNotMatch(account,/view=live|Google Meet link|enable tab audio separately/);
 });

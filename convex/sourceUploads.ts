@@ -2,8 +2,8 @@ import {v,ConvexError} from 'convex/values';
 import {internalMutation,internalQuery} from './_generated/server';
 import {expectedSource} from './sourceValues';
 import {MAX_SOURCE_BYTES} from './sourceLimits';
-const grant=v.object({token:v.string(),ownerKey:v.string(),expectedId:expectedSource,name:v.string(),size:v.number(),expiresAt:v.number(),state:v.union(v.literal('ready'),v.literal('receiving')),storageId:v.union(v.id('_storage'),v.null())});
-export const create=internalMutation({args:{token:v.string(),ownerKey:v.string(),expectedId:expectedSource,name:v.string(),size:v.number()},returns:v.null(),handler:async(ctx,args)=>{
+const grant=v.object({token:v.string(),ownerKey:v.string(),expectedId:expectedSource,name:v.string(),size:v.number(),library:v.optional(v.boolean()),title:v.optional(v.string()),expectedVersion:v.optional(v.number()),expiresAt:v.number(),state:v.union(v.literal('ready'),v.literal('receiving')),storageId:v.union(v.id('_storage'),v.null())});
+export const create=internalMutation({args:{token:v.string(),ownerKey:v.string(),expectedId:expectedSource,name:v.string(),size:v.number(),library:v.optional(v.boolean()),title:v.optional(v.string()),expectedVersion:v.optional(v.number())},returns:v.null(),handler:async(ctx,args)=>{
  if(!Number.isInteger(args.size)||args.size<1||args.size>MAX_SOURCE_BYTES)throw new ConvexError('Choose a file no larger than 10 MB.');
  if(args.name.length>160||! /\.(pdf|docx)$/i.test(args.name))throw new ConvexError('Choose a PDF or Word .docx file with a name of at most 160 characters.');
  await ctx.db.insert('sourceUploads',{...args,expiresAt:Date.now()+120000,state:'ready',storageId:null});return null;

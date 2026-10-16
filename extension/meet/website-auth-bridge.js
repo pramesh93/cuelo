@@ -4,11 +4,12 @@ function e(e, t) {
 }
 //#endregion
 //#region extension/src/websiteAuthBridge.ts
-var t = globalThis.chrome, n = "https://calculating-gecko-263.convex.cloud";
-window === window.top && e(location.origin, n) && (window.addEventListener("message", (e) => {
+var t = globalThis.chrome, n = "https://calculating-gecko-263.convex.cloud", r = "__cueloAuthBridge_" + n, i = globalThis;
+window === window.top && e(location.origin, n) && !i[r] && (i[r] = !0, window.addEventListener("message", (e) => {
 	let r = e.data;
 	if (e.source === window && e.origin === location.origin && r?.channel === "cuelo-auth-request" && r.backend === n && typeof r.id == "string" && /^[a-f0-9]{32}$/.test(r.id)) {
 		if (r.request?.operation === "probe") {
+			if (!t.runtime?.id) return;
 			window.postMessage({
 				channel: "cuelo-auth-reply",
 				id: r.id,

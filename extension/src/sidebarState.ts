@@ -7,13 +7,13 @@ export function sidebarScreen(input:{checking:boolean;meeting:boolean;authLoadin
  if(input.accessLoading)return 'checking-access';
  return 'setup';
 }
-export function startBlock(input:{eligible:boolean;invited:boolean;enabled:boolean;busy:boolean;mode:'generic'|'document'|null;sourceSelected:boolean;sourceLoading:boolean}){
+export function startBlock(input:{eligible:boolean;trialExhausted:boolean;enabled:boolean;busy:boolean;mode:'generic'|'document'|null;sourceSelected:boolean;sourceLoading:boolean}){
  if(input.busy)return 'Connecting…';
  if(!input.eligible)return 'Join a Meet call before starting Cuelo.';
- if(!input.invited)return 'Your account needs invited tester access before listening can start.';
- if(!input.enabled)return 'Live listening is not enabled for this test account yet.';
+ if(input.trialExhausted)return 'Your free trial has ended. You’ve reached your three-call or 90-minute allowance. Paid plans are coming soon.';
+ if(!input.enabled)return 'Live listening is currently unavailable. Please try again later.';
  if(!input.mode)return 'Choose how Cuelo should answer.';
  if(input.mode==='document'&&input.sourceLoading)return 'Your source is still loading.';
- if(input.mode==='document'&&!input.sourceSelected)return 'Choose a ready source to enable Start.';
+ if(input.mode==='document'&&!input.sourceSelected)return 'Select ready sources to enable Start.';
  return null;
 }

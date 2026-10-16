@@ -11,3 +11,5 @@ test('replayed final speech is ignored across flushes while a spoken repeat rema
  const final=(start:number)=>({type:'Results',start,is_final:true,speech_final:true,channel:{alternatives:[{transcript:'What is the price?',confidence:.95}]}});
  receive(final(1));receive(final(1));receive(final(3));assert.deepEqual(turns,['What is the price?','What is the price?']);
 });
+
+test('production ignores the answer test cap while retaining activation and spending guards',()=>{const env={CONVEX_CLOUD_URL:'https://deafening-frog-846.convex.cloud',LIVE_CALL_TESTING_ENABLED:'true',V1_PAID_TESTING_ENABLED:'true',DEEPGRAM_API_KEY:'fake',OPENAI_API_KEY:'fake',LIVE_CALL_TEST_SESSION_LIMIT:'2',LIVE_CALL_MAX_CONNECTIONS:'2',LIVE_CALL_MAX_DETECTIONS:'12',LIVE_CALL_MAX_ANSWERS:'4',LIVE_CALL_RESERVE_PAISE:'10000'};assert.equal(liveCallConfig(env)?.answers,0);assert.equal(liveCallConfig({...env,LIVE_CALL_MAX_ANSWERS:undefined})?.answers,0);assert.equal(liveCallConfig({...env,V1_PAID_TESTING_ENABLED:'false'}),null);assert.equal(liveCallConfig({...env,LIVE_CALL_RESERVE_PAISE:undefined}),null);});

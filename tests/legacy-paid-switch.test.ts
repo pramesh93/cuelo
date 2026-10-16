@@ -20,3 +20,9 @@ test('main paid switch blocks legacy answers and speech before source reads, res
  }
  }finally{for(const [key,value] of Object.entries(previous)){if(value===undefined)delete process.env[key];else process.env[key]=value;}}
 });
+test('enabling only the landing demo keeps legacy answer and microphone budgets disabled',async()=>{
+ const keys=['V1_PAID_TESTING_ENABLED','OPENING_DEMO_TESTING_ENABLED','EVALUATION_TESTING_ENABLED','SPEECH_TESTING_ENABLED','OPENAI_API_KEY','DEEPGRAM_API_KEY'];const previous=keys.map(key=>process.env[key]);
+ try{Object.assign(process.env,{V1_PAID_TESTING_ENABLED:'true',OPENING_DEMO_TESTING_ENABLED:'true',EVALUATION_TESTING_ENABLED:'false',SPEECH_TESTING_ENABLED:'false',OPENAI_API_KEY:'fake',DEEPGRAM_API_KEY:'fake'});const ctx={db:{query:()=>{assert.fail('Legacy budgets must stay disabled');}}} as any;
+ assert.equal(await reserveAnswer._handler(ctx,{}),false);assert.equal(await reserveSpeech._handler(ctx,{lease:'fictional'}),'disabled');assert.equal((await status._handler(ctx,{})).enabled,false);
+ }finally{keys.forEach((key,index)=>{if(previous[index]===undefined)delete process.env[key];else process.env[key]=previous[index];});}
+});

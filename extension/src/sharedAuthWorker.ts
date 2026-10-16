@@ -1,3 +1,4 @@
+import {connectOpenWebsites} from './connectOpenWebsites';
 import '../meet/auth-worker.js';
 import {ConvexHttpClient} from 'convex/browser';
 import {api} from '../../convex/_generated/api';
@@ -32,3 +33,9 @@ browser.storage.onChanged.addListener((changes:any,area:string)=>{
  void browser.runtime.sendMessage({type:'shared-auth-changed',backend}).catch(()=>{});
  void browser.tabs.query({}).then((tabs:any[])=>Promise.allSettled(tabs.filter(tab=>{try{return allowedWebsite(new URL(tab.url).origin,backend);}catch{return false;}}).map(tab=>browser.tabs.sendMessage(tab.id,{type:'shared-auth-changed',backend})))).catch(()=>{});
 });
+
+// Installation/update also connects tabs opened before the extension was present.
+browser.runtime.onInstalled.addListener(()=>{void connectOpenWebsites(browser,backend).catch(()=>{});});
+// Re-enabling starts a fresh worker without firing onInstalled. Also repair open
+// website connections on every worker start; bridge attachment is idempotent.
+void connectOpenWebsites(browser,backend).catch(()=>{});

@@ -1,3 +1,4 @@
+import {sourceEvidenceLink,type SourceWebsite} from './answerEvidence';
 import {Topbar} from "./Topbar";
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useAction,useMutation,useQuery} from 'convex/react';
@@ -7,15 +8,24 @@ import {SourceManager,getSourceVisitSecret} from './SourceManager';
 type Source=NonNullable<FunctionReturnType<typeof api.sources.get>>;
 type Result=FunctionReturnType<typeof api.selectedAnswers.ask>;
 type Selection={source:Source;guestSecret?:string};
-export function AnswerCard({result,elapsedMs,sourceLinks=true}:{result:Result;elapsedMs?:number;sourceLinks?:boolean}){
+export function AnswerCard({result,elapsedMs,sourceLinks=true,sourceWebsite}:{result:Omit<Result,'citations'>&{citations:Array<Result['citations'][number]&{sourceId?:string;sourceTitle?:string}>;bulletCitations?:number[][]};elapsedMs?:number;sourceLinks?:boolean;sourceWebsite?:SourceWebsite}){
+ const groups:Array<{link:NonNullable<ReturnType<typeof sourceEvidenceLink>>;passages:typeof result.citations}>=[];
+ if(sourceWebsite)for(const passage of result.citations){const link=sourceEvidenceLink(passage,result.source,sourceWebsite);if(!link)continue;const group=groups.find(g=>g.link.id===link.id);if(group){group.passages.push(passage);group.link.inline=group.link.inline&&link.inline;}else groups.push({link,passages:[passage]});}
+ const inlineGroups=groups.filter(g=>g.link.inline);
  return <section className="answer-panel selected-answer-card" aria-label="Answer" aria-live="polite">
  <h2>Cuelo’s answer</h2>
  {result.mode==='generic'&&<p className="provenance">Not from your document</p>}
- {result.bullets.length>0&&<ul className="answer">{result.bullets.map((text,i)=><li key={i}>{text}</li>)}</ul>}
+ {result.bullets.length>0&&<ul className="answer">{result.bullets.map((text,i)=><li key={i}>{text}{result.bulletCitations?.[i]&&<small className="answer-bullet-citations">{sourceWebsite?[...new Map(result.bulletCitations[i].map(id=>result.citations.find(p=>p.ordinal===id)).filter(Boolean).map(p=>sourceEvidenceLink(p!,result.source,sourceWebsite)).filter(Boolean).map(link=>[link!.id,link!] as const)).values()].map(link=><a key={link.id} href={link.href} target="_blank" rel="noreferrer">{link.title}</a>):[...new Set(result.bulletCitations[i].map(id=>result.citations.find(p=>p.ordinal===id)).filter(Boolean).map(p=>`${p!.reference} · ${p!.sourceTitle??result.source?.title??''}`))].join('; ')}</small>}</li>)}</ul>}
  {result.message&&<p className={result.status==='error'?'error':''} role={result.status==='error'?'alert':undefined}>{result.message}</p>}
  {result.mode==='document'&&result.source&&result.citations.length>0&&<>
- <p className="citation">{[...new Set(result.citations.map(p=>p.reference))].join(', ')}<br/>{sourceLinks&&result.source.url?<a href={result.source.url} target="_blank" rel="noreferrer">{result.source.title}</a>:result.source.title}</p>
- <details><summary>Open supporting passage</summary>{result.citations.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><blockquote>{p.text}</blockquote></div>)}</details>
+ {sourceWebsite?<>
+ <p className="citation citation-source-link">{groups.length?groups.map(({link})=><a key={link.id} href={link.href} target="_blank" rel="noreferrer">{link.title}<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M14 3h7v7M21 3 10 14M10 3H3v18h18v-7"/></svg></a>):'Source unavailable.'}</p>
+ {inlineGroups.length>0&&<details><summary>Open supporting passage</summary>{inlineGroups.map(({link,passages})=><div key={link.id}><p className="citation-source-link"><a href={link.href} target="_blank" rel="noreferrer">{link.title}</a></p>{passages.map(p=><blockquote key={p.ordinal}>{p.text}</blockquote>)}</div>)}</details>}
+ </>:<>
+ <p className="citation">{[...new Set(result.citations.map(p=>p.sourceTitle?`${p.reference} · ${p.sourceTitle}`:p.reference))].join(', ')}{!result.citations.some(p=>p.sourceTitle)&&<><br/>{sourceLinks&&result.source.url?<a href={result.source.url} target="_blank" rel="noreferrer">{result.source.title}</a>:result.source.title}</>}</p>
+ <details><summary>Open supporting passage</summary>{result.citations.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><blockquote>{p.text}</blockquote>{p.sourceTitle&&<p className="citation-source-name">{p.sourceTitle}</p>}</div>)}</details>
+ </>}
+
  </>}
  {result.status!=='error'&&result.status!=='cancelled'&&<p className="timing">Measured response: {((elapsedMs??result.elapsedMs)/1000).toFixed(1)} seconds</p>}
  {result.budgetAlert&&<p className="supporting">The testing budget is nearly used up.</p>}

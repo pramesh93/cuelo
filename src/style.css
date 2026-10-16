@@ -228,10 +228,6 @@ body:has(.home-page) .site-header a:not(.wordmark):hover {background:#393441;bor
 @media(max-width:540px){body:has(.home-page) .site-header {margin:6px 6px 0;width:calc(100% - 12px)}.home-page {padding:0 6px 24px}.home-page .opening {padding:24px 20px 36px}.home-page .conversation-stage {margin-top:24px;gap:18px}.home-page .cuelo-blob {width:166px;height:150px}.blob-face {gap:22px}.blob-eye {width:12px;height:19px}.blob-eye:after {width:3px;height:4px;left:3px;top:3px}.home-page .call-invitation-section {padding:0 18px}.home-page .home-footer {margin:0 18px}.home-page .welcome-card:before {border:0}}
 @media(prefers-reduced-motion:reduce){.blob-eye {animation:none}.blob-face {transition:none}}
 
-/* Original acoustic architecture, placed behind the actual opening content. */
-.home-page .opening {background-color:#25232B;background-image:linear-gradient(180deg,#25232B18 0%,#25232B18 58%,#25232BA6 100%),url('/images/cuelo-background.jpg');background-position:center;background-size:cover;background-repeat:no-repeat}
-@media(max-width:540px){.home-page .opening {background-position:center top;background-size:100% 100%}}
-
 /* Original staged on-call preview; every state is explicitly illustrative. */
 .call-preview {width:100%;margin-bottom:40px}
 .preview-heading {display:flex;align-items:flex-end;justify-content:space-between;gap:24px;margin:0 0 32px}
@@ -291,3 +287,84 @@ body:has(.home-page) .site-header a:not(.wordmark):hover {background:#393441;bor
 
 .site-header nav {gap:12px}
 @media(max-width:540px){.site-header nav {gap:6px}.site-header a:not(.wordmark) {padding:8px;font-size:13px}.site-header .wordmark {font-size:22px}.site-header,body:has(.home-page) .site-header {padding-left:16px;padding-right:16px}}
+
+.account-nav-links,.landing-nav-links {display:flex;align-items:center;gap:12px}
+body:has(.home-page) .site-header nav {flex:1;justify-content:space-between;margin-left:60px}
+.landing-nav-links a {border:0!important}
+body:has(.home-page) .account-nav-links a:last-of-type {background:#FAF8F5;color:#25232B}
+.home-page .home-intro {max-width:46ch}
+.home-page .opening-controls .quiet-source {display:inline-block;background:transparent;border:0;color:#E9E1F8;font-size:14px;padding:8px;text-decoration:underline}
+.home-page .opening-controls .text-button {color:#E9E1F8}
+.home-page .voice-action {text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
+.opening-source {max-width:720px;margin:24px auto 0;padding:24px;background:#FAF8F5;border-radius:16px;color:#25232B;text-align:left}
+.opening-source .primary {margin-top:12px}
+.welcome-card details {font-size:14px;max-height:220px;overflow:auto;text-align:left}
+.welcome-card .opening-question {font-size:14px;color:#64606C}
+.home-page .landing-info {max-width:1100px;margin:80px auto;padding:0 32px;scroll-margin-top:120px;color:#25232B}
+.landing-info h2 {font-size:28px;margin-bottom:24px}
+.landing-info p {color:#64606C;max-width:65ch}
+.landing-info a {color:#5C429F}
+.landing-feature-list {display:grid;grid-template-columns:repeat(3,1fr);gap:36px}
+.landing-feature-list h3 {font-size:20px}
+@media(max-width:760px){body:has(.home-page) .site-header {height:auto;min-height:90px;flex-wrap:wrap;padding:16px 20px;gap:12px}body:has(.home-page) .site-header nav {margin-left:0;flex-basis:100%;flex-wrap:wrap;gap:10px}.account-nav-links,.landing-nav-links {gap:4px}.landing-feature-list {grid-template-columns:1fr;gap:20px}.home-page .landing-info {margin:48px auto;padding:0 24px}.opening-source {padding:16px}.home-page .welcome-card {max-width:100%}}
+.home-page .blob-handle {cursor:default}
+.home-page .opening-controls {display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center}
+.home-page .opening-controls .quiet-source {display:block;margin:0}
+.home-page .blob-handle:active {cursor:default}
+@media(prefers-reduced-motion:no-preference){.is-listening .cuelo-blob {animation:blob-breathe 2s ease-in-out infinite}.is-listening .card-presence span {background:#7357C8}}
+
+/* Approved light landing colours; existing layout and demo remain. */
+body:has(.home-page) .site-header {background:#FAF8F5;color:#25232B}
+body:has(.home-page) .site-header .wordmark {color:#25232B}
+body:has(.home-page) .site-header a:not(.wordmark) {color:#25232B;border-color:#E4DFEA;background:transparent}
+body:has(.home-page) .site-header a:not(.wordmark):hover {background:#E9E1F8;border-color:#C8B5E8}
+body:has(.home-page) .account-nav-links a:first-of-type {background:#7357C8;color:#FFF;border-color:#7357C8}
+body:has(.home-page) .account-nav-links a:first-of-type:hover {background:#6045B1}
+body:has(.home-page) .account-nav-links a:last-of-type {background:transparent;color:#25232B}
+.home-page .opening {background:#FAF8F5;color:#25232B}
+.home-page .opening h1 {color:#25232B}
+.home-page .home-intro,.home-page .blob-caption,.home-page .opening-controls .supporting {color:#64606C}
+.home-page .opening-controls .quiet-source,.home-page .opening-controls .text-button {color:#5C429F}
+.home-page .voice-action {background:#7357C8;color:#FFF}
+.home-page .voice-action:hover:not(:disabled) {background:#6045B1}
+.home-page .voice-action:disabled {background:#E4DFEA;color:#64606C;border:1px solid #E4DFEA}
+.home-page :focus-visible {outline-color:#7357C8}
+
+/* Approved frosted-glass landing: lavender light behind translucent surfaces. */
+body:has(.home-page) {background:#F4EFF9;background-image:radial-gradient(ellipse at 12% 12%,#D8C8F0 0,transparent 42%),radial-gradient(ellipse at 90% 34%,#E1D8F4 0,transparent 40%);background-attachment:fixed}
+body:has(.home-page) .site-header {background:rgba(255,255,255,.56);border:1px solid rgba(255,255,255,.8);border-bottom:0;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px)}
+body:has(.home-page) .site-header.compact {background:rgba(250,248,253,.92);border-bottom:1px solid rgba(255,255,255,.8);box-shadow:0 8px 24px #47326712}
+.home-page .opening {background:rgba(255,255,255,.26);border:1px solid rgba(255,255,255,.7);border-top:0;box-shadow:0 24px 48px #6550800D}
+.home-page .welcome-card,.home-page .opening-source {background:rgba(255,255,255,.67);border:1px solid rgba(255,255,255,.92);border-radius:16px;backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);box-shadow:0 20px 42px #5640791A,inset 0 1px 0 #FFFFFF}
+.home-page .welcome-card:before {background:#F2ECF8;border:0}
+.home-page .welcome-card p,.home-page .welcome-card ul {color:#494150}
+.home-page .landing-feature-list {gap:24px}
+.home-page .landing-feature-list article {padding:28px;background:rgba(255,255,255,.42);border:1px solid rgba(255,255,255,.8);border-radius:16px;backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 12px 28px #5640790D;transition:background .2s ease,transform .2s ease}
+.home-page .landing-feature-list article:hover {background:rgba(255,255,255,.66);transform:translateY(-3px)}
+.home-page .landing-feature-list h3 {margin-top:0}
+.home-page .call-invitation,.home-page .preview-toggle {background:rgba(255,255,255,.6);border:1px solid rgba(255,255,255,.85);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px);box-shadow:0 12px 24px #56407910}
+.home-page .call-invitation:hover {background:rgba(255,255,255,.8)}
+.home-page .preview-desktop {background:linear-gradient(130deg,#E4D9F0BB,#F7F4FABB 60%,#D8C8E8BB);border:1px solid rgba(255,255,255,.85)}
+.home-page .voice-action {box-shadow:0 8px 20px #7357C826,inset 0 1px 0 #FFFFFF33}
+.home-page .voice-action:disabled {box-shadow:none;background:#E4DDEB;color:#62596C;border-color:#D7CDDF}
+@supports not (backdrop-filter:blur(12px)){body:has(.home-page) .site-header,.home-page .welcome-card,.home-page .opening-source,.home-page .landing-feature-list article {background:#F7F3FC}}
+@media(max-width:760px){body:has(.home-page) {background-attachment:scroll}.home-page .landing-feature-list article {padding:24px}}
+@media(prefers-reduced-motion:reduce){.home-page .landing-feature-list article:hover {transform:none}}
+
+/* Website questions and signed-in call trials are separate choices. */
+.home-page .opening-controls {flex-direction:row;justify-content:center;flex-wrap:wrap;gap:14px}
+.home-page .opening-controls .supporting {flex-basis:100%;margin:8px 0}
+.call-experience-button {min-height:56px;padding:14px 24px;border:1px solid #7357C8;border-radius:12px;background:#FFFFFF80;color:#5C429F;font-weight:600}
+.call-experience-button:hover {background:#E9E1F8}
+.call-download-backdrop {position:fixed;inset:0;z-index:200;background:#25232B66;backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:24px;text-align:left}
+.call-download-dialog {position:relative;width:100%;max-width:580px;max-height:calc(100dvh - 48px);overflow:auto;background:#FAF8F5;border:1px solid #FFF;border-radius:20px;padding:36px;box-shadow:0 24px 64px #25232B33;color:#25232B}
+.call-download-dialog h2 {padding-right:40px;margin:12px 0 16px;font-size:28px}
+.download-close {display:block;margin-left:auto;min-height:44px;border:0;background:transparent;color:#5C429F;padding:8px}
+.download-options {display:grid;gap:14px;margin:24px 0}
+.download-options button,.download-options a {display:flex;flex-direction:column;align-items:flex-start;gap:6px;border:1px solid #D5C9E4;border-radius:12px;padding:20px;text-align:left;text-decoration:none;background:#E9E1F8;color:#25232B;font-size:17px}
+.download-options span {font-size:14px;color:#64606C}
+.download-options :disabled {background:#F0ECF4;color:#64606C;cursor:default}
+.download-options a {border-color:#7357C8}
+.download-options a:hover {background:#DDD0F0}
+.download-trial {font-size:14px;line-height:1.6;color:#64606C;margin:0}
+@media(max-width:540px){.home-page .opening-controls {flex-direction:column}.home-page .opening-controls .supporting {flex-basis:auto}.call-download-backdrop {padding:16px}.call-download-dialog {padding:24px;max-height:calc(100dvh - 32px)}}

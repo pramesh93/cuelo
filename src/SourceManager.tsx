@@ -1,3 +1,5 @@
+import {SignInLoader} from './SignInLoader';
+import {Workspace} from './Workspace';
 import {Topbar} from "./Topbar";
 import {useEffect,useRef,useState} from 'react';
 import {useAction,useMutation,useQuery,useConvexAuth} from 'convex/react';
@@ -34,11 +36,12 @@ export function SourceManager({savedOnly=false,accountOnly=false,sidebarAdd=fals
  useEffect(()=>{if(storedSource!==undefined)sourceChanged.current?.(source??null,scope);},[source?.id,source?.expiresAt,useGuest,secret,storedSource===undefined]);
  function fail(error:unknown){setError(error instanceof ConvexError&&typeof error.data==='string'?error.data:error instanceof Error?error.message:'Your source could not be saved. Check your connection and try again.');}
  async function submit(event:React.FormEvent){event.preventDefault();setBusy(true);setError('');setMessage('');
- try {const args={...scope,expectedId:source?.id??null};
- if(method==='text')await paste({...args,title,text});
- else if(method==='webpage')await webpage({...args,url});
- else {if(!file)throw new Error('Choose a PDF or Word .docx file.');if(file.size>10*1024*1024)throw new Error('Choose a file no larger than 10 MB.');const ticket=await prepareUpload({...args,name:file.name,size:file.size});const response=await fetch(ticket.url,{method:'POST',headers:{Authorization:`Bearer ${ticket.token}`,'Content-Type':'application/octet-stream'},body:file});const result=await response.json();if(!response.ok)throw new Error(result.error||'Your file could not be read. Try again.');}
- setEditing(false);setInspect(false);setText('');setFile(null);setMessage('Your source is ready. No answer has been generated.');
+ try {const args={...scope,expectedId:sidebarAdd&&accountOnly?null:source?.id??null,...(sidebarAdd&&accountOnly?{library:true}:{})};let imported:Meta|null=null;
+ if(method==='text')imported=await paste({...args,title,text});
+ else if(method==='webpage')imported=await webpage({...args,url});
+ else {if(!file)throw new Error('Choose a PDF or Word .docx file.');if(file.size>10*1024*1024)throw new Error('Choose a file no larger than 10 MB.');const ticket=await prepareUpload({...args,name:file.name,size:file.size});const response=await fetch(ticket.url,{method:'POST',headers:{Authorization:`Bearer ${ticket.token}`,'Content-Type':'application/octet-stream'},body:file});const result=await response.json();if(!response.ok)throw new Error(result.error||'Your file could not be read. Try again.');imported=result;}
+ if(sidebarAdd&&imported)sourceChanged.current?.(imported,scope);
+ setEditing(false);setInspect(false);setText('');setFile(null);setMessage(sidebarAdd&&accountOnly?'Content saved to your library.':'Your source is ready. No answer has been generated.');
  }catch(error){fail(error);}finally{setBusy(false);}}
  async function deleteSource(){if(!source)return;setBusy(true);setError('');try{await remove({...scope,expectedId:source.id});setMessage('Source deleted, including its readable text and search entries.');setInspect(false);}catch(error){fail(error);}finally{setBusy(false);}}
  async function saveSource(){if(!source)return;setBusy(true);setError('');try{await keep({...scope,expectedId:source.id,replaceSaved:Boolean(saved&&saved.id!==source.id)});setKept(true);setPreferGuest(false);setMessage('Your source is saved to your account until you replace or delete it.');}catch(error){fail(error);}finally{setBusy(false);}}
@@ -55,11 +58,11 @@ export function SourceManager({savedOnly=false,accountOnly=false,sidebarAdd=fals
  {onConfirmed&&<button type="button" className="primary" disabled={busy} onClick={()=>onConfirmed(source,scope)}>Use this source</button>}
  </div>}
  {(!source||editing||sidebarAdd)&&<form onSubmit={submit}>
- {sidebarAdd&&source&&<p className="supporting">Adding a new source replaces your current source. You can inspect, replace or delete sources on the Cuelo website.</p>}
+ {sidebarAdd&&source&&<p className="supporting">New content is saved to your library. You can edit or delete it on the Cuelo website.</p>}
  <fieldset className="source-methods"><legend>How will you add your source?</legend>{([['text','Paste text'],['file','Upload file'],['webpage','Public webpage']] as const).map(([value,label])=><label key={value}><input type="radio" name="source-method" checked={method===value} disabled={busy} onChange={()=>{setMethod(value);setError('');}}/>{label}</label>)}</fieldset>
  {method==='text'?<><label htmlFor="source-name">Source name</label><input id="source-name" value={title} maxLength={160} required disabled={busy} onChange={e=>setTitle(e.target.value)}/><label htmlFor="source-text">Source text</label><textarea id="source-text" rows={7} value={text} required disabled={busy} onChange={e=>setText(e.target.value)}/></>:method==='webpage'?<><label htmlFor="source-link">Public webpage link</label><input id="source-link" type="url" value={url} maxLength={2048} required disabled={busy} placeholder="https://example.com/help/product" onChange={e=>setUrl(e.target.value)}/><p className="supporting">Cuelo reads this page only. Private pages and whole-site searches are outside this version.</p></>:<><label htmlFor="source-file">PDF or Word document</label><input id="source-file" type="file" accept=".pdf,.docx" required disabled={busy} onChange={e=>setFile(e.target.files?.[0]??null)}/><p className="supporting">Scans need a text-based PDF. Older .doc files need exporting as .docx or PDF. If Word’s saved page count is unavailable, export a PDF.</p></>}
- <p className="supporting">Your file is read to extract text; the original file is not kept. Temporary text is deleted when you delete it or when it expires. Signed-in sources are kept only when you choose to keep them.</p>
- <button className="primary" disabled={busy}>{busy?'Reading your source…':source&&!sidebarAdd?'Replace source':'Read source'}</button>{editing&&<button type="button" className="text-button" disabled={busy} onClick={()=>setEditing(false)}>Cancel replacement</button>}
+ <p className="supporting">{sidebarAdd&&accountOnly?'New content is saved to your account until you edit or delete it. Original files are not kept.':'Your file is read to extract text; the original file is not kept. Temporary text is deleted when you delete it or when it expires. Signed-in sources are kept only when you choose to keep them.'}</p>
+ <button className="primary" disabled={busy}>{busy?'Reading your source…':sidebarAdd&&accountOnly?'Save source':source&&!sidebarAdd?'Replace source':'Read source'}</button>{editing&&<button type="button" className="text-button" disabled={busy} onClick={()=>setEditing(false)}>Cancel replacement</button>}
  </form>}
  </>}
  {message&&<p role="status">{message}</p>}{error&&<p className="error" role="alert">{error}</p>}
@@ -67,8 +70,8 @@ export function SourceManager({savedOnly=false,accountOnly=false,sidebarAdd=fals
 }
 export function SourcesPage(){
  const {isLoading,isAuthenticated}=useConvexAuth();
- if(isLoading)return <><Topbar/><main className="account-page"><p role="status">Checking your account…</p></main></>;
+ if(isLoading)return <SignInLoader/>;
  if(!isAuthenticated)return <Account returnToSources/>;
- return <><Topbar/><main className="account-page"><h1>Your account source.</h1><p className="intro">View, add or manage the source for this Google account. A new source stays temporary until you choose to keep it. Your saved source remains until you replace or delete it.</p><SourceManager accountOnly/><p><a href="/?view=account">Set up Cuelo for a call</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;
+ return <Workspace initialPage="content"/>;
 }
 export function DemoSourcesPage(){return <><Topbar/><main className="account-page"><h1>Try a temporary demo source.</h1><p className="intro">No account needed. This upload is private to this visit. Closing, refreshing or returning to Cuelo starts empty. Temporary server copies expire after one hour. Saving to your account is a separate choice.</p><SourceManager/><p><a href="/?view=answers">Try answers with this demo source</a></p><footer>Built for desktop Chrome. Cuelo replies in text.</footer></main></>;}

@@ -1,6 +1,6 @@
 import {v} from "convex/values";
 import {internalMutation, internalQuery} from "./_generated/server";
-import {ALERT_THRESHOLD_PAISE, budgetDecision, MONTHLY_BUDGET_PAISE, SPENDING_HEADROOM_PAISE, spendingMonth} from "./spendingPolicy";
+import {ALERT_THRESHOLD_PAISE, allocationLimit, budgetDecision, MONTHLY_BUDGET_PAISE, SPENDING_HEADROOM_PAISE, spendingMonth} from "./spendingPolicy";
 
 const purpose = v.union(v.literal("opening"), v.literal("practice"), v.literal("live"));
 
@@ -22,7 +22,7 @@ export const reserve = internalMutation({
     }
     const month = spendingMonth(Date.now());
     const row = (await ctx.db.query("spendingMonths").withIndex("by_month", q => q.eq("month", month)).take(1))[0];
-    const decision = budgetDecision(row?.reservedPaise ?? 0, args.amountPaise);
+    const decision = budgetDecision(row?.reservedPaise ?? 0, args.amountPaise,allocationLimit());
     if (!decision.allowed) return {status: "exhausted" as const, alert: true};
     const values = {reservedPaise: (row?.reservedPaise ?? 0) + args.amountPaise, reservations: (row?.reservations ?? 0) + 1};
     if (row) await ctx.db.patch(row._id, values);
@@ -35,13 +35,13 @@ export const reserve = internalMutation({
 });
 
 export const snapshot = internalQuery({
-  args: {}, returns: v.object({enabled: v.boolean(), month: v.string(), budgetPaise: v.number(), reservedPaise: v.number(), headroomPaise: v.number(), availablePaise: v.number(), alert: v.boolean()}),
+  args: {}, returns: v.object({enabled: v.boolean(), month: v.string(), budgetPaise: v.number(), allocationPaise:v.number(), reservedPaise: v.number(), headroomPaise: v.number(), availablePaise: v.number(), alert: v.boolean()}),
   handler: async ctx => {
     const month = spendingMonth(Date.now());
     const row = (await ctx.db.query("spendingMonths").withIndex("by_month", q => q.eq("month", month)).take(1))[0];
     const reservedPaise = row?.reservedPaise ?? 0;
-    return {enabled: process.env.V1_PAID_TESTING_ENABLED === "true", month, budgetPaise: MONTHLY_BUDGET_PAISE, reservedPaise, headroomPaise: SPENDING_HEADROOM_PAISE,
-      availablePaise: Math.max(0, MONTHLY_BUDGET_PAISE - SPENDING_HEADROOM_PAISE - reservedPaise), alert: reservedPaise >= ALERT_THRESHOLD_PAISE};
+    return {enabled: process.env.V1_PAID_TESTING_ENABLED === "true", month, budgetPaise: MONTHLY_BUDGET_PAISE, allocationPaise:allocationLimit(), reservedPaise, headroomPaise: SPENDING_HEADROOM_PAISE,
+      availablePaise: Math.max(0, allocationLimit() - reservedPaise), alert: reservedPaise >= Math.min(ALERT_THRESHOLD_PAISE,Math.floor(allocationLimit()*.8))};
   },
 });
 

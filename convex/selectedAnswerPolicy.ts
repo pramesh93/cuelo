@@ -21,10 +21,10 @@ export function selectAnswerPassages(passages:SourcePassage[],question:string):S
  return selected;
 }
 export function checkSelectedAnswer(raw:unknown,mode:'generic'|'document',passages:SourcePassage[]):CheckedAnswer {
- const refused:CheckedAnswer={status:'unverified',bullets:[],message:mode==='document'?MISSING_SOURCE_ANSWER:GENERIC_EVIDENCE_NEEDED,citations:[]};
+ const refused:CheckedAnswer={status:'unverified',bullets:[],message:mode==='document'?(passages.some(p=>p.sourceTitle)?'I couldn’t find this in your selected sources.':MISSING_SOURCE_ANSWER):GENERIC_EVIDENCE_NEEDED,citations:[]};
  if(!raw||typeof raw!=='object')return refused;
  const value=raw as Record<string,unknown>;
- if(mode==='document'&&value.status==='conflict')return {...refused,status:'conflict',message:'The source has conflicting information. Confirm it before answering.'};
+ if(mode==='document'&&value.status==='conflict')return {...refused,status:'conflict',message:passages.some(p=>p.sourceTitle)?'Your selected sources contain conflicting information. Confirm it before answering.':'The source has conflicting information. Confirm it before answering.'};
  if(value.conflicting===true||value.status!==(mode==='document'?'supported':'generic')||!Array.isArray(value.bullets)||value.bullets.length<1||value.bullets.length>3)return refused;
  if(mode==='generic'&&value.companySpecific!==false)return refused;
  const bullets:string[]=[];const citations=new Map<number,SourcePassage>();

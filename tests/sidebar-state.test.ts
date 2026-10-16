@@ -11,6 +11,6 @@ test('sign-in is available without Meet, including while meeting detection is pe
  assert.equal(sidebarScreen({...signedOut,authenticated:true}),'no-meeting');
 });
 test('Start explains each blocker and automatically clears when requirements become ready',()=>{
- const ready={eligible:true,invited:true,enabled:true,busy:false,mode:'document' as const,sourceSelected:true,sourceLoading:false};
- assert.equal(startBlock(ready),null);assert.match(startBlock({...ready,eligible:false})!,/Join a Meet/);assert.match(startBlock({...ready,invited:false})!,/tester/);assert.match(startBlock({...ready,enabled:false})!,/not enabled/);assert.match(startBlock({...ready,sourceLoading:true})!,/loading/);assert.match(startBlock({...ready,sourceSelected:false})!,/ready source/);assert.equal(startBlock({...ready,mode:'generic',sourceSelected:false,sourceLoading:true}),null);
+ const ready={eligible:true,trialExhausted:false,enabled:true,busy:false,mode:'document' as const,sourceSelected:true,sourceLoading:false};
+ assert.equal(startBlock(ready),null);assert.match(startBlock({...ready,eligible:false})!,/Join a Meet/);assert.match(startBlock({...ready,trialExhausted:true})!,/free trial has ended/);assert.match(startBlock({...ready,enabled:false})!,/unavailable/);assert.match(startBlock({...ready,sourceLoading:true})!,/loading/);assert.match(startBlock({...ready,sourceSelected:false})!,/ready source/);assert.equal(startBlock({...ready,mode:'generic',sourceSelected:false,sourceLoading:true}),null);
 });
