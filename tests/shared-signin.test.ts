@@ -64,3 +64,11 @@ test('an ongoing Google login survives renewal of the existing session',async()=
  await f.service.run({operation:'refresh',token:f.rawTokens.token});
  assert.ok((await f.service.run({operation:'signIn',args:{params:{code:'new-code'},verifier:started.verifier}})).state.token);
 });
+
+test('hosted website sign-in accepts its exact return address and completes shared sidebar login',async()=>{
+ const f=fixture();
+ const started=await f.service.run({operation:'signIn',args:{provider:'google',params:{redirectTo:backend.replace('.cloud','.site')+'/?view=home'}}});
+ const completed=await f.service.run({operation:'signIn',args:{params:{code:'fictional-hosted-code'},verifier:started.verifier}});
+ assert.equal(completed.state.token,f.rawTokens.token);
+ await assert.rejects(()=>f.service.run({operation:'signIn',args:{provider:'google',params:{redirectTo:'https://evil.invalid/?view=home'}}}),/Invalid sign-in return/);
+});

@@ -4,7 +4,7 @@ export function SidebarInstructions(){
  <h2>Use Cuelo in the Chrome sidebar.</h2>
  <ol><li>Join your Google Meet call in desktop Chrome.</li><li>Open the Cuelo extension to show its sidebar.</li><li>Choose Generic answers or Answers from my document. Select or add one source for document answers.</li><li>Click Start in the sidebar. Your answers and Pause/Stop controls stay there.</li></ol>
  <p>With the Cuelo extension installed, signing in on this website also signs you into its sidebar, and signing in there signs you into this website. Use the same Chrome profile. After installing or reloading the extension, refresh the website.</p>
- <p className="supporting">Sign in with Google for up to three free calls or 90 minutes of listening, whichever comes first. Cuelo never speaks. Sharing the window containing Cuelo may show its answers.</p>
+ <p className="supporting">Sign in with Google for up to three free calls or 90 minutes, including paused time, whichever comes first. Cuelo never speaks. Sharing the window containing Cuelo may show its answers.</p>
  <p className="supporting">The Chrome extension download will be available here once its Chrome Web Store listing is published.</p>
  </section>;
 }

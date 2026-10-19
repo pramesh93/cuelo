@@ -1,0 +1,12 @@
+import {test} from 'node:test';import assert from 'node:assert/strict';import {publicDiagnostic,finalPublicDiagnostic} from '../convex/publicAnswerDiagnostics';
+test('public diagnostics contain only fixed codes and numeric counts, never supplied text or URLs',t=>{
+ const oldCloud=process.env.CONVEX_CLOUD_URL,oldFlag=process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED;const logs:any[]=[];t.mock.method(console,'info',(...args)=>{logs.push(args);});
+ try{process.env.CONVEX_CLOUD_URL='https://calculating-gecko-263.convex.cloud';process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED='true';publicDiagnostic('missing_provider_sources',{sourceCount:0,question:'Private test text',answer:'Private answer',url:'https://example.com/private'} as any);publicDiagnostic('Private question' as any);finalPublicDiagnostic({status:'generic',companySpecific:false,bullets:[{text:'word '.repeat(41)}]},false);assert.equal(logs.length,2);assert.deepEqual(JSON.parse(logs[0][1]),{code:'missing_provider_sources',sourceCount:0});assert.equal(JSON.parse(logs[1][1]).code,'final_word_limit');assert.equal(JSON.stringify(logs).includes('Private'),false);assert.equal(JSON.stringify(logs).includes('example.com'),false);process.env.CONVEX_CLOUD_URL='https://deafening-frog-846.convex.cloud';publicDiagnostic('final_accepted');assert.equal(logs.length,2);}
+ finally{if(oldCloud===undefined)delete process.env.CONVEX_CLOUD_URL;else process.env.CONVEX_CLOUD_URL=oldCloud;if(oldFlag===undefined)delete process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED;else process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED=oldFlag;}
+});
+
+test('repair diagnostics log only fixed rejection reasons and numeric measurements',t=>{
+ const cloud=process.env.CONVEX_CLOUD_URL,flag=process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED;const logs:any[]=[];t.mock.method(console,'info',(...args)=>logs.push(args));
+ try{process.env.CONVEX_CLOUD_URL='https://calculating-gecko-263.convex.cloud';process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED='true';publicDiagnostic('repair_rejected_details',{wordCount:17,originalWordCount:45,attemptCount:1,elapsedMs:750,text:'private text'} as any);assert.deepEqual(JSON.parse(logs[0][1]),{code:'repair_rejected_details',wordCount:17,originalWordCount:45,attemptCount:1,elapsedMs:750});assert.equal(JSON.stringify(logs).includes('private text'),false);}
+ finally{if(cloud===undefined)delete process.env.CONVEX_CLOUD_URL;else process.env.CONVEX_CLOUD_URL=cloud;if(flag===undefined)delete process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED;else process.env.PUBLIC_SEARCH_DIAGNOSTICS_ENABLED=flag;}
+});

@@ -1,3 +1,4 @@
+import {BUDGET_EXHAUSTED} from './answerErrors';
 import {v,ConvexError} from 'convex/values';
 import {internalMutation,internalQuery,mutation,query} from './_generated/server';
 import {ownerKey} from './sources';
@@ -19,7 +20,7 @@ export const admit=internalMutation({args,returns:v.object({remaining:v.number()
  const usage=(await ctx.db.query('evaluationUsage').withIndex('by_scope',q=>q.eq('scope','milestone1')).take(1))[0];
  if((usage?.count??0)>=answerAttemptLimit())throw new ConvexError('The development answer allowance is used up. Paid requests have stopped.');
  const month=spendingMonth(now);const ledger=(await ctx.db.query('spendingMonths').withIndex('by_month',q=>q.eq('month',month)).take(1))[0];
- const decision=budgetDecision(ledger?.reservedPaise??0,ANSWER_RESERVATION_PAISE);if(!decision.allowed)throw new ConvexError('The testing budget is reached. New paid answers have stopped.');
+ const decision=budgetDecision(ledger?.reservedPaise??0,ANSWER_RESERVATION_PAISE);if(!decision.allowed)throw new ConvexError(BUDGET_EXHAUSTED);
  // All checks and reservations are atomic; disabled/exhausted admission writes nothing.
  if(visit?.activeKey){const old=(await ctx.db.query('answerRequests').withIndex('by_key',q=>q.eq('key',visit.activeKey!)).take(1))[0];if(old&&old.ownerKey===key)await ctx.db.patch(old._id,{cancelled:true});}
  const values={successful,activeKey:args.requestKey,activeUntil:now+45000,expiresAt:now+86400000};

@@ -9,8 +9,12 @@
  */
 
 import type * as accountSetup from "../accountSetup.js";
+import type * as answerErrors from "../answerErrors.js";
 import type * as answerGeneration from "../answerGeneration.js";
+import type * as answerRepair from "../answerRepair.js";
+import type * as answerRepairPolicy from "../answerRepairPolicy.js";
 import type * as auth from "../auth.js";
+import type * as authReturnPolicy from "../authReturnPolicy.js";
 import type * as callAccess from "../callAccess.js";
 import type * as crons from "../crons.js";
 import type * as dashboard from "../dashboard.js";
@@ -33,10 +37,14 @@ import type * as openingPolicy from "../openingPolicy.js";
 import type * as preparedSourceValues from "../preparedSourceValues.js";
 import type * as preparedSources from "../preparedSources.js";
 import type * as providerError from "../providerError.js";
+import type * as publicAnswerDiagnostics from "../publicAnswerDiagnostics.js";
+import type * as publicAnswerGeneration from "../publicAnswerGeneration.js";
+import type * as publicAnswerPolicy from "../publicAnswerPolicy.js";
 import type * as publicPage from "../publicPage.js";
 import type * as selectedAnswerBudget from "../selectedAnswerBudget.js";
 import type * as selectedAnswerPolicy from "../selectedAnswerPolicy.js";
 import type * as selectedAnswers from "../selectedAnswers.js";
+import type * as shortening from "../shortening.js";
 import type * as sourceContent from "../sourceContent.js";
 import type * as sourceImport from "../sourceImport.js";
 import type * as sourceLibrary from "../sourceLibrary.js";
@@ -64,8 +72,12 @@ import type {
 
 declare const fullApi: ApiFromModules<{
   accountSetup: typeof accountSetup;
+  answerErrors: typeof answerErrors;
   answerGeneration: typeof answerGeneration;
+  answerRepair: typeof answerRepair;
+  answerRepairPolicy: typeof answerRepairPolicy;
   auth: typeof auth;
+  authReturnPolicy: typeof authReturnPolicy;
   callAccess: typeof callAccess;
   crons: typeof crons;
   dashboard: typeof dashboard;
@@ -88,10 +100,14 @@ declare const fullApi: ApiFromModules<{
   preparedSourceValues: typeof preparedSourceValues;
   preparedSources: typeof preparedSources;
   providerError: typeof providerError;
+  publicAnswerDiagnostics: typeof publicAnswerDiagnostics;
+  publicAnswerGeneration: typeof publicAnswerGeneration;
+  publicAnswerPolicy: typeof publicAnswerPolicy;
   publicPage: typeof publicPage;
   selectedAnswerBudget: typeof selectedAnswerBudget;
   selectedAnswerPolicy: typeof selectedAnswerPolicy;
   selectedAnswers: typeof selectedAnswers;
+  shortening: typeof shortening;
   sourceContent: typeof sourceContent;
   sourceImport: typeof sourceImport;
   sourceLibrary: typeof sourceLibrary;

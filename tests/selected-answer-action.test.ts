@@ -16,7 +16,7 @@ function context({denied=false,enabled=true,deleted=false,cancelled=false}:{deni
 test('inaccessible sources and disabled testing never reach a model; generic mode cannot smuggle a source',async t=>{
  const key=process.env.OPENAI_API_KEY;process.env.OPENAI_API_KEY='fake-test-key';let calls=0;t.mock.method(Agent.prototype,'generateText',async()=>{calls++;throw new Error('Must not call provider');});
  try{const denied=context({denied:true});assert.equal((await ask._handler(denied.ctx,args)).status,'error');assert.equal(denied.admissions,0);
- const disabled=context({enabled:false});assert.match((await ask._handler(disabled.ctx,args)).message,/not enabled/);
+ const disabled=context({enabled:false});assert.match((await ask._handler(disabled.ctx,args)).message,/contact the Cuelo team/);
  const generic=context();assert.match((await ask._handler(generic.ctx,{...args,mode:'generic'})).message,/cannot include/);assert.equal(generic.admissions,0);assert.equal(calls,0);
  }finally{if(key===undefined)delete process.env.OPENAI_API_KEY;else process.env.OPENAI_API_KEY=key;}
 });

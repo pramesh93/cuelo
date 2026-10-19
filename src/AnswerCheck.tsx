@@ -1,3 +1,4 @@
+import {checkedWebSources} from '../convex/publicAnswerPolicy';
 import {sourceEvidenceLink,type SourceWebsite} from './answerEvidence';
 import {Topbar} from "./Topbar";
 import {useCallback,useEffect,useRef,useState} from 'react';
@@ -17,13 +18,14 @@ export function AnswerCard({result,elapsedMs,sourceLinks=true,sourceWebsite}:{re
  {result.mode==='generic'&&<p className="provenance">Not from your document</p>}
  {result.bullets.length>0&&<ul className="answer">{result.bullets.map((text,i)=><li key={i}>{text}{result.bulletCitations?.[i]&&<small className="answer-bullet-citations">{sourceWebsite?[...new Map(result.bulletCitations[i].map(id=>result.citations.find(p=>p.ordinal===id)).filter(Boolean).map(p=>sourceEvidenceLink(p!,result.source,sourceWebsite)).filter(Boolean).map(link=>[link!.id,link!] as const)).values()].map(link=><a key={link.id} href={link.href} target="_blank" rel="noreferrer">{link.title}</a>):[...new Set(result.bulletCitations[i].map(id=>result.citations.find(p=>p.ordinal===id)).filter(Boolean).map(p=>`${p!.reference} · ${p!.sourceTitle??result.source?.title??''}`))].join('; ')}</small>}</li>)}</ul>}
  {result.message&&<p className={result.status==='error'?'error':''} role={result.status==='error'?'alert':undefined}>{result.message}</p>}
+ {result.mode==='generic'&&result.sourceUnverified&&<p className="public-source-unverified"><span aria-hidden="true">⚠</span> Source not verified</p>}{result.mode==='generic'&&!!result.webSources?.length&&<p className="public-answer-sources">{checkedWebSources(result.webSources).map(source=><a key={source.url} href={source.url} target="_blank" rel="noreferrer">{source.title} ↗</a>)}</p>}
  {result.mode==='document'&&result.source&&result.citations.length>0&&<>
  {sourceWebsite?<>
  <p className="citation citation-source-link">{groups.length?groups.map(({link})=><a key={link.id} href={link.href} target="_blank" rel="noreferrer">{link.title}<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" strokeWidth="1.8" aria-hidden="true"><path d="M14 3h7v7M21 3 10 14M10 3H3v18h18v-7"/></svg></a>):'Source unavailable.'}</p>
- {inlineGroups.length>0&&<details><summary>Open supporting passage</summary>{inlineGroups.map(({link,passages})=><div key={link.id}><p className="citation-source-link"><a href={link.href} target="_blank" rel="noreferrer">{link.title}</a></p>{passages.map(p=><blockquote key={p.ordinal}>{p.text}</blockquote>)}</div>)}</details>}
+ {!result.shorteningTimedOut&&inlineGroups.length>0&&<details><summary>Open supporting passage</summary>{inlineGroups.map(({link,passages})=><div key={link.id}><p className="citation-source-link"><a href={link.href} target="_blank" rel="noreferrer">{link.title}</a></p>{passages.map(p=><blockquote key={p.ordinal}>{p.text}</blockquote>)}</div>)}</details>}
  </>:<>
- <p className="citation">{[...new Set(result.citations.map(p=>p.sourceTitle?`${p.reference} · ${p.sourceTitle}`:p.reference))].join(', ')}{!result.citations.some(p=>p.sourceTitle)&&<><br/>{sourceLinks&&result.source.url?<a href={result.source.url} target="_blank" rel="noreferrer">{result.source.title}</a>:result.source.title}</>}</p>
- <details><summary>Open supporting passage</summary>{result.citations.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><blockquote>{p.text}</blockquote>{p.sourceTitle&&<p className="citation-source-name">{p.sourceTitle}</p>}</div>)}</details>
+ <p className="citation">{[...new Set(result.citations.map(p=>p.sourceTitle?`${p.reference} · ${p.sourceTitle}`:p.reference))].join(', ')}{!result.citations.some(p=>p.sourceTitle)&&<><br/>{result.shorteningTimedOut?<a href={`/?view=content&source=${encodeURIComponent(result.source.id)}`} target="_blank" rel="noreferrer">{result.source.title}</a>:sourceLinks&&result.source.url?<a href={result.source.url} target="_blank" rel="noreferrer">{result.source.title}</a>:result.source.title}</>}</p>
+ {!result.shorteningTimedOut&&<details><summary>Open supporting passage</summary>{result.citations.map(p=><div key={p.ordinal}><h3>{p.reference}</h3><blockquote>{p.text}</blockquote>{p.sourceTitle&&<p className="citation-source-name">{p.sourceTitle}</p>}</div>)}</details>}
  </>}
 
  </>}

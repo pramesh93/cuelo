@@ -13,7 +13,7 @@ export function Account({returnToSources=false,workspacePage='home'}:{returnToSo
  const googleReturn=useRef(params.has('code'));
  const [returningFromGoogle,setReturningFromGoogle]=useState(()=>params.has('code'));
  useEffect(()=>{if(isAuthenticated){setReturningFromGoogle(false);setBusy(false);}},[isAuthenticated]);
- async function login(){setBusy(true);setError('');try{const result=await signIn('google',{redirectTo:destination});if(!result.signingIn&&!result.redirect)setBusy(false);}catch{setError('We couldn’t sign you in. Please try again.');setBusy(false);}}
+ async function login(){setBusy(true);setError('');try{const result=await signIn('google',{redirectTo:new URL(destination,location.origin).href});if(!result.signingIn&&!result.redirect)setBusy(false);}catch{setError('We couldn’t sign you in. Please try again.');setBusy(false);}}
  if(!isLoading&&isAuthenticated)return <Workspace initialPage={returnToSources?'content':workspacePage} signingIn={googleReturn.current||busy}/>;
  if(params.has('code')||returningFromGoogle&&isLoading||!!token)return <SignInLoader message={params.has('code')||returningFromGoogle?'Signing you in…':'Getting your quiet corner ready…'}/>;
  return <SignInPage signup={signup} returnToSources={returnToSources||params.get('next')==='sources'} ready={!isLoading&&!!access?.googleConfigured} unavailable={!isLoading&&access!==undefined&&!access.googleConfigured} busy={busy} error={error||(returningFromGoogle?'Your sign-in did not complete. Please try again.':'')} onLogin={()=>void login()}/>;

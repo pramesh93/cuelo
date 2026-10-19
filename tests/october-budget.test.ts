@@ -1,7 +1,7 @@
 import {previewDevelopmentRetest,applyDevelopmentRetest} from '../convex/spendingReview';
 import {test} from 'node:test';import assert from 'node:assert/strict';
 import {previewOctober,applyOctober} from '../convex/spendingReview';
-import {allocationLimit,budgetDecision} from '../convex/spendingPolicy';
+import {allocationLimit,budgetDecision,spendingHeadroom} from '../convex/spendingPolicy';
 function fixture(){
  const month='2026-10',ledger={_id:'ledger',month,reservedPaise:408000,reservations:9};
  const reservations=Array.from({length:8},(_,i)=>({_id:`reservation-${i}`,key:`live-call-${i}`,month,purpose:'live',amountPaise:50000,_creationTime:Date.UTC(2026,9,1)+1000}));
@@ -16,3 +16,20 @@ test('October adjustment accounts for the previous review without releasing the 
 test('review refuses active listening, stale approvals and protected holds; production uses the same audited narrow adjustment',async()=>env(async()=>{const f=fixture();process.env.LIVE_CALL_TESTING_ENABLED='true';await assert.rejects(()=>previewOctober._handler(f.ctx,args),/listening off/);process.env.LIVE_CALL_TESTING_ENABLED='false';await assert.rejects(()=>applyOctober._handler(f.ctx,{...args,expectedBeforePaise:1,expectedReleasePaise:1}),/changed/);for(let i=0;i<8;i++)f.active.set(`call-${i}`,{state:'paused'});await assert.rejects(()=>previewOctober._handler(f.ctx,args),/protecting/);assert.equal(f.audits.length,0);const g=fixture();g.reservations.splice(2);g.ledger.reservedPaise=100000;process.env.CONVEX_CLOUD_URL='https://deafening-frog-846.convex.cloud';assert.equal((await previewOctober._handler(g.ctx,args)).releasePaise,50000);assert.equal(g.ledger.reservedPaise,100000);}));
 
 test('one-call follow-up releases only ₹500, accounts for both earlier reviews and never changes production',async()=>env(async()=>{const f=fixture();for(let i=8;i<15;i++)f.reservations.push({...f.reservations[0],_id:`reservation-${i}`,key:`live-call-${i}`});f.ledger.reservedPaise=150000;f.audits.push({_id:'first',month:'2026-10',releasePaise:340000,reservationIds:f.reservations.slice(0,7).map(x=>x._id)},{_id:'second',month:'2026-10',reviewKey:'2026-10-15-approved-split',releasePaise:272200,reservationIds:f.reservations.slice(0,13).map(x=>x._id)});const a={...args,retainedPaise:100000 as const,openAiUsdMicros:140000 as const,deepgramUsdMicros:275780 as const};assert.equal((await previewDevelopmentRetest._handler(f.ctx,a)).releasePaise,50000);assert.equal(f.ledger.reservedPaise,150000);for(let i=0;i<2;i++)await applyDevelopmentRetest._handler(f.ctx,{...a,expectedBeforePaise:150000,expectedReleasePaise:50000});assert.equal(f.ledger.reservedPaise,100000);assert.equal(f.audits.length,3);assert.equal(f.reservations[0].amountPaise,50000);process.env.CONVEX_CLOUD_URL='https://deafening-frog-846.convex.cloud';await assert.rejects(()=>previewDevelopmentRetest._handler(f.ctx,a),/development only/);}));
+
+test('approved test transfer fits ₹5000 without releasing old holds and leaves ₹132 buffer',()=>{
+ const transfer={CUELO_TEST_BUDGET_TRANSFER:'2026-10-17'};const dev=allocationLimit({...transfer,CONVEX_CLOUD_URL:'https://calculating-gecko-263.convex.cloud'}),prod=allocationLimit({...transfer,CONVEX_CLOUD_URL:'https://deafening-frog-846.convex.cloud'});assert.equal(dev,332600);assert.equal(prod,54200);assert.equal(dev+prod+100000+13200,500000);assert.equal(dev-150000,182600);assert.equal(2*50000+8*5000+6*(2100+5000),182600);assert.equal(budgetDecision(150000,182600,dev).allowed,true);assert.equal(budgetDecision(dev,1,dev).allowed,false);assert.equal(budgetDecision(prod,1,prod).allowed,false);
+});
+
+test('sidebar testing transfers only ₹122 from the buffer, preserving ₹5000 total and all production limits',()=>{
+ const marker={CUELO_TEST_BUDGET_TRANSFER:'2026-10-17',CUELO_SIDEBAR_BUDGET_TRANSFER:'2026-10-17'};
+ const dev={...marker,CONVEX_CLOUD_URL:'https://calculating-gecko-263.convex.cloud'};
+ const prod={...marker,CONVEX_CLOUD_URL:'https://deafening-frog-846.convex.cloud'};
+ assert.equal(allocationLimit(dev),344800);assert.equal(spendingHeadroom(dev),1000);
+ assert.equal(allocationLimit(prod),54200);assert.equal(spendingHeadroom(prod),13200);
+ assert.equal(allocationLimit(dev)+allocationLimit(prod)+100000+spendingHeadroom(dev),500000);
+ assert.equal(budgetDecision(287700,50000,allocationLimit(dev)).allowed,true);
+ assert.equal(budgetDecision(337700,50000,allocationLimit(dev)).allowed,false);
+ assert.equal(budgetDecision(344800,1,allocationLimit(dev)).allowed,false);
+ const inactive={...dev,CUELO_TEST_BUDGET_TRANSFER:'off'};assert.equal(allocationLimit(inactive),150000);assert.equal(spendingHeadroom(inactive),50000);
+});

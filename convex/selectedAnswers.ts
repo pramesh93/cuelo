@@ -1,4 +1,5 @@
 "use node";
+import {answerErrorMessage,ANSWER_NOT_FOUND,ANSWER_TIMEOUT} from './answerErrors';
 import {action} from './_generated/server';
 import {internal} from './_generated/api';
 import {v,ConvexError} from 'convex/values';
@@ -7,7 +8,7 @@ import {passageValue,sourceScopeArgs,sourceMetaValue} from './sourceValues';
 import type {Infer} from 'convex/values';
 import {checkSelectedAnswer,selectAnswerPassages,SELECTED_ANSWER_INSTRUCTIONS,MAX_ANSWER_INPUT_BYTES,MISSING_SOURCE_ANSWER} from './selectedAnswerPolicy';
 const mode=v.union(v.literal('generic'),v.literal('document'));
-const result=v.object({mode,status:v.union(v.literal('supported'),v.literal('unverified'),v.literal('conflict'),v.literal('generic'),v.literal('error'),v.literal('cancelled')),bullets:v.array(v.string()),message:v.string(),citations:v.array(passageValue),source:v.union(sourceMetaValue,v.null()),elapsedMs:v.number(),budgetAlert:v.boolean()});
+const result=v.object({mode,status:v.union(v.literal('supported'),v.literal('unverified'),v.literal('conflict'),v.literal('generic'),v.literal('error'),v.literal('cancelled')),bullets:v.array(v.string()),message:v.string(),shorteningTimedOut:v.optional(v.boolean()),sourceUnverified:v.optional(v.boolean()),webSources:v.optional(v.array(v.object({url:v.string(),title:v.string()}))),citations:v.array(passageValue),source:v.union(sourceMetaValue,v.null()),elapsedMs:v.number(),budgetAlert:v.boolean()});
 export const ask=action({args:{...sourceScopeArgs,visitSecret:v.string(),requestKey:v.string(),mode,sourceId:v.optional(v.id('sources')),question:v.string()},returns:result,handler:async(ctx,args):Promise<Infer<typeof result>>=>{
  const started=Date.now();const base={mode:args.mode,bullets:[],citations:[],source:null,elapsedMs:0,budgetAlert:false};
  const failure=(message:string,status:'error'|'cancelled'='error'):Infer<typeof result>=>({...base,status,message,elapsedMs:Date.now()-started});
@@ -27,7 +28,7 @@ export const ask=action({args:{...sourceScopeArgs,visitSecret:v.string(),request
  if(!process.env.OPENAI_API_KEY)return failure('Real answers are not configured yet.');
  let admitted;
  try {admitted=await ctx.runMutation(internal.selectedAnswerBudget.admit,{visitSecret:args.visitSecret,requestKey:args.requestKey});}
- catch(error){return failure(error instanceof ConvexError&&typeof error.data==='string'?error.data:'Real answer testing is unavailable right now.');}
+ catch(error){return failure(answerErrorMessage(error));}
  const controller=new AbortController();let finished=false,polling=false;let timeout:ReturnType<typeof setTimeout>|undefined;let timer:ReturnType<typeof setInterval>|undefined;
  const cancelled=()=>ctx.runQuery(internal.selectedAnswerBudget.cancelled,{visitSecret:args.visitSecret,requestKey:args.requestKey});
  try {
@@ -37,21 +38,22 @@ export const ask=action({args:{...sourceScopeArgs,visitSecret:v.string(),request
   const generated=await generateSelectedAnswer(ctx,prompt,controller.signal);
   if(await cancelled())return failure('This answer was cancelled.','cancelled');
   if(source&&args.sourceId)await ctx.runQuery(internal.sources.answerSource,{guestSecret:args.guestSecret,id:args.sourceId});
-  let raw:unknown;try{raw=JSON.parse(generated.text);}catch{return failure('The answer could not be checked. Try again.');}
-  const checked=checkSelectedAnswer(raw,args.mode,evidence);
+  let raw:unknown;try{raw=JSON.parse(generated.text);}catch{return failure(ANSWER_NOT_FOUND);}
+  const checked=checkSelectedAnswer(raw,args.mode,evidence,generated.webSources,generated.sourceUnverified);
   const declared=raw && typeof raw==='object' && 'status' in raw ? raw.status : null;
   if(!['supported','generic','unverified','conflict'].includes(String(declared)) ||
      ((declared==='supported'||declared==='generic') && checked.status==='unverified'))
-   return failure('The answer could not be checked. Try again.');
+   return failure(ANSWER_NOT_FOUND);
   const accepted=await ctx.runMutation(internal.selectedAnswerBudget.finish,{visitSecret:args.visitSecret,requestKey:args.requestKey,successful:true});finished=true;
   if(!accepted)return failure('This answer was cancelled.','cancelled');
   return {...checked,mode:args.mode,source,elapsedMs:Date.now()-started,budgetAlert:admitted.budgetAlert};
  }catch(error){
   if(await cancelled().catch(()=>true))return failure('This answer was cancelled.','cancelled');
-  if(error instanceof ConvexError&&typeof error.data==='string')return failure(error.data);
+  if(controller.signal.aborted)return failure(ANSWER_TIMEOUT);
+  if(error instanceof ConvexError&&typeof error.data==='string')return failure(answerErrorMessage(error));
   // Do not put questions, passages, provider messages or responses in routine logs.
   console.error('Cuelo selected answer failed',{step:'generation_or_cleanup'});
-  return failure('Busy right now. Try again in a few minutes.');
+  return failure(answerErrorMessage(error));
  }finally{
   if(timer)clearInterval(timer);if(timeout)clearTimeout(timeout);
   if(!finished)await ctx.runMutation(internal.selectedAnswerBudget.finish,{visitSecret:args.visitSecret,requestKey:args.requestKey,successful:false});

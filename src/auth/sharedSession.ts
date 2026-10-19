@@ -1,3 +1,4 @@
+import {authReturnUrl} from '../../convex/authReturnPolicy';
 export type Tokens={token:string;refreshToken:string};
 export type Session={token:string|null;revision:number;established:boolean};
 export type Stored=Session&{refreshToken:string|null;attempts?:Record<string,number>};
@@ -51,7 +52,8 @@ export function createSharedSession(deps:{backend:string;load:()=>Promise<Stored
    if(args.provider==='google'&&params?.code!==undefined)throw Error('Complete only the original sign-in attempt.');
    if(args.provider!=='google'&&!(typeof params?.code==='string'&&typeof args.verifier==='string'))throw Error('Invalid sign-in completion.');
    if(params?.redirectTo!==undefined){
-    if(typeof params.redirectTo!=='string'||!params.redirectTo.startsWith('/?view=')||params.redirectTo.startsWith('//'))throw Error('Invalid sign-in return.');
+    if(typeof params.redirectTo!=='string')throw Error('Invalid sign-in return.');
+    authReturnUrl(params.redirectTo,deps.backend,deps.backend.replace('.convex.cloud','.convex.site'));
    }
    if(args.provider!=='google'){
     if(typeof params?.code!=='string'||params.code.length>2048||typeof args.verifier!=='string'||!((s.attempts?.[args.verifier]??0)>Date.now()))throw Error('This sign-in attempt expired or was cancelled.');

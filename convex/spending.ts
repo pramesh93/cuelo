@@ -1,6 +1,6 @@
-import {v} from "convex/values";
+import {v,ConvexError} from "convex/values";
 import {internalMutation, internalQuery} from "./_generated/server";
-import {ALERT_THRESHOLD_PAISE, allocationLimit, budgetDecision, MONTHLY_BUDGET_PAISE, SPENDING_HEADROOM_PAISE, spendingMonth} from "./spendingPolicy";
+import {ALERT_THRESHOLD_PAISE, allocationLimit, budgetDecision, MONTHLY_BUDGET_PAISE, SPENDING_HEADROOM_PAISE, spendingMonth,spendingHeadroom,monthlyBudget,spendingAlertThreshold} from "./spendingPolicy";
 
 const purpose = v.union(v.literal("opening"), v.literal("practice"), v.literal("live"));
 
@@ -8,7 +8,7 @@ const purpose = v.union(v.literal("opening"), v.literal("practice"), v.literal("
 // Actual provider work must call this BEFORE spending. Until those routes are
 // connected and an explicit test allowance is agreed, keep this feature off.
 export const reserve = internalMutation({
-  args: {key: v.string(), purpose, amountPaise: v.number()},
+  args: {key: v.string(), purpose, amountPaise: v.number(),sessionId:v.optional(v.id("liveCalls"))},
   returns: v.object({status: v.union(v.literal("reserved"), v.literal("disabled"), v.literal("exhausted")), alert: v.boolean()}),
   handler: async (ctx, args) => {
     if (process.env.V1_PAID_TESTING_ENABLED !== "true") return {status: "disabled" as const, alert: false};
@@ -16,18 +16,25 @@ export const reserve = internalMutation({
     budgetDecision(0, args.amountPaise);
     const prior = (await ctx.db.query("spendingReservations").withIndex("by_key", q => q.eq("key", args.key)).take(1))[0];
     if (prior) {
-      if (prior.purpose !== args.purpose || prior.amountPaise !== args.amountPaise) throw new Error("A spending reservation cannot be reused for another operation.");
+      if (prior.purpose !== args.purpose || prior.amountPaise !== args.amountPaise || prior.sessionId !== args.sessionId) throw new Error("A spending reservation cannot be reused for another operation.");
       const ledger = (await ctx.db.query("spendingMonths").withIndex("by_month", q => q.eq("month", prior.month)).take(1))[0];
-      return {status: "reserved" as const, alert: (ledger?.reservedPaise ?? 0) >= ALERT_THRESHOLD_PAISE};
+      return {status: "reserved" as const, alert: (ledger?.reservedPaise ?? 0) >= Math.min(spendingAlertThreshold(),Math.floor(allocationLimit()*.8))};
     }
     const month = spendingMonth(Date.now());
     const row = (await ctx.db.query("spendingMonths").withIndex("by_month", q => q.eq("month", month)).take(1))[0];
-    const decision = budgetDecision(row?.reservedPaise ?? 0, args.amountPaise,allocationLimit());
+    const call=args.sessionId?await ctx.db.get(args.sessionId):null;
+    if(args.sessionId&&(!call||call.state!=='active'||call.deadline<=Date.now()||call.expiresAt<=Date.now()))throw new ConvexError('This Cuelo session stopped or expired.');
+    const pool=args.sessionId?(await ctx.db.query('callAnswerBudgets').withIndex('by_session',q=>q.eq('sessionId',args.sessionId!)).take(1))[0]:null;
+    if(pool&&(!row||!Number.isSafeInteger(pool.remainingPaise)||!Number.isSafeInteger(pool.allocatedPaise)||pool.remainingPaise<0||pool.remainingPaise>pool.allocatedPaise||pool.allocatedPaise<=0))throw Error('Invalid call answer budget.');
+    if(pool&&pool.month!==month)throw new ConvexError('This Cuelo session crossed the monthly budget period. Stop Cuelo and start a new call.');
+    const fromCallPoolPaise=Math.min(pool?.remainingPaise??0,args.amountPaise),additionalPaise=args.amountPaise-fromCallPoolPaise;
+    const decision = additionalPaise?budgetDecision(row?.reservedPaise ?? 0, additionalPaise,allocationLimit()):{allowed:true,alert:(row?.reservedPaise??0)>=Math.min(spendingAlertThreshold(),Math.floor(allocationLimit()*.8))};
     if (!decision.allowed) return {status: "exhausted" as const, alert: true};
-    const values = {reservedPaise: (row?.reservedPaise ?? 0) + args.amountPaise, reservations: (row?.reservations ?? 0) + 1};
+    if(pool&&fromCallPoolPaise)await ctx.db.patch(pool._id,{remainingPaise:pool.remainingPaise-fromCallPoolPaise});
+    const values = {reservedPaise: (row?.reservedPaise ?? 0) + additionalPaise, reservations: (row?.reservations ?? 0) + (additionalPaise?1:0)};
     if (row) await ctx.db.patch(row._id, values);
     else await ctx.db.insert("spendingMonths", {month, ...values});
-    await ctx.db.insert("spendingReservations", {key: args.key, month, purpose: args.purpose, amountPaise: args.amountPaise});
+    await ctx.db.insert("spendingReservations", {key: args.key, month, purpose: args.purpose, amountPaise: args.amountPaise,...(args.sessionId?{sessionId:args.sessionId,fromCallPoolPaise}: {})});
     // Failed requests keep their reservation. No speculative refunds while
     // provider charges, retries and delayed billing are not reconciled.
     return {status: "reserved" as const, alert: decision.alert};
@@ -40,8 +47,8 @@ export const snapshot = internalQuery({
     const month = spendingMonth(Date.now());
     const row = (await ctx.db.query("spendingMonths").withIndex("by_month", q => q.eq("month", month)).take(1))[0];
     const reservedPaise = row?.reservedPaise ?? 0;
-    return {enabled: process.env.V1_PAID_TESTING_ENABLED === "true", month, budgetPaise: MONTHLY_BUDGET_PAISE, allocationPaise:allocationLimit(), reservedPaise, headroomPaise: SPENDING_HEADROOM_PAISE,
-      availablePaise: Math.max(0, allocationLimit() - reservedPaise), alert: reservedPaise >= Math.min(ALERT_THRESHOLD_PAISE,Math.floor(allocationLimit()*.8))};
+    return {enabled: process.env.V1_PAID_TESTING_ENABLED === "true", month, budgetPaise: monthlyBudget(), allocationPaise:allocationLimit(), reservedPaise, headroomPaise: spendingHeadroom(),
+      availablePaise: Math.max(0, allocationLimit() - reservedPaise), alert: reservedPaise >= Math.min(spendingAlertThreshold(),Math.floor(allocationLimit()*.8))};
   },
 });
 

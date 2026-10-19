@@ -1,3 +1,4 @@
+import {trialMessage} from './trialMessage';
 import {CueloWordmark} from './CueloWordmark';
 import {useCallback,useEffect,useRef,useState} from 'react';
 import {useMutation,usePaginatedQuery} from 'convex/react';
@@ -21,7 +22,7 @@ export function OnboardingDetails({name}:{name:string}){
  return <main className="welcome-onboarding"><header className="welcome-header"><a href="/" className="welcome-wordmark"><CueloWordmark/></a><button onClick={()=>void leave()} disabled={busy}>Sign out</button></header><section className="welcome-details glass-panel"><div className="welcome-greeting">Good to meet you{name&&name!=='Cuelo user'?`, ${name.split(' ')[0]}`:''}.</div><h1>A little about you.</h1><p>Tell us your role and company to get your Cuelo account ready.</p><form onSubmit={e=>void submit(e)}><label htmlFor="onboarding-role">Your role</label><input id="onboarding-role" value={role} onChange={e=>setRole(e.target.value)} required maxLength={120} disabled={busy} autoComplete="organization-title" placeholder="e.g. Account executive"/><label htmlFor="onboarding-company">Company name</label><input id="onboarding-company" value={company} onChange={e=>setCompany(e.target.value)} required maxLength={160} disabled={busy} autoComplete="organization" placeholder="Your company"/>{error&&<p role="alert" className="workspace-error">{error}</p>}<button className="workspace-primary" disabled={busy||!role.trim()||!company.trim()}>{busy?'Saving…':'Continue'}<WorkspaceIcon name="arrow"/></button></form></section></main>;
 }
 export function TrialAllowance({trial}:{trial:Overview['trial']}){
- return <section className="workspace-trial glass-panel" aria-label="Free trial"><div><h2>Your free trial</h2><p>{trial.exhausted?'Your free trial has ended. Paid plans are coming soon.':`${trial.callsRemaining} ${trial.callsRemaining===1?'call':'calls'} and ${Math.ceil(trial.remainingMs/60000)} minutes remaining. Whichever runs out first.`}</p></div><span className="trial-badge">3 calls / 90 minutes</span></section>;
+ return <section className="workspace-trial glass-panel" aria-label="Free trial"><div><h2>Your free trial</h2><p>{trialMessage(trial)}</p></div></section>;
 }
 function useExtensionCheck(){
  const [status,setStatus]=useState<'checking'|'installed'|'missing'>('checking');

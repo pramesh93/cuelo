@@ -35,7 +35,7 @@ test('an unsafe queued answer is rejected without losing the next question',asyn
  const completed:any[]=[];
  const ctx:any={runMutation:async(fn:any,input:any)=>getFunctionName(fn)==='liveCalls:queuedPrepare'?{mode:'document',question:'Does it include sign-in?',sequence:1,cached:false,skipped:false,answerResult:null}:(completed.push(input.answerResult),true),runQuery:async(fn:any)=>getFunctionName(fn)==='liveCalls:check'?true:{conversation:[],source,passages:[passage]}};
  const rejected=await answerQueued._handler(ctx,{...args,generation:1});
- assert.equal((rejected as any).problemCode,'answer_check_failed');assert.deepEqual(rejected.bullets,[]);assert.deepEqual(rejected.citations,[]);assert.match(rejected.message,/Listening continues/);
+ assert.equal((rejected as any).problemCode,'answer_check_failed');assert.deepEqual(rejected.bullets,[]);assert.deepEqual(rejected.citations,[]);assert.equal(rejected.message,'Answer not found.');
  const next=await answerQueued._handler(ctx,{...args,utteranceId:'next-turn' as any,generation:1});assert.equal(next.status,'supported');assert.equal(completed.length,2);
 });
 
@@ -57,5 +57,12 @@ test('queued missing evidence refuses without provider use; missing source and p
  kind='missing-source';const removed=await answerQueued._handler(ctx,{...args,generation:1});
  assert.equal(removed.status,'error');assert.match(removed.message,/source changed or expired/);assert.equal(model.calls,0);
  kind='provider';const unavailable=await answerQueued._handler(ctx,{...args,generation:1});
- assert.equal(unavailable.status,'error');assert.equal(unavailable.message,'Busy right now. Try again in a few minutes.');assert.equal(model.calls,1);assert.equal(model.deleted,1);
+ assert.equal(unavailable.status,'error');assert.equal(unavailable.message,'Something went wrong with Cuelo. Please contact the Cuelo team.');assert.equal(model.calls,1);assert.equal(model.deleted,1);
+});
+
+test('failed queued format repair is settled as Answer not found without preventing the next answer',async t=>{
+ const {answerQueued}=await import('../convex/liveAnswers');let calls=0;const completed:any[]=[];
+ t.mock.method(Agent.prototype,'createThread',async()=>({threadId:'fictional-repair'}));t.mock.method(Agent.prototype,'deleteThreadAsync',async()=>{});t.mock.method(Agent.prototype,'generateText',async()=>({text:++calls<3?'unreadable':JSON.stringify({status:'supported',bullets:[{text:'It includes password sign-in.',passageIds:[0]}]})}));
+ const ctx:any={runMutation:async(fn:any,input:any)=>{const name=getFunctionName(fn);if(name==='spending:reserve')return {status:'reserved'};if(name==='liveCalls:queuedPrepare')return {mode:'document',question:'Does it include sign-in?',sequence:1,cached:false,skipped:false,answerResult:null};completed.push(input.answerResult);return true;},runQuery:async(fn:any)=>getFunctionName(fn)==='liveCalls:check'?true:{conversation:[],source,passages:[passage]}};
+ const first=await answerQueued._handler(ctx,{...args,generation:1});assert.equal(first.problemCode,'answer_check_failed');assert.equal(first.message,'Answer not found.');assert.equal(completed.length,1);const next=await answerQueued._handler(ctx,{...args,utteranceId:'next-turn' as any,generation:1});assert.equal(next.status,'supported');assert.equal(completed.length,2);
 });

@@ -11966,8 +11966,25 @@ function _r(e) {
 	};
 }
 //#endregion
+//#region convex/authReturnPolicy.ts
+var vr = "calculating-gecko-263.convex.cloud", yr = "deafening-frog-846.convex.cloud";
+function br(e, t, n) {
+	let r = new URL(t);
+	if (r.protocol !== "https:" || r.port !== "" || r.origin !== t || ![vr, yr].includes(r.hostname)) throw Error("Invalid sign-in environment.");
+	let i = [t.replace(".convex.cloud", ".convex.site"), ...r.hostname === vr ? ["http://127.0.0.1:5173"] : []];
+	if (!i.includes(n) || e.startsWith("//")) throw Error("Invalid sign-in return.");
+	let a = new URL(e, n), o = a.searchParams.get("view");
+	if (!i.includes(a.origin) || a.username || a.password || a.pathname !== "/" || a.hash || a.searchParams.getAll("view").length !== 1 || ![
+		"home",
+		"sources",
+		"account",
+		"extension-auth"
+	].includes(o ?? "") || [...a.searchParams.keys()].some((e) => e !== "view" && (o !== "extension-auth" || e !== "state")) || o === "extension-auth" && (a.searchParams.getAll("state").length !== 1 || !/^[a-f0-9]{64}$/.test(a.searchParams.get("state") ?? ""))) throw Error("Invalid sign-in return.");
+	return a.href;
+}
+//#endregion
 //#region src/auth/sharedSession.ts
-function vr(e) {
+function xr(e) {
 	try {
 		return JSON.parse(atob(e.split(".")[1].replace(/-/g, "+").replace(/_/g, "/"))).sub;
 	} catch {
@@ -11975,19 +11992,14 @@ function vr(e) {
 	}
 }
 //#endregion
-//#region src/auth/navigation.ts
-function yr(e) {
-	return e === "/?view=sources" ? "/?view=sources" : "/?view=home";
-}
-//#endregion
 //#region src/auth/SharedAuth.tsx
-var br = (0, P.createContext)(null), xr = (0, P.createContext)(void 0);
-function Sr() {
-	let e = (0, P.useContext)(br), t = gr();
+var Sr = (0, P.createContext)(null), Cr = (0, P.createContext)(void 0);
+function wr() {
+	let e = (0, P.useContext)(Sr), t = gr();
 	return e ?? t;
 }
-var Cr = /* @__PURE__ */ new Map();
-function wr({ client: e, transport: t, initial: n, popup: r, children: i, handleCode: a = !1 }) {
+var Tr = /* @__PURE__ */ new Map();
+function Er({ client: e, transport: t, initial: n, popup: r, children: i, handleCode: a = !1 }) {
 	let [o, s] = (0, P.useState)(n ?? {
 		token: null,
 		revision: -1,
@@ -12016,13 +12028,13 @@ function wr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 			return;
 		}
 		let i = e.address + ":" + n;
-		Cr.has(i) || Cr.set(i, t.request({
+		Tr.has(i) || Tr.set(i, t.request({
 			operation: "signIn",
 			args: {
 				params: { code: n },
 				verifier: r
 			}
-		})), Cr.get(i).then((e) => {
+		})), Tr.get(i).then((e) => {
 			p(e.state), sessionStorage.removeItem("cuelo-website-login-verifier");
 			let t = new URL(location.href);
 			t.searchParams.delete("code"), history.replaceState({}, "", t.pathname + t.search + t.hash);
@@ -12033,41 +12045,42 @@ function wr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 		e,
 		p
 	]);
-	let h = (0, P.useCallback)(async (e = "google", n = {}) => {
-		if (e !== "google") throw Error("Use Google sign-in only.");
+	let h = (0, P.useCallback)(async (n = "google", i = {}) => {
+		if (n !== "google") throw Error("Use Google sign-in only.");
 		f("");
-		let i = Array.from(crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32)), (e) => e.toString(16).padStart(2, "0")).join(""), a = await t.request({
+		let a = Array.from(crypto.getRandomValues(/* @__PURE__ */ new Uint8Array(32)), (e) => e.toString(16).padStart(2, "0")).join(""), o = await t.request({
 			operation: "signIn",
 			args: {
 				provider: "google",
 				params: {
-					...n,
-					redirectTo: r ? `/?view=extension-auth&state=${i}` : yr(n.redirectTo)
+					...i,
+					redirectTo: r ? `/?view=extension-auth&state=${a}` : br(typeof i.redirectTo == "string" ? i.redirectTo : "/?view=home", e.url, location.origin)
 				}
 			}
 		});
-		if (a.redirect) {
-			if (!a.verifier) throw Error("Google sign-in could not start.");
+		if (o.redirect) {
+			if (!o.verifier) throw Error("Google sign-in could not start.");
 			if (r) {
-				let e = await r(a.redirect, i), n = await t.request({
+				let e = await r(o.redirect, a), n = await t.request({
 					operation: "signIn",
 					args: {
 						params: { code: e },
-						verifier: a.verifier
+						verifier: o.verifier
 					}
 				});
 				return p(n.state), { signingIn: !!n.state.token };
 			}
-			return sessionStorage.setItem("cuelo-website-login-verifier", a.verifier), location.assign(a.redirect), {
+			return sessionStorage.setItem("cuelo-website-login-verifier", o.verifier), location.assign(o.redirect), {
 				signingIn: !1,
-				redirect: new URL(a.redirect)
+				redirect: new URL(o.redirect)
 			};
 		}
-		return p(a.state), { signingIn: !!a.state.token };
+		return p(o.state), { signingIn: !!o.state.token };
 	}, [
 		t,
 		r,
-		p
+		p,
+		e
 	]), g = (0, P.useCallback)(async () => {
 		let e = await t.request({ operation: "signOut" });
 		p(e.state);
@@ -12081,7 +12094,7 @@ function wr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 	}, [
 		t,
 		p,
-		vr(o.token)
+		xr(o.token)
 	]);
 	return d ? /* @__PURE__ */ (0, F.jsxs)("main", {
 		className: "account-page",
@@ -12099,12 +12112,12 @@ function wr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 				children: "Return to sign in"
 			}) })
 		]
-	}) : /* @__PURE__ */ (0, F.jsx)(br.Provider, {
+	}) : /* @__PURE__ */ (0, F.jsx)(Sr.Provider, {
 		value: {
 			signIn: h,
 			signOut: g
 		},
-		children: /* @__PURE__ */ (0, F.jsx)(xr.Provider, {
+		children: /* @__PURE__ */ (0, F.jsx)(Cr.Provider, {
 			value: o.token,
 			children: /* @__PURE__ */ (0, F.jsx)(lr, {
 				client: e,
@@ -12118,9 +12131,9 @@ function wr({ client: e, transport: t, initial: n, popup: r, children: i, handle
 		})
 	});
 }
-function Tr({ client: e, popup: t, children: n }) {
+function Dr({ client: e, popup: t, children: n }) {
 	let [r] = (0, P.useState)(() => _r(e.address));
-	return /* @__PURE__ */ (0, F.jsx)(wr, {
+	return /* @__PURE__ */ (0, F.jsx)(Er, {
 		client: e,
 		transport: r,
 		popup: t,
@@ -12129,10 +12142,10 @@ function Tr({ client: e, popup: t, children: n }) {
 }
 //#endregion
 //#region extension/src/chrome.ts
-var Er = globalThis.chrome;
-function Dr(e, t) {
+var Or = globalThis.chrome;
+function kr(e, t) {
 	return new Promise((n, r) => {
-		let i = Er.runtime.connect({ name: "cuelo-signin" }), a = !1, o = setInterval(() => {
+		let i = Or.runtime.connect({ name: "cuelo-signin" }), a = !1, o = setInterval(() => {
 			if (!a) try {
 				i.postMessage({ type: "ping" });
 			} catch {
@@ -12156,9 +12169,9 @@ function Dr(e, t) {
 }
 //#endregion
 //#region node_modules/convex/dist/esm/server/components/index.js
-function Or(e, t) {
+function Ar(e, t) {
 	return new Proxy({}, { get(n, r) {
-		if (typeof r == "string") return Or(e, [...t, r]);
+		if (typeof r == "string") return Ar(e, [...t, r]);
 		if (r === Dt) {
 			if (t.length < 1) {
 				let n = [e, ...t].join(".");
@@ -12168,15 +12181,20 @@ function Or(e, t) {
 		}
 	} });
 }
-var kr = () => Or("components", []), Ar = Nt;
-kr();
+var jr = () => Ar("components", []), Mr = Nt;
+jr();
 //#endregion
 //#region extension/src/client.ts
-var jr = "https://calculating-gecko-263.convex.cloud";
-`${jr}`;
+var Nr = "https://calculating-gecko-263.convex.cloud";
+`${Nr}`;
+//#endregion
+//#region src/trialMessage.ts
+function Pr(e) {
+	return e.exhausted ? "Your free trial has ended. Paid plans are coming soon." : e.callsUsed === 0 ? "Your free trial includes 3 calls or 90 meeting minutes, whichever runs out first." : `${e.callsRemaining} free ${e.callsRemaining === 1 ? "call" : "calls"} · ${Math.ceil(e.remainingMs / 6e4)} free meeting minutes remaining.`;
+}
 //#endregion
 //#region src/CueloWordmark.tsx
-function Mr() {
+function Fr() {
 	return /* @__PURE__ */ (0, F.jsxs)("span", {
 		className: "cuelo-brand-text",
 		children: ["Cuelo", /* @__PURE__ */ (0, F.jsx)("span", {
@@ -12187,13 +12205,13 @@ function Mr() {
 }
 //#endregion
 //#region extension/src/SourcePicker.tsx
-var Nr = (e) => ({
+var Ir = (e) => ({
 	text: "Text",
 	pdf: "PDF",
 	docx: "Word",
 	webpage: "Link"
 })[e] ?? e;
-function Pr({ sources: e, selected: t, onChange: n, loading: r }) {
+function Lr({ sources: e, selected: t, onChange: n, loading: r }) {
 	let [i, a] = (0, P.useState)(!1), [o, s] = (0, P.useState)(""), [c, l] = (0, P.useState)(!1), u = (0, P.useRef)(null), d = (0, P.useRef)(null), f = (0, P.useRef)(null);
 	(0, P.useEffect)(() => {
 		if (!i) return;
@@ -12232,7 +12250,7 @@ function Pr({ sources: e, selected: t, onChange: n, loading: r }) {
 			window.removeEventListener("resize", e), window.removeEventListener("scroll", e, !0);
 		};
 	}, [i]);
-	let h = e.filter((e) => (!c || t.includes(e.id)) && `${e.title} ${Nr(e.kind)}`.toLowerCase().includes(o.trim().toLowerCase()));
+	let h = e.filter((e) => (!c || t.includes(e.id)) && `${e.title} ${Ir(e.kind)}`.toLowerCase().includes(o.trim().toLowerCase()));
 	function g(e) {
 		n(t.includes(e) ? t.filter((t) => t !== e) : [...t, e]);
 	}
@@ -12299,7 +12317,7 @@ function Pr({ sources: e, selected: t, onChange: n, loading: r }) {
 						onClick: () => g(e.id),
 						children: [/* @__PURE__ */ (0, F.jsxs)("span", {
 							className: "source-option-title",
-							children: [e.title, /* @__PURE__ */ (0, F.jsx)("small", { children: Nr(e.kind) })]
+							children: [e.title, /* @__PURE__ */ (0, F.jsx)("small", { children: Ir(e.kind) })]
 						}), t.includes(e.id) && /* @__PURE__ */ (0, F.jsx)("svg", {
 							viewBox: "0 0 24 24",
 							width: "16",
@@ -12329,7 +12347,34 @@ function Pr({ sources: e, selected: t, onChange: n, loading: r }) {
 		})]
 	});
 }
-function Fr(e, t, n) {
+//#endregion
+//#region convex/publicAnswerPolicy.ts
+function Rr(e) {
+	if (typeof e != "string" || e.length > 2048) return null;
+	try {
+		let t = new URL(e);
+		if (!["https:", "http:"].includes(t.protocol) || t.username || t.password) return null;
+		let n = t.hostname.toLowerCase();
+		return !n.includes(".") || n === "localhost" || n.endsWith(".local") || n.endsWith(".internal") || n.endsWith(".localhost") || n.includes(":") || /^\d+(?:\.\d+){3}$/.test(n) ? null : t.href;
+	} catch {
+		return null;
+	}
+}
+function zr(e, t = 8) {
+	let n = /* @__PURE__ */ new Map();
+	for (let t of e) {
+		if (!t || typeof t != "object") continue;
+		let e = t, r = Rr(e.url);
+		if (!r) continue;
+		let i = typeof e.title == "string" ? e.title.trim().slice(0, 120) : "", a = i && !/[<>]/.test(i) ? i : new URL(r).hostname;
+		n.set(r, {
+			url: r,
+			title: a
+		});
+	}
+	return [...n.values()].slice(0, t);
+}
+function Br(e, t, n) {
 	if (!n) return null;
 	let r = e.sourceId ?? t?.id;
 	if (!r) return null;
@@ -12345,10 +12390,10 @@ function Fr(e, t, n) {
 }
 //#endregion
 //#region src/AnswerCheck.tsx
-function Ir({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) {
+function Vr({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) {
 	let i = [];
 	if (r) for (let t of e.citations) {
-		let n = Fr(t, e.source, r);
+		let n = Br(t, e.source, r);
 		if (!n) continue;
 		let a = i.find((e) => e.link.id === n.id);
 		a ? (a.passages.push(t), a.link.inline = a.link.inline && n.inline) : i.push({
@@ -12371,7 +12416,7 @@ function Ir({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) 
 				className: "answer",
 				children: e.bullets.map((t, n) => /* @__PURE__ */ (0, F.jsxs)("li", { children: [t, e.bulletCitations?.[n] && /* @__PURE__ */ (0, F.jsx)("small", {
 					className: "answer-bullet-citations",
-					children: r ? [...new Map(e.bulletCitations[n].map((t) => e.citations.find((e) => e.ordinal === t)).filter(Boolean).map((t) => Fr(t, e.source, r)).filter(Boolean).map((e) => [e.id, e])).values()].map((e) => /* @__PURE__ */ (0, F.jsx)("a", {
+					children: r ? [...new Map(e.bulletCitations[n].map((t) => e.citations.find((e) => e.ordinal === t)).filter(Boolean).map((t) => Br(t, e.source, r)).filter(Boolean).map((e) => [e.id, e])).values()].map((e) => /* @__PURE__ */ (0, F.jsx)("a", {
 						href: e.href,
 						target: "_blank",
 						rel: "noreferrer",
@@ -12383,6 +12428,22 @@ function Ir({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) 
 				className: e.status === "error" ? "error" : "",
 				role: e.status === "error" ? "alert" : void 0,
 				children: e.message
+			}),
+			e.mode === "generic" && e.sourceUnverified && /* @__PURE__ */ (0, F.jsxs)("p", {
+				className: "public-source-unverified",
+				children: [/* @__PURE__ */ (0, F.jsx)("span", {
+					"aria-hidden": "true",
+					children: "⚠"
+				}), " Source not verified"]
+			}),
+			e.mode === "generic" && !!e.webSources?.length && /* @__PURE__ */ (0, F.jsx)("p", {
+				className: "public-answer-sources",
+				children: zr(e.webSources).map((e) => /* @__PURE__ */ (0, F.jsxs)("a", {
+					href: e.url,
+					target: "_blank",
+					rel: "noreferrer",
+					children: [e.title, " ↗"]
+				}, e.url))
 			}),
 			e.mode === "document" && e.source && e.citations.length > 0 && /* @__PURE__ */ (0, F.jsx)(F.Fragment, { children: r ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [/* @__PURE__ */ (0, F.jsx)("p", {
 				className: "citation citation-source-link",
@@ -12401,7 +12462,7 @@ function Ir({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) 
 						children: /* @__PURE__ */ (0, F.jsx)("path", { d: "M14 3h7v7M21 3 10 14M10 3H3v18h18v-7" })
 					})]
 				}, e.id)) : "Source unavailable."
-			}), a.length > 0 && /* @__PURE__ */ (0, F.jsxs)("details", { children: [/* @__PURE__ */ (0, F.jsx)("summary", { children: "Open supporting passage" }), a.map(({ link: e, passages: t }) => /* @__PURE__ */ (0, F.jsxs)("div", { children: [/* @__PURE__ */ (0, F.jsx)("p", {
+			}), !e.shorteningTimedOut && a.length > 0 && /* @__PURE__ */ (0, F.jsxs)("details", { children: [/* @__PURE__ */ (0, F.jsx)("summary", { children: "Open supporting passage" }), a.map(({ link: e, passages: t }) => /* @__PURE__ */ (0, F.jsxs)("div", { children: [/* @__PURE__ */ (0, F.jsx)("p", {
 				className: "citation-source-link",
 				children: /* @__PURE__ */ (0, F.jsx)("a", {
 					href: e.href,
@@ -12411,13 +12472,18 @@ function Ir({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) 
 				})
 			}), t.map((e) => /* @__PURE__ */ (0, F.jsx)("blockquote", { children: e.text }, e.ordinal))] }, e.id))] })] }) : /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [/* @__PURE__ */ (0, F.jsxs)("p", {
 				className: "citation",
-				children: [[...new Set(e.citations.map((e) => e.sourceTitle ? `${e.reference} · ${e.sourceTitle}` : e.reference))].join(", "), !e.citations.some((e) => e.sourceTitle) && /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [/* @__PURE__ */ (0, F.jsx)("br", {}), n && e.source.url ? /* @__PURE__ */ (0, F.jsx)("a", {
+				children: [[...new Set(e.citations.map((e) => e.sourceTitle ? `${e.reference} · ${e.sourceTitle}` : e.reference))].join(", "), !e.citations.some((e) => e.sourceTitle) && /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [/* @__PURE__ */ (0, F.jsx)("br", {}), e.shorteningTimedOut ? /* @__PURE__ */ (0, F.jsx)("a", {
+					href: `/?view=content&source=${encodeURIComponent(e.source.id)}`,
+					target: "_blank",
+					rel: "noreferrer",
+					children: e.source.title
+				}) : n && e.source.url ? /* @__PURE__ */ (0, F.jsx)("a", {
 					href: e.source.url,
 					target: "_blank",
 					rel: "noreferrer",
 					children: e.source.title
 				}) : e.source.title] })]
-			}), /* @__PURE__ */ (0, F.jsxs)("details", { children: [/* @__PURE__ */ (0, F.jsx)("summary", { children: "Open supporting passage" }), e.citations.map((e) => /* @__PURE__ */ (0, F.jsxs)("div", { children: [
+			}), !e.shorteningTimedOut && /* @__PURE__ */ (0, F.jsxs)("details", { children: [/* @__PURE__ */ (0, F.jsx)("summary", { children: "Open supporting passage" }), e.citations.map((e) => /* @__PURE__ */ (0, F.jsxs)("div", { children: [
 				/* @__PURE__ */ (0, F.jsx)("h3", { children: e.reference }),
 				/* @__PURE__ */ (0, F.jsx)("blockquote", { children: e.text }),
 				e.sourceTitle && /* @__PURE__ */ (0, F.jsx)("p", {
@@ -12442,17 +12508,17 @@ function Ir({ result: e, elapsedMs: t, sourceLinks: n = !0, sourceWebsite: r }) 
 }
 //#endregion
 //#region extension/src/sidebarState.ts
-function Lr(e) {
+function Hr(e) {
 	return e.authLoading ? "checking-account" : e.authenticated ? e.checking ? "checking-meeting" : e.meeting ? e.accessLoading ? "checking-access" : "setup" : "no-meeting" : "sign-in";
 }
-function Rr(e) {
+function Ur(e) {
 	return e.busy ? "Connecting…" : e.eligible ? e.trialExhausted ? "Your free trial has ended. You’ve reached your three-call or 90-minute allowance. Paid plans are coming soon." : e.enabled ? e.mode ? e.mode === "document" && e.sourceLoading ? "Your source is still loading." : e.mode === "document" && !e.sourceSelected ? "Select ready sources to enable Start." : null : "Choose how Cuelo should answer." : "Live listening is currently unavailable. Please try again later." : "Join a Meet call before starting Cuelo.";
 }
 //#endregion
 //#region extension/src/runtime.ts
-var zr = globalThis.chrome.runtime;
-async function Br(e, t = {}) {
-	let n = await zr.sendMessage({
+var Wr = globalThis.chrome.runtime;
+async function Gr(e, t = {}) {
+	let n = await Wr.sendMessage({
 		type: e,
 		...t
 	});
@@ -12464,11 +12530,12 @@ Je.object({
 	callsRemaining: Je.number(),
 	listeningMs: Je.number(),
 	remainingMs: Je.number(),
+	trialMs: Je.optional(Je.number()),
 	exhausted: Je.boolean()
 });
 //#endregion
 //#region extension/src/callEngine.tsx
-var Vr = {
+var Kr = {
 	state: "idle",
 	message: "Choose how Cuelo should answer, then Start.",
 	busy: !1,
@@ -12481,16 +12548,16 @@ var Vr = {
 };
 //#endregion
 //#region extension/src/Sidebar.tsx
-function Hr() {
-	let { isAuthenticated: e, isLoading: t } = cr(), { signIn: n, signOut: r } = Sr(), i = Kn(Ar.callAccess.status, e ? {} : "skip"), a = tr(Ar.sourceLibrary.list, e ? {} : "skip", { initialNumItems: 50 }), o = (0, P.useRef)(0), [s, c] = (0, P.useState)(!1), [l, u] = (0, P.useState)(""), [d, f] = (0, P.useState)(!1), [p, m] = (0, P.useState)(!1), [h, g] = (0, P.useState)(!0), [_, v] = (0, P.useState)(Vr), [y, b] = (0, P.useState)(null), [x, ee] = (0, P.useState)([]);
+function qr() {
+	let { isAuthenticated: e, isLoading: t } = cr(), { signIn: n, signOut: r } = wr(), i = Kn(Mr.callAccess.status, e ? {} : "skip"), a = tr(Mr.sourceLibrary.list, e ? {} : "skip", { initialNumItems: 50 }), o = (0, P.useRef)(0), [s, c] = (0, P.useState)(!1), [l, u] = (0, P.useState)(""), [d, f] = (0, P.useState)(!1), [p, m] = (0, P.useState)(!1), [h, g] = (0, P.useState)(!0), [_, v] = (0, P.useState)(Kr), [y, b] = (0, P.useState)(null), [x, ee] = (0, P.useState)([]);
 	(0, P.useEffect)(() => {
 		let e = !0, t = !1;
 		async function n() {
 			if (!t) {
 				t = !0;
 				try {
-					let t = await Br("sidebar-status");
-					e && (f(t.eligible === !0), m(t.meeting === !0), v(t.view ?? Vr), g(!1));
+					let t = await Gr("sidebar-status");
+					e && (f(t.eligible === !0), m(t.meeting === !0), v(t.view ?? Kr), g(!1));
 				} catch (t) {
 					e && (u(t instanceof Error ? t.message : "Cuelo could not connect."), g(!1));
 				} finally {
@@ -12525,27 +12592,27 @@ function Hr() {
 		let t = ++o.current;
 		c(!0), u("");
 		try {
-			e === "signin" ? await n("google") : e === "signout" ? (await Br("stop"), await r()) : e === "start" ? await Br("start", {
+			e === "signin" ? await n("google") : e === "signout" ? (await Gr("stop"), await r()) : e === "start" ? await Gr("start", {
 				resume: _.state === "paused",
 				mode: y,
 				...y === "document" && x.length ? {
 					sourceIds: x,
 					sourceTitle: x.length === 1 ? te.find((e) => e.id === x[0])?.title : `${x.length} selected sources`
 				} : {}
-			}) : await Br(e);
+			}) : await Gr(e);
 		} catch (e) {
 			u(e instanceof Error ? e.message : "This action could not finish. Try again.");
 		} finally {
 			t === o.current && c(!1);
 		}
 	}
-	let re = Lr({
+	let re = Hr({
 		checking: h,
 		meeting: p,
 		authLoading: t,
 		authenticated: e,
 		accessLoading: i === void 0
-	}), C = Rr({
+	}), C = Ur({
 		eligible: d,
 		trialExhausted: !!i?.trial?.exhausted,
 		enabled: !!i?.liveEnabled,
@@ -12559,7 +12626,7 @@ function Hr() {
 		let t = o.current;
 		se(!0), u("");
 		try {
-			let e = await Br("typed-question", { text: ie.trim() });
+			let e = await Gr("typed-question", { text: ie.trim() });
 			t === o.current && (e.view && v((t) => t.state === "listening" ? e.view : t), ae(""));
 		} catch (e) {
 			u(e instanceof Error ? e.message : "Your question could not be sent. Try again.");
@@ -12582,13 +12649,13 @@ function Hr() {
 		};
 	}, [ce]);
 	let pe = _.state === "listening" && (oe || _.busy || !!_.questionQueue && (_.questionQueue.checking > 0 || _.questionQueue.questions.length > 0)), me = {
-		baseURL: "https://calculating-gecko-263.convex.cloud".includes("calculating-gecko-263") ? "http://127.0.0.1:5173" : jr.replace(".convex.cloud", ".convex.site"),
+		baseURL: "https://calculating-gecko-263.convex.cloud".includes("calculating-gecko-263") ? "http://127.0.0.1:5173" : Nr.replace(".convex.cloud", ".convex.site"),
 		sources: te.map(({ id: e, title: t, kind: n }) => ({
 			id: e,
 			title: t,
 			kind: n
 		}))
-	}, he = jr.includes("calculating-gecko-263"), ge = e && _.state !== "idle";
+	}, he = Nr.includes("calculating-gecko-263"), ge = e && _.state !== "idle";
 	return /* @__PURE__ */ (0, F.jsxs)("div", {
 		className: "sidebar-shell",
 		children: [
@@ -12596,7 +12663,7 @@ function Hr() {
 				className: "cuelo-header",
 				children: [/* @__PURE__ */ (0, F.jsxs)("div", {
 					className: "cuelo-wordmark",
-					children: [/* @__PURE__ */ (0, F.jsx)(Wr, {}), /* @__PURE__ */ (0, F.jsx)(Mr, {})]
+					children: [/* @__PURE__ */ (0, F.jsx)(Yr, {}), /* @__PURE__ */ (0, F.jsx)(Fr, {})]
 				}), e ? /* @__PURE__ */ (0, F.jsxs)("div", {
 					className: "sidebar-account",
 					children: [/* @__PURE__ */ (0, F.jsx)("button", {
@@ -12604,7 +12671,7 @@ function Hr() {
 						"aria-label": "Account options",
 						"aria-expanded": ce,
 						onClick: () => le(!ce),
-						children: /* @__PURE__ */ (0, F.jsx)(Gr, { name: "user" })
+						children: /* @__PURE__ */ (0, F.jsx)(Xr, { name: "user" })
 					}), ce && /* @__PURE__ */ (0, F.jsxs)("div", {
 						className: "sidebar-account-menu",
 						children: [/* @__PURE__ */ (0, F.jsx)("button", {
@@ -12627,7 +12694,7 @@ function Hr() {
 			}),
 			/* @__PURE__ */ (0, F.jsxs)("main", {
 				className: "sidebar-main" + (ge && !ue ? " is-call" : re === "setup" && !ue ? " is-setup" : ""),
-				children: [ue && e ? /* @__PURE__ */ (0, F.jsx)(Ur, { onBack: () => {
+				children: [ue && e ? /* @__PURE__ */ (0, F.jsx)(Jr, { onBack: () => {
 					de(!1), document.querySelector(".sidebar-account>.icon-button")?.focus();
 				} }) : /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [
 					ge ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [
@@ -12642,11 +12709,11 @@ function Hr() {
 						/* @__PURE__ */ (0, F.jsx)("p", {
 							className: "call-status-copy",
 							role: "status",
-							children: pe ? "Finding your answer…" : _.message === "Listening for customer questions. Your microphone adds context only." ? "Listening for customer questions." : _.message
+							children: pe ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: ["Finding your answer", /* @__PURE__ */ (0, F.jsx)(Zr, {})] }) : _.state === "listening" && ["Listening for customer questions.", "Listening for customer questions. Your microphone adds context only."].includes(_.message) ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: ["Listening", /* @__PURE__ */ (0, F.jsx)(Zr, {})] }) : _.message
 						}),
 						_.warning && /* @__PURE__ */ (0, F.jsx)("p", {
 							className: "sidebar-notice",
-							children: "Five minutes of listening remain in this session. Meet can continue."
+							children: "Five minutes remain in this Cuelo session. Meet can continue."
 						}),
 						_.questionQueue && _.questionQueue.questions.length > 0 && /* @__PURE__ */ (0, F.jsxs)("details", {
 							className: "waiting-questions",
@@ -12677,16 +12744,16 @@ function Hr() {
 							children: _.result ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: [/* @__PURE__ */ (0, F.jsx)("p", {
 								className: "answer-question",
 								children: _.result.question
-							}), /* @__PURE__ */ (0, F.jsx)(Ir, {
+							}), /* @__PURE__ */ (0, F.jsx)(Vr, {
 								result: _.result,
 								sourceLinks: !1,
 								sourceWebsite: me
 							})] }) : /* @__PURE__ */ (0, F.jsxs)("div", {
 								className: "answer-empty",
 								children: [
-									/* @__PURE__ */ (0, F.jsx)(Wr, { large: !0 }),
-									/* @__PURE__ */ (0, F.jsx)("h2", { children: pe ? "Finding your first answer…" : "Here when you need an answer." }),
-									/* @__PURE__ */ (0, F.jsx)("p", { children: _.state === "paused" ? "Resume Cuelo when you’re ready. Your waiting questions stay here." : _.state === "connecting" ? "Connecting your call. Questions will appear once Cuelo is listening." : _.state === "limited" ? "Listening is off. Your answers stay here until you press Stop." : "Ask out loud, or type your question below. Cuelo replies quietly in text." })
+									/* @__PURE__ */ (0, F.jsx)(Yr, { large: !0 }),
+									/* @__PURE__ */ (0, F.jsx)("h2", { children: pe ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: ["Finding your first answer", /* @__PURE__ */ (0, F.jsx)(Zr, {})] }) : "Here when you need an answer." }),
+									/* @__PURE__ */ (0, F.jsx)("p", { children: _.state === "paused" ? "Resume Cuelo when you’re ready. Your trial time continues while paused." : _.state === "connecting" ? "Connecting your call. Questions will appear once Cuelo is listening." : _.state === "limited" ? "Listening is off. Your answers stay here until you press Stop." : "Ask out loud, or type your question below. Cuelo replies quietly in text." })
 								]
 							})
 						}),
@@ -12698,7 +12765,7 @@ function Hr() {
 								children: [/* @__PURE__ */ (0, F.jsx)("summary", {
 									title: e.question,
 									children: e.question
-								}), /* @__PURE__ */ (0, F.jsx)(Ir, {
+								}), /* @__PURE__ */ (0, F.jsx)(Vr, {
 									result: e,
 									sourceLinks: !1,
 									sourceWebsite: me
@@ -12737,7 +12804,7 @@ function Hr() {
 					] }) : re === "sign-in" ? /* @__PURE__ */ (0, F.jsxs)("section", {
 						className: "sidebar-welcome",
 						children: [
-							/* @__PURE__ */ (0, F.jsx)(Wr, { large: !0 }),
+							/* @__PURE__ */ (0, F.jsx)(Yr, { large: !0 }),
 							/* @__PURE__ */ (0, F.jsxs)("h1", { children: [
 								"Your quiet assistant,",
 								/* @__PURE__ */ (0, F.jsx)("br", {}),
@@ -12748,21 +12815,21 @@ function Hr() {
 								className: "primary-button google-button",
 								disabled: s,
 								onClick: () => void S("signin"),
-								children: [/* @__PURE__ */ (0, F.jsx)(Gr, { name: "google" }), s ? "Opening Google…" : "Sign in with Google"]
+								children: [/* @__PURE__ */ (0, F.jsx)(Xr, { name: "google" }), s ? "Opening Google…" : "Sign in with Google"]
 							}),
 							/* @__PURE__ */ (0, F.jsxs)("p", {
 								className: "trial-note",
 								children: [
 									"New here? The same button creates your account.",
 									/* @__PURE__ */ (0, F.jsx)("br", {}),
-									"Try 3 calls or 90 minutes, whichever runs out first."
+									"Try 3 calls or 90 minutes, including pauses. Whichever runs out first."
 								]
 							})
 						]
 					}) : re === "no-meeting" ? /* @__PURE__ */ (0, F.jsxs)("section", {
 						className: "sidebar-welcome",
 						children: [
-							/* @__PURE__ */ (0, F.jsx)(Wr, { large: !0 }),
+							/* @__PURE__ */ (0, F.jsx)(Yr, { large: !0 }),
 							/* @__PURE__ */ (0, F.jsx)("h1", { children: "Ready for your next conversation." }),
 							/* @__PURE__ */ (0, F.jsx)("p", { children: "Start or join a Google Meet call in Chrome, then open Cuelo beside it." }),
 							/* @__PURE__ */ (0, F.jsxs)("a", {
@@ -12770,7 +12837,7 @@ function Hr() {
 								href: "https://meet.google.com/",
 								target: "_blank",
 								rel: "noreferrer",
-								children: ["Open Google Meet ", /* @__PURE__ */ (0, F.jsx)(Gr, { name: "arrow" })]
+								children: ["Open Google Meet ", /* @__PURE__ */ (0, F.jsx)(Xr, { name: "arrow" })]
 							}),
 							/* @__PURE__ */ (0, F.jsx)("p", {
 								className: "trial-note",
@@ -12816,7 +12883,7 @@ function Hr() {
 										className: "source-picker-label",
 										children: "Choose your sources"
 									}),
-									/* @__PURE__ */ (0, F.jsx)(Pr, {
+									/* @__PURE__ */ (0, F.jsx)(Lr, {
 										sources: te,
 										selected: x,
 										onChange: ee,
@@ -12848,7 +12915,7 @@ function Hr() {
 								className: "primary-button start-button",
 								disabled: C !== null,
 								onClick: () => void S("start"),
-								children: [/* @__PURE__ */ (0, F.jsx)(Gr, { name: "mic" }), s ? "Connecting…" : "Start Cuelo"]
+								children: [/* @__PURE__ */ (0, F.jsx)(Xr, { name: "mic" }), s ? "Connecting…" : "Start Cuelo"]
 							}),
 							C && /* @__PURE__ */ (0, F.jsx)("p", {
 								className: "supporting",
@@ -12863,9 +12930,9 @@ function Hr() {
 					}) : /* @__PURE__ */ (0, F.jsxs)("div", {
 						className: "sidebar-loading",
 						role: "status",
-						children: [/* @__PURE__ */ (0, F.jsx)(Wr, { large: !0 }), /* @__PURE__ */ (0, F.jsx)("p", { children: re === "checking-account" ? "Getting your quiet corner ready…" : re === "checking-meeting" ? "Looking for your meeting…" : "Getting Cuelo ready…" })]
+						children: [/* @__PURE__ */ (0, F.jsx)(Yr, { large: !0 }), /* @__PURE__ */ (0, F.jsx)("p", { children: re === "checking-account" ? "Getting your quiet corner ready…" : re === "checking-meeting" ? "Looking for your meeting…" : "Getting Cuelo ready…" })]
 					}),
-					!ge && _.message !== Vr.message && /* @__PURE__ */ (0, F.jsx)("p", {
+					!ge && _.message !== Kr.message && /* @__PURE__ */ (0, F.jsx)("p", {
 						className: "sidebar-notice",
 						role: "status",
 						children: _.message
@@ -12875,15 +12942,9 @@ function Hr() {
 						onClick: () => void S("stop"),
 						children: "Cancel connection"
 					}),
-					e && !ge && i?.trial && /* @__PURE__ */ (0, F.jsxs)("p", {
+					e && !ge && i?.trial && /* @__PURE__ */ (0, F.jsx)("p", {
 						className: "sidebar-trial",
-						children: [
-							"Your free trial · ",
-							i.trial.callsRemaining,
-							" calls · ",
-							Math.ceil(i.trial.remainingMs / 6e4),
-							" min remaining"
-						]
+						children: Pr(i.trial)
 					})
 				] }), l && !ge && /* @__PURE__ */ (0, F.jsx)("p", {
 					className: "sidebar-error",
@@ -12898,19 +12959,19 @@ function Hr() {
 						className: "composer-toolbar",
 						children: [/* @__PURE__ */ (0, F.jsxs)("span", {
 							className: "listening-state " + (_.state === "listening" ? "is-listening" : ""),
-							children: [/* @__PURE__ */ (0, F.jsx)("span", { className: "state-dot" }), pe ? "Finding your answer…" : _.state === "listening" ? "Listening" : _.state === "connecting" ? "Connecting" : _.state === "limited" ? "Listening off" : "Paused"]
+							children: [/* @__PURE__ */ (0, F.jsx)("span", { className: "state-dot" }), pe ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: ["Finding your answer", /* @__PURE__ */ (0, F.jsx)(Zr, {})] }) : _.state === "listening" ? /* @__PURE__ */ (0, F.jsxs)(F.Fragment, { children: ["Listening", /* @__PURE__ */ (0, F.jsx)(Zr, {})] }) : _.state === "connecting" ? "Connecting" : _.state === "limited" ? "Listening off" : "Paused"]
 						}), /* @__PURE__ */ (0, F.jsxs)("div", {
 							className: "call-buttons",
 							children: [/* @__PURE__ */ (0, F.jsxs)("button", {
 								className: "control-button",
 								disabled: s || _.controlsBusy || _.state === "connecting" || _.state === "limited",
 								onClick: () => void S(_.state === "paused" ? "start" : "pause"),
-								children: [/* @__PURE__ */ (0, F.jsx)(Gr, { name: _.state === "paused" ? "play" : "pause" }), _.state === "paused" ? "Resume" : "Pause"]
+								children: [/* @__PURE__ */ (0, F.jsx)(Xr, { name: _.state === "paused" ? "play" : "pause" }), _.state === "paused" ? "Resume" : "Pause"]
 							}), /* @__PURE__ */ (0, F.jsxs)("button", {
 								className: "control-button stop-button",
 								disabled: _.controlsBusy,
 								onClick: () => void S("stop"),
-								children: [/* @__PURE__ */ (0, F.jsx)(Gr, { name: "stop" }), "Stop"]
+								children: [/* @__PURE__ */ (0, F.jsx)(Xr, { name: "stop" }), "Stop"]
 							})]
 						})]
 					}),
@@ -12944,7 +13005,7 @@ function Hr() {
 								className: "send-question",
 								"aria-label": oe ? "Sending question" : "Send question",
 								disabled: _.state !== "listening" || oe || !ie.trim(),
-								children: /* @__PURE__ */ (0, F.jsx)(Gr, { name: "arrow" })
+								children: /* @__PURE__ */ (0, F.jsx)(Xr, { name: "arrow" })
 							})
 						]
 					}),
@@ -12957,8 +13018,8 @@ function Hr() {
 		]
 	});
 }
-function Ur({ onBack: e }) {
-	let t = Kn(Ar.dashboard.overview), n = (0, P.useRef)(null);
+function Jr({ onBack: e }) {
+	let t = Kn(Mr.dashboard.overview), n = (0, P.useRef)(null);
 	return (0, P.useEffect)(() => {
 		n.current?.focus();
 	}, []), /* @__PURE__ */ (0, F.jsxs)("section", {
@@ -12968,7 +13029,7 @@ function Ur({ onBack: e }) {
 			/* @__PURE__ */ (0, F.jsxs)("button", {
 				className: "text-button profile-back",
 				onClick: e,
-				children: [/* @__PURE__ */ (0, F.jsx)(Gr, { name: "arrow" }), "Back to Cuelo"]
+				children: [/* @__PURE__ */ (0, F.jsx)(Xr, { name: "arrow" }), "Back to Cuelo"]
 			}),
 			/* @__PURE__ */ (0, F.jsx)("h1", {
 				ref: n,
@@ -12986,7 +13047,7 @@ function Ur({ onBack: e }) {
 		]
 	});
 }
-function Wr({ large: e = !1 }) {
+function Yr({ large: e = !1 }) {
 	return /* @__PURE__ */ (0, F.jsx)("span", {
 		className: "cuelo-mascot" + (e ? " large" : ""),
 		"aria-hidden": "true",
@@ -13002,7 +13063,7 @@ function Wr({ large: e = !1 }) {
 		})
 	});
 }
-function Gr({ name: e }) {
+function Xr({ name: e }) {
 	return /* @__PURE__ */ (0, F.jsx)("svg", {
 		viewBox: "0 0 24 24",
 		width: "18",
@@ -13040,11 +13101,22 @@ function Gr({ name: e }) {
 		}[e]
 	});
 }
+function Zr() {
+	return /* @__PURE__ */ (0, F.jsxs)("span", {
+		className: "sidebar-status-dots",
+		"aria-hidden": "true",
+		children: [
+			/* @__PURE__ */ (0, F.jsx)("i", { children: "." }),
+			/* @__PURE__ */ (0, F.jsx)("i", { children: "." }),
+			/* @__PURE__ */ (0, F.jsx)("i", { children: "." })
+		]
+	});
+}
 //#endregion
 //#region extension/src/main.tsx
-(0, mr.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, F.jsx)(P.StrictMode, { children: /* @__PURE__ */ (0, F.jsx)(Tr, {
-	client: new Hn(jr),
-	popup: Dr,
-	children: /* @__PURE__ */ (0, F.jsx)(Hr, {})
+(0, mr.createRoot)(document.getElementById("root")).render(/* @__PURE__ */ (0, F.jsx)(P.StrictMode, { children: /* @__PURE__ */ (0, F.jsx)(Dr, {
+	client: new Hn(Nr),
+	popup: kr,
+	children: /* @__PURE__ */ (0, F.jsx)(qr, {})
 }) }));
 //#endregion

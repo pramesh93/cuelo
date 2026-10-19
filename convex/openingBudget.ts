@@ -1,11 +1,14 @@
+import {BUDGET_EXHAUSTED} from './answerErrors';
+import {WEBSITE_TEST_LIMIT} from './answerErrors';
 import {v,ConvexError} from 'convex/values';
 import {query,internalMutation} from './_generated/server';
 import {getAuthUserId} from '@convex-dev/auth/server';
 import {ownerKey} from './sources';
 import {openingDay,openingReset,openingEnabled,OPENING_DAILY_LIMIT,OPENING_RESERVATION_PAISE} from './openingPolicy';
 import {answerAttemptLimit} from './testingLimits';
-import {spendingMonth,budgetDecision} from './spendingPolicy';
+import {spendingMonth,budgetDecision,allocationLimit} from './spendingPolicy';
 const args={browserSecret:v.string()};
+function openingLimit(name:string,fallback:number){const value=process.env[name];if(value===undefined)return fallback;const n=Number(value);return Number.isSafeInteger(n)&&n>0&&n<=100?n:0;}
 export const status=query({args:{...args,day:v.string()},returns:v.object({enabled:v.boolean(),remaining:v.number(),resetAt:v.number(),signedIn:v.boolean(),busy:v.boolean()}),handler:async(ctx,args)=>{
  const key=await ownerKey(ctx,args.browserSecret),now=Date.now();const row=(await ctx.db.query('openingUsage').withIndex('by_owner',q=>q.eq('ownerKey',key)).take(1))[0];
  return {enabled:openingEnabled(process.env),remaining:Math.max(0,OPENING_DAILY_LIMIT-(row?.day===openingDay(now)?row.attempts:0)),resetAt:openingReset(now),signedIn:!!await getAuthUserId(ctx),busy:!!row&&row.activeUntil>now};
@@ -22,10 +25,10 @@ export const admit=internalMutation({args:{...args,requestKey:v.string()},return
  const prior=(await ctx.db.query('spendingReservations').withIndex('by_key',q=>q.eq('key',requestKey)).take(1))[0];if(prior)throw new ConvexError('That question was already submitted.');
  const evaluation=(await ctx.db.query('evaluationUsage').withIndex('by_scope',q=>q.eq('scope','milestone1')).take(1))[0];
  const speech=(await ctx.db.query('speechUsage').withIndex('by_scope',q=>q.eq('scope','mic-evaluation')).take(1))[0];
- if((evaluation?.count??0)>=answerAttemptLimit()||(speech?.count??0)>=10)throw new ConvexError('The voice demo allowance is used up. Please try again later.');
+ if((evaluation?.count??0)>=openingLimit('OPENING_DEMO_MAX_ANSWERS',answerAttemptLimit())||(speech?.count??0)>=openingLimit('OPENING_DEMO_MAX_TRANSCRIPTIONS',10))throw new ConvexError(process.env.CONVEX_CLOUD_URL==='https://calculating-gecko-263.convex.cloud'?WEBSITE_TEST_LIMIT:'The voice demo allowance is used up. Please try again later.');
  if(speech&&speech.activeUntil>now)throw new ConvexError('Busy right now. Try again in a few minutes.');
  const month=spendingMonth(now),ledger=(await ctx.db.query('spendingMonths').withIndex('by_month',q=>q.eq('month',month)).take(1))[0];
- const decision=budgetDecision(ledger?.reservedPaise??0,OPENING_RESERVATION_PAISE);if(!decision.allowed)throw new ConvexError('The voice demo budget is reached. Please try again later.');
+ const decision=budgetDecision(ledger?.reservedPaise??0,OPENING_RESERVATION_PAISE,allocationLimit());if(!decision.allowed)throw new ConvexError(BUDGET_EXHAUSTED);
  const values={day,attempts:used+1,activeKey:args.requestKey,activeUntil:now+90000,expiresAt:openingReset(now)+86400000};
  if(row)await ctx.db.patch(row._id,values);else await ctx.db.insert('openingUsage',{ownerKey:key,...values});
  if(evaluation)await ctx.db.patch(evaluation._id,{count:evaluation.count+1,reservedUsd:evaluation.reservedUsd+.2});else await ctx.db.insert('evaluationUsage',{scope:'milestone1',count:1,reservedUsd:.2});
